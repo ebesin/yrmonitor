@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:oneshot="false">
+
+    <item android:drawable="@drawable/ic_method_draw_image1" android:duration="20"/>
+    <item android:drawable="@drawable/ic_method_draw_image2" android:duration="20"/>
+    <item android:drawable="@drawable/ic_method_draw_image3" android:duration="20"/>
+    <item android:drawable="@drawable/ic_method_draw_image4" android:duration="20"/>
+    <item android:drawable="@drawable/ic_method_draw_image5" android:duration="20"/>
+    <item android:drawable="@drawable/ic_method_draw_image6" android:duration="20"/>
+    <item android:drawable="@drawable/ic_method_draw_image7" android:duration="20"/>
+    <item android:drawable="@drawable/ic_method_draw_image8" android:duration="20"/>
+    <item android:drawable="@drawable/ic_method_draw_image9" android:duration="20"/>
+    <item android:drawable="@drawable/ic_method_draw_image10" android:duration="20"/>
+
+</animation-list>

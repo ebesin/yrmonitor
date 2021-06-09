@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <com.jiyouliang.fmap.view.widget.TopTitleView
+        android:id="@+id/ttv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/padding_large2"
+        android:layout_marginRight="@dimen/padding_large2"
+        app:ttvLeftIcon="@drawable/arrow_left_black"
+        app:ttvLeftSize="22dp"
+        app:ttvRightTitleVisiable="false" />
+
+
+    <TextView
+        android:id="@+id/tv_login"
+        style="@style/BiggerTextTheme.BaseTextTheme"
+        android:layout_marginLeft="@dimen/padding_large2"
+        android:layout_marginTop="@dimen/padding_large2"
+        android:layout_marginRight="@dimen/padding_large2"
+        android:text="@string/personal_profile"
+        android:textColor="#464646"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/user_info_item_height"
+        android:layout_marginTop="@dimen/padding_large2"
+        android:background="@drawable/user_detail_item_selector"
+        android:paddingLeft="@dimen/padding_large2"
+        android:paddingRight="@dimen/padding_large2">
+
+        <com.jiyouliang.fmap.view.widget.SettingItemView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            app:sivRightIvBackground="@drawable/user_detail_logined_boy"
+            app:sivRightIvVisiable="true"
+            app:sivTitle="@string/logo"
+            app:sivTitleSize="18dp" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/user_info_item_height"
+        android:background="@drawable/user_detail_item_selector"
+        android:paddingLeft="@dimen/padding_large2"
+        android:paddingRight="@dimen/padding_large2">
+
+        <com.jiyouliang.fmap.view.widget.SettingItemView
+            android:layout_width="match_parent"
+            android:id="@+id/siv_nickname"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            app:sivSubtitle="@string/temp_content"
+            app:sivSubtitleSize="14dp"
+            app:sivSubtitleVisiable="true"
+            app:sivTitle="@string/user_info_nickname"
+            app:sivTitleSize="18dp" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/user_info_item_height"
+        android:background="@drawable/user_detail_item_selector"
+        android:paddingLeft="@dimen/padding_large2"
+        android:paddingRight="@dimen/padding_large2">
+
+        <com.jiyouliang.fmap.view.widget.SettingItemView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            app:sivSubtitle="@string/user_info_select_sex"
+            app:sivSubtitleSize="14dp"
+            app:sivSubtitleVisiable="true"
+            app:sivTitle="@string/user_info_sex"
+            app:sivTitleSize="18dp" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/user_info_item_height"
+        android:background="@drawable/user_detail_item_selector"
+        android:paddingLeft="@dimen/padding_large2"
+        android:paddingRight="@dimen/padding_large2">
+
+        <com.jiyouliang.fmap.view.widget.SettingItemView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            app:sivSubtitle="@string/user_info_select_birthday"
+            app:sivSubtitleSize="14dp"
+            app:sivSubtitleVisiable="true"
+            app:sivTitle="@string/user_info_age"
+            app:sivTitleSize="18dp" />
+    </FrameLayout>
+
+    <View
+        style="@style/DividerCommon"
+        android:layout_margin="@dimen/padding_large2" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/user_info_item_height"
+        android:background="@drawable/user_detail_item_selector"
+        android:paddingLeft="@dimen/padding_large2"
+        android:paddingRight="@dimen/padding_large2">
+
+        <com.jiyouliang.fmap.view.widget.SettingItemView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            app:sivSubtitle="@string/user_info_sign_in_days"
+            app:sivSubtitleSize="14dp"
+            app:sivSubtitleVisiable="true"
+            app:sivTitle="@string/user_info_sign_in"
+            app:sivTitleSize="18dp" />
+    </FrameLayout>
+
+</LinearLayout>

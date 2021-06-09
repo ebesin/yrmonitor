@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white">
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/rl_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/padding_large2"
+        android:background="@drawable/user_detail_offline_fav_rect_bg"
+        android:paddingStart="@dimen/padding_large2">
+
+        <ImageView
+            android:id="@+id/iv_more"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:background="@drawable/user_detail_more_icon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/padding_large"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/iv_more"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/tv_tool_tip"
+                style="@style/MediumTextTheme.BaseTextTheme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/user_detail_tool_tip"
+                android:textColor="@color/user_detail_tool" />
+
+            <TextView
+                android:id="@+id/tv_offline_tip"
+                style="@style/NormalTextTheme.BaseTextTheme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding_medium"
+                android:text="@string/user_detail_offline_tip"
+                android:textColor="@color/user_detail_subtitle_color" />
+
+        </LinearLayout>
+
+
+        <ImageView
+            android:id="@+id/iv_divider"
+            android:layout_width="1px"
+            android:layout_height="36dp"
+            android:layout_centerVertical="true"
+            android:layout_margin="@dimen/padding_size"
+            android:layout_toStartOf="@id/tv_see"
+            android:background="#FFADADAD"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/tv_see"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_see"
+            style="@style/NormalTextTheme.BaseTextTheme"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="@dimen/padding_large2"
+            android:text="@string/user_detail_to_see"
+            android:textColor="@color/user_detail_to_see"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
+
+    <ImageView
+        android:id="@+id/iv_close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:layout_marginTop="@dimen/padding_size"
+        android:layout_marginEnd="@dimen/padding_large"
+        android:background="@drawable/commute_tips_close2" />
+
+</FrameLayout>
