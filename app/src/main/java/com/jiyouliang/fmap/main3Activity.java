@@ -3,7 +3,9 @@ package com.jiyouliang.fmap;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
+import android.arch.lifecycle.ViewModelStore;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Point;
@@ -49,6 +51,8 @@ import com.jilk.ros.rosbridge.implementation.PublishEvent;
 import com.jiyouliang.fmap.ViewModel.FanSpeedViewModel2;
 import com.jiyouliang.fmap.ViewModel.GPSData;
 import com.jiyouliang.fmap.ViewModel.GPSDataViewModel;
+import com.jiyouliang.fmap.ViewModel.StatusViewModel;
+import com.jiyouliang.fmap.bean.Status;
 import com.jiyouliang.fmap.factory.InputStreamBitmapDecoderFactory;
 import com.jiyouliang.fmap.factory.LargeImageView;
 import com.jiyouliang.fmap.ui.BaseActivity;
@@ -64,7 +68,7 @@ import java.util.List;
 
 import de.greenrobot.event.EventBus;
 
-public class main3Activity extends BaseActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener,GPSView.OnGPSViewClickListener {
+public class main3Activity extends BaseActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, GPSView.OnGPSViewClickListener {
 
     private static final String TAG = "MapActivity3";
     private View mBottomSheet;
@@ -83,11 +87,6 @@ public class main3Activity extends BaseActivity implements View.OnClickListener,
     private TextView slideUpInfo;
 
 
-    /**
-     * 数据
-     */
-    private GPSDataViewModel gpsDataViewModel;
-    private FanSpeedViewModel2 fanSpeedViewModel2;
     @SuppressLint("HandlerLeak")
     Handler handler = new Handler() {
         @Override
@@ -99,9 +98,30 @@ public class main3Activity extends BaseActivity implements View.OnClickListener,
                 case 2:
                     fanSpeedViewModel2.setSpeedValue((int[]) msg.obj);
                     break;
+                case 3:
+                    statusViewModel.setValue((Status) msg.obj);
+                    break;
             }
         }
     };
+
+    @SuppressLint("HandlerLeak")
+    Handler viewhandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case 1:
+                    Status status = (Status) msg.obj;
+                    speed_data.setText(String.valueOf(status.getSpeed()));
+                    front_wheel_angle_data.setText(String.valueOf(status.getFront_wheel_angle()));
+                    yaw_angle_data.setText(String.valueOf(status.getYaw_angle()));
+                    lat_data.setText(String.valueOf(status.getLat()));
+                    lng_data.setText(String.valueOf(status.getLng()));
+                    break;
+            }
+        }
+    };
+
 
     CardView charge_cardview;
     CardView setArgs_cardView;
@@ -144,11 +164,31 @@ public class main3Activity extends BaseActivity implements View.OnClickListener,
     //地图
     LargeImageView largeImageView;
 
+    /**
+     * 数据
+     */
+    private GPSDataViewModel gpsDataViewModel;
+    private FanSpeedViewModel2 fanSpeedViewModel2;
+    private StatusViewModel statusViewModel;
+
+    //dialog
+    AlertDialog charge_dialog;
+    AlertDialog args_dialog;
+    AlertDialog status_dialog;
+
+    //dialog控件
+    TextView speed_data;
+    TextView front_wheel_angle_data;
+    TextView yaw_angle_data;
+    TextView lat_data;
+    TextView lng_data;
+
 
     //ros通信
     ROSBridgeClient client;
-    String ip = "192.168.1.114";   //ros的 IP
+    String ip = "192.168.1.176";   //ros的 IP
     String port = "9090";
+    boolean isConn = false;
     Runnable connectRunnable = new Runnable() {
         @Override
         public void run() {
@@ -169,7 +209,6 @@ public class main3Activity extends BaseActivity implements View.OnClickListener,
     private void initView(Bundle savedInstanceState) {
         //建立连接,订阅topic
         new Thread(connectRunnable).start();
-
         largeImageView = findViewById(R.id.largeImage);
         try {
             largeImageView.setImage(new InputStreamBitmapDecoderFactory(getAssets().open("map2.png")));
@@ -248,6 +287,7 @@ public class main3Activity extends BaseActivity implements View.OnClickListener,
         setFan();
 
         setBottomSheet();
+        setDialog();
     }
 
 
@@ -269,6 +309,18 @@ public class main3Activity extends BaseActivity implements View.OnClickListener,
             }
         });
         setSpeed();
+
+        statusViewModel = ViewModelProviders.of(this).get(StatusViewModel.class);
+        statusViewModel.getStatusMutableLiveData().observe(this, new Observer<Status>() {
+            @Override
+            public void onChanged(@Nullable Status status) {
+                Message message = new Message();
+                message.what = 1;
+                message.obj = status;
+                viewhandler.sendMessage(message);
+            }
+        });
+
     }
 
     private void setSpeed() {
@@ -391,18 +443,21 @@ public class main3Activity extends BaseActivity implements View.OnClickListener,
             public void onConnect() {
                 client.setDebug(true);
                 ((RCApplication) getApplication()).setRosClient(client);
+                isConn = true;
                 publish();
                 Log.d("dwayne", "Connect ROS success");
             }
 
             @Override
             public void onDisconnect(boolean normal, String reason, int code) {
+                isConn = false;
                 Log.d("dwayne", "ROS disconnect");
             }
 
             @Override
             public void onError(Exception ex) {
                 ex.printStackTrace();
+                isConn = false;
                 Log.d("dwayne", "ROS communication error");
             }
         });
@@ -424,20 +479,30 @@ public class main3Activity extends BaseActivity implements View.OnClickListener,
 
 
     public void onEvent(@NonNull final PublishEvent event) {
-        Log.d("event", "receive" + event.msg);
+        Log.i("dwayne2", event.msg);
         if ("/chatter".equals(event.name)) {
-            parseChatterTopic(event);
-            return;
+            Status status = new Gson().fromJson(event.msg, Status.class);
+            Message message = new Message();
+            message.what = 3;
+            message.obj = status;
+            handler.sendMessage(message);
         }
-        Log.d("dwayne", event.msg);
     }
 
 
     private void parseChatterTopic(PublishEvent event) {
         Log.d("event2", "receive2");
         Log.i("dwayne2", event.msg);
+
     }
 
+    @Override
+    protected void onDestroy() {
+        if (isConn) {
+            client.disconnect();
+        }
+        super.onDestroy();
+    }
 
     private void setFan() {
         animation_0_speed.setInterpolator(linearInterpolator);
@@ -497,7 +562,6 @@ public class main3Activity extends BaseActivity implements View.OnClickListener,
         mBehavior.setPeekHeight(mMinPeekHeight + poiTaxiHeight);
 
     }
-
 
     /**
      * 设置底部POI详细BottomSheet
@@ -611,77 +675,95 @@ public class main3Activity extends BaseActivity implements View.OnClickListener,
         }
 
         if (v == charge_cardview) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);  //先得到构造器
-            builder.setCancelable(true);           //将对话框以外的区域设置成无法点击
-            // 载入自定义布局
-            LayoutInflater inflater = getLayoutInflater();
-            View layout = inflater.inflate(R.layout.charge_detail_layout, null);
-            builder.setView(layout);
-
-            // 设置确认按钮
-            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();      //取消显示(关闭)对话框
-                }
-            });
-            builder.create().show();         //创建并显示对话框
-
+            charge_dialog.show();         //创建并显示对话框
         }
-
         if (v == setArgs_cardView) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);  //先得到构造器
-            builder.setCancelable(true);           //将对话框以外的区域设置成无法点击
-            // 载入自定义布局
-            LayoutInflater inflater = getLayoutInflater();
-            View layout = inflater.inflate(R.layout.set_args_layout2, null);
-            builder.setView(layout);
-
-            // 设置确认按钮
-            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();      //取消显示(关闭)对话框
-                }
-            });
-
-            // 设置取消按钮
-            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();      //取消显示(关闭)对话框
-                }
-            });
-            builder.create().show();
+            args_dialog.show();
         }
-
         if (v == device_state_cardView) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);  //先得到构造器
-            builder.setCancelable(true);           //将对话框以外的区域设置成无法点击
-            // 载入自定义布局
-            LayoutInflater inflater = getLayoutInflater();
-            View layout = inflater.inflate(R.layout.device_detail_layout, null);
-            builder.setView(layout);
-
-            // 设置确认按钮
-            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();      //取消显示(关闭)对话框
-                }
-            });
-
-            // 设置取消按钮
-            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();      //取消显示(关闭)对话框
-                }
-            });
-            builder.create().show();
+            status_dialog.show();
         }
     }
 
+    private void setDialog() {
+        /**
+         * status dialog
+         */
+        AlertDialog.Builder status_builder = new AlertDialog.Builder(this);  //先得到构造器
+        status_builder.setCancelable(true);           //将对话框以外的区域设置成无法点击
+        // 载入自定义布局
+        LayoutInflater inflater = getLayoutInflater();
+        View layout = inflater.inflate(R.layout.device_detail_layout, null);
+        status_builder.setView(layout);
+
+        yaw_angle_data = layout.findViewById(R.id.yaw_angle_data);
+        speed_data = layout.findViewById(R.id.speed_data);
+        lat_data = layout.findViewById(R.id.lat_data);
+        lng_data = layout.findViewById(R.id.lng_data);
+        front_wheel_angle_data = layout.findViewById(R.id.front_wheel_angle_data);
+
+        // 设置确认按钮
+        status_builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();      //取消显示(关闭)对话框
+            }
+        });
+
+        // 设置取消按钮
+        status_builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();      //取消显示(关闭)对话框
+            }
+        });
+        status_dialog = status_builder.create();
+
+        /**
+         * charge dialog
+         */
+        AlertDialog.Builder charge_builder = new AlertDialog.Builder(this);  //先得到构造器
+        charge_builder.setCancelable(true);           //将对话框以外的区域设置成无法点击
+        // 载入自定义布局
+        LayoutInflater inflater2 = getLayoutInflater();
+        View layout2 = inflater2.inflate(R.layout.charge_detail_layout, null);
+        charge_builder.setView(layout2);
+
+        // 设置确认按钮
+        charge_builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();      //取消显示(关闭)对话框
+            }
+        });
+        charge_dialog = charge_builder.create();
+
+        /**
+         * args dialog
+         */
+        AlertDialog.Builder args_builder = new AlertDialog.Builder(this);  //先得到构造器
+        args_builder.setCancelable(true);           //将对话框以外的区域设置成无法点击
+        // 载入自定义布局
+        LayoutInflater inflater3 = getLayoutInflater();
+        View layout3 = inflater3.inflate(R.layout.set_args_layout2, null);
+        args_builder.setView(layout3);
+
+        // 设置确认按钮
+        args_builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();      //取消显示(关闭)对话框
+            }
+        });
+        // 设置取消按钮
+        args_builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();      //取消显示(关闭)对话框
+            }
+        });
+        args_dialog = args_builder.create();
+    }
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

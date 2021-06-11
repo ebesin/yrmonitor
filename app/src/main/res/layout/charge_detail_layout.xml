@@ -48,7 +48,7 @@
             app:layout_constraintTop_toBottomOf="@+id/guideline2" />
 
         <TextView
-            android:id="@+id/textView10"
+            android:id="@+id/speed_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
@@ -58,68 +58,68 @@
             app:layout_constraintTop_toTopOf="@+id/guideline2" />
 
         <TextView
-            android:id="@+id/textView11"
+            android:id="@+id/speed_data"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="60dp"
             android:text="50%"
-            app:layout_constraintBottom_toBottomOf="@+id/textView10"
-            app:layout_constraintStart_toEndOf="@+id/textView10"
-            app:layout_constraintTop_toTopOf="@+id/textView10" />
+            app:layout_constraintBottom_toBottomOf="@+id/speed_text"
+            app:layout_constraintStart_toEndOf="@+id/speed_text"
+            app:layout_constraintTop_toTopOf="@+id/speed_text" />
 
         <TextView
-            android:id="@+id/textView12"
+            android:id="@+id/front_wheel_angle_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="温度"
-            app:layout_constraintStart_toStartOf="@+id/textView10"
-            app:layout_constraintTop_toBottomOf="@+id/textView10" />
+            app:layout_constraintStart_toStartOf="@+id/speed_text"
+            app:layout_constraintTop_toBottomOf="@+id/speed_text" />
 
         <TextView
-            android:id="@+id/textView13"
+            android:id="@+id/front_wheel_angle_data"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="34°"
-            app:layout_constraintBottom_toBottomOf="@+id/textView12"
-            app:layout_constraintStart_toStartOf="@+id/textView11"
-            app:layout_constraintTop_toTopOf="@+id/textView12" />
+            app:layout_constraintBottom_toBottomOf="@+id/front_wheel_angle_text"
+            app:layout_constraintStart_toStartOf="@+id/speed_data"
+            app:layout_constraintTop_toTopOf="@+id/front_wheel_angle_text" />
 
         <TextView
-            android:id="@+id/textView14"
+            android:id="@+id/yaw_angle_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="状态"
-            app:layout_constraintStart_toStartOf="@+id/textView12"
-            app:layout_constraintTop_toBottomOf="@+id/textView12" />
+            app:layout_constraintStart_toStartOf="@+id/front_wheel_angle_text"
+            app:layout_constraintTop_toBottomOf="@+id/front_wheel_angle_text" />
 
         <TextView
-            android:id="@+id/textView15"
+            android:id="@+id/yaw_angle_data"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="放电中"
-            app:layout_constraintBottom_toBottomOf="@+id/textView14"
-            app:layout_constraintStart_toStartOf="@+id/textView13"
-            app:layout_constraintTop_toTopOf="@+id/textView14" />
+            app:layout_constraintBottom_toBottomOf="@+id/yaw_angle_text"
+            app:layout_constraintStart_toStartOf="@+id/front_wheel_angle_data"
+            app:layout_constraintTop_toTopOf="@+id/yaw_angle_text" />
 
         <TextView
-            android:id="@+id/textView16"
+            android:id="@+id/lat_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="健康状况"
-            app:layout_constraintStart_toStartOf="@+id/textView14"
-            app:layout_constraintTop_toBottomOf="@+id/textView14" />
+            app:layout_constraintStart_toStartOf="@+id/yaw_angle_text"
+            app:layout_constraintTop_toBottomOf="@+id/yaw_angle_text" />
 
         <TextView
-            android:id="@+id/textView17"
+            android:id="@+id/lat_data"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="良好"
-            app:layout_constraintBottom_toBottomOf="@+id/textView16"
-            app:layout_constraintStart_toStartOf="@+id/textView15"
-            app:layout_constraintTop_toTopOf="@+id/textView16" />
+            app:layout_constraintBottom_toBottomOf="@+id/lat_text"
+            app:layout_constraintStart_toStartOf="@+id/yaw_angle_data"
+            app:layout_constraintTop_toTopOf="@+id/lat_text" />
 
         <TextView
             android:id="@+id/textView18"
@@ -127,8 +127,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="电压"
-            app:layout_constraintStart_toStartOf="@+id/textView16"
-            app:layout_constraintTop_toBottomOf="@+id/textView16" />
+            app:layout_constraintStart_toStartOf="@+id/lat_text"
+            app:layout_constraintTop_toBottomOf="@+id/lat_text" />
 
         <TextView
             android:id="@+id/textView19"
@@ -136,7 +136,7 @@
             android:layout_height="wrap_content"
             android:text="4.12 V"
             app:layout_constraintBottom_toBottomOf="@+id/textView18"
-            app:layout_constraintStart_toStartOf="@+id/textView17"
+            app:layout_constraintStart_toStartOf="@+id/lat_data"
             app:layout_constraintTop_toTopOf="@+id/textView18" />
 
         <TextView

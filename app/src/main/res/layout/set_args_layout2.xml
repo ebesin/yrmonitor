@@ -48,7 +48,7 @@
             app:layout_constraintTop_toBottomOf="@+id/guideline2" />
 
         <TextView
-            android:id="@+id/textView10"
+            android:id="@+id/speed_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
@@ -59,112 +59,112 @@
             app:layout_constraintTop_toTopOf="@+id/guideline2" />
 
         <EditText
-            android:id="@+id/textView11"
+            android:id="@+id/speed_data"
             android:layout_width="70dp"
             android:layout_height="40dp"
             android:layout_marginStart="30dp"
             android:textAlignment="center"
             android:textSize="14sp"
 
-            app:layout_constraintBottom_toBottomOf="@+id/textView10"
-            app:layout_constraintStart_toEndOf="@+id/textView10"
-            app:layout_constraintTop_toTopOf="@+id/textView10" />
+            app:layout_constraintBottom_toBottomOf="@+id/speed_text"
+            app:layout_constraintStart_toEndOf="@+id/speed_text"
+            app:layout_constraintTop_toTopOf="@+id/speed_text" />
 
         <TextView
-            android:id="@+id/textView12"
+            android:id="@+id/front_wheel_angle_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="树木最大高度"
             android:textSize="14sp"
-            app:layout_constraintStart_toStartOf="@+id/textView10"
-            app:layout_constraintTop_toBottomOf="@+id/textView10" />
+            app:layout_constraintStart_toStartOf="@+id/speed_text"
+            app:layout_constraintTop_toBottomOf="@+id/speed_text" />
 
         <EditText
-            android:id="@+id/textView13"
+            android:id="@+id/front_wheel_angle_data"
             android:layout_width="70dp"
             android:layout_height="40dp"
             android:textSize="14sp"
             android:textAlignment="center"
-            app:layout_constraintBottom_toBottomOf="@+id/textView12"
-            app:layout_constraintStart_toStartOf="@+id/textView11"
-            app:layout_constraintTop_toTopOf="@+id/textView12" />
+            app:layout_constraintBottom_toBottomOf="@+id/front_wheel_angle_text"
+            app:layout_constraintStart_toStartOf="@+id/speed_data"
+            app:layout_constraintTop_toTopOf="@+id/front_wheel_angle_text" />
 
         <TextView
-            android:id="@+id/textView14"
+            android:id="@+id/yaw_angle_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="最大检测范围"
             android:textSize="14sp"
-            app:layout_constraintStart_toStartOf="@+id/textView12"
-            app:layout_constraintTop_toBottomOf="@+id/textView12" />
+            app:layout_constraintStart_toStartOf="@+id/front_wheel_angle_text"
+            app:layout_constraintTop_toBottomOf="@+id/front_wheel_angle_text" />
 
         <EditText
-            android:id="@+id/textView15"
+            android:id="@+id/yaw_angle_data"
             android:layout_width="70dp"
             android:layout_height="40dp"
             android:textSize="14sp"
             android:textAlignment="center"
-            app:layout_constraintBottom_toBottomOf="@+id/textView14"
-            app:layout_constraintStart_toStartOf="@+id/textView13"
-            app:layout_constraintTop_toTopOf="@+id/textView14" />
+            app:layout_constraintBottom_toBottomOf="@+id/yaw_angle_text"
+            app:layout_constraintStart_toStartOf="@+id/front_wheel_angle_data"
+            app:layout_constraintTop_toTopOf="@+id/yaw_angle_text" />
 
         <TextView
-            android:id="@+id/textView16"
+            android:id="@+id/lat_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="延时单元"
             android:textSize="14sp"
-            app:layout_constraintStart_toStartOf="@+id/textView14"
-            app:layout_constraintTop_toBottomOf="@+id/textView14" />
+            app:layout_constraintStart_toStartOf="@+id/yaw_angle_text"
+            app:layout_constraintTop_toBottomOf="@+id/yaw_angle_text" />
 
         <EditText
-            android:id="@+id/textView17"
+            android:id="@+id/lat_data"
             android:layout_width="70dp"
             android:layout_height="40dp"
             android:textSize="14sp"
             android:textAlignment="center"
-            app:layout_constraintBottom_toBottomOf="@+id/textView16"
-            app:layout_constraintStart_toStartOf="@+id/textView15"
-            app:layout_constraintTop_toTopOf="@+id/textView16" />
+            app:layout_constraintBottom_toBottomOf="@+id/lat_text"
+            app:layout_constraintStart_toStartOf="@+id/yaw_angle_data"
+            app:layout_constraintTop_toTopOf="@+id/lat_text" />
 
         <TextView
             android:id="@+id/textView26"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="m"
-            app:layout_constraintBottom_toBottomOf="@+id/textView11"
-            app:layout_constraintStart_toEndOf="@+id/textView11"
-            app:layout_constraintTop_toTopOf="@+id/textView11" />
+            app:layout_constraintBottom_toBottomOf="@+id/speed_data"
+            app:layout_constraintStart_toEndOf="@+id/speed_data"
+            app:layout_constraintTop_toTopOf="@+id/speed_data" />
 
         <TextView
             android:id="@+id/textView27"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="m"
-            app:layout_constraintBottom_toBottomOf="@+id/textView13"
-            app:layout_constraintStart_toEndOf="@+id/textView13"
-            app:layout_constraintTop_toBottomOf="@+id/textView11" />
+            app:layout_constraintBottom_toBottomOf="@+id/front_wheel_angle_data"
+            app:layout_constraintStart_toEndOf="@+id/front_wheel_angle_data"
+            app:layout_constraintTop_toBottomOf="@+id/speed_data" />
 
         <TextView
             android:id="@+id/textView28"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="m"
-            app:layout_constraintBottom_toBottomOf="@+id/textView15"
-            app:layout_constraintStart_toEndOf="@+id/textView15"
-            app:layout_constraintTop_toBottomOf="@+id/textView13" />
+            app:layout_constraintBottom_toBottomOf="@+id/yaw_angle_data"
+            app:layout_constraintStart_toEndOf="@+id/yaw_angle_data"
+            app:layout_constraintTop_toBottomOf="@+id/front_wheel_angle_data" />
 
         <TextView
             android:id="@+id/textView29"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="t"
-            app:layout_constraintBottom_toBottomOf="@+id/textView17"
-            app:layout_constraintStart_toEndOf="@+id/textView17"
-            app:layout_constraintTop_toBottomOf="@+id/textView15" />
+            app:layout_constraintBottom_toBottomOf="@+id/lat_data"
+            app:layout_constraintStart_toEndOf="@+id/lat_data"
+            app:layout_constraintTop_toBottomOf="@+id/yaw_angle_data" />
 
         <TextView
             android:id="@+id/textView30"
@@ -172,8 +172,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="行进速率"
-            app:layout_constraintStart_toStartOf="@+id/textView16"
-            app:layout_constraintTop_toBottomOf="@+id/textView16" />
+            app:layout_constraintStart_toStartOf="@+id/lat_text"
+            app:layout_constraintTop_toBottomOf="@+id/lat_text" />
 
         <EditText
             android:id="@+id/textView18"
@@ -182,8 +182,8 @@
             android:textAlignment="center"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="@+id/textView30"
-            app:layout_constraintEnd_toEndOf="@+id/textView17"
-            app:layout_constraintStart_toStartOf="@+id/textView17"
+            app:layout_constraintEnd_toEndOf="@+id/lat_data"
+            app:layout_constraintStart_toStartOf="@+id/lat_data"
             app:layout_constraintTop_toTopOf="@+id/textView30" />
 
         <TextView
@@ -193,7 +193,7 @@
             android:text="m/s"
             app:layout_constraintBottom_toBottomOf="@+id/textView18"
             app:layout_constraintStart_toEndOf="@+id/textView18"
-            app:layout_constraintTop_toBottomOf="@+id/textView17" />
+            app:layout_constraintTop_toBottomOf="@+id/lat_data" />
 
 
     </android.support.constraint.ConstraintLayout>
