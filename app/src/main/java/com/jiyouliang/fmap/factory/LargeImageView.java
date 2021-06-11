@@ -95,6 +95,16 @@ public class LargeImageView extends View implements BlockImageLoader.OnImageLoad
     }
 
     @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        final int layoutWidth = getMeasuredWidth();
+        final int layoutHeight = getMeasuredHeight();
+        System.out.println("layoutWidth:"+layoutWidth+"======="+"layoutHeight:"+layoutHeight);
+        mScale = (1.0f * 23417 / layoutWidth) * layoutHeight / 15813;
+        System.out.println("======================="+mScale);
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    }
+
+    @Override
     public void computeScroll() {
         super.computeScroll();
         if (scaleHelper.computeScrollOffset()) {
@@ -510,12 +520,14 @@ public class LargeImageView extends View implements BlockImageLoader.OnImageLoad
     private void initFitImageScale(int imageWidth, int imageHeight) {
         final int layoutWidth = getMeasuredWidth();
         final int layoutHeight = getMeasuredHeight();
-        if (imageWidth > imageHeight) {
+//        if (imageWidth > imageHeight) {
+        if(imageWidth/layoutWidth > imageHeight/layoutHeight){
             fitScale = (1.0f * imageWidth / layoutWidth) * layoutHeight / imageHeight;
 //            fitScale = 1.0f * imageHeight / layoutHeight;
             maxScale = 1.0f * imageWidth / layoutWidth * 4;
 
             minScale = fitScale;
+            mScale = fitScale;
 //            minScale = 1.0f * imageHeight / layoutHeight;
 //            minScale = 2;
 //            if (minScale > 1) {
@@ -523,17 +535,18 @@ public class LargeImageView extends View implements BlockImageLoader.OnImageLoad
 //            }
         } else {
             fitScale = 1.0f;
-            minScale = 0.25f;
+            mScale = fitScale;
+            minScale = fitScale;
             maxScale = 1.0f * imageWidth / layoutWidth;
-            float a = (1.0f * imageWidth / layoutWidth) * layoutHeight / imageHeight;
+//            float a = (1.0f * imageWidth / layoutWidth) * layoutHeight / imageHeight;
             float density = getContext().getResources().getDisplayMetrics().density;
             maxScale = maxScale * density;
             if (maxScale < 4) {
                 maxScale = 4;
             }
-            if (minScale > a) {
-                minScale = a;
-            }
+//            if (minScale > a) {
+//                minScale = a;
+//            }
         }
         Log.d("initFitImageScale", "info" + "\n" + "fitScale:" + fitScale + "\n" + "minScale:" + minScale + "\n" + "maxScale:" + maxScale + "\n" + "layoutWidth:" + layoutWidth + "\n" + "layoutHeight:" + layoutHeight + "\n" + "imageWidth:" + imageWidth + "\n" + "imageHeight:" + imageHeight);
         if (criticalScaleValueHook != null) {
@@ -807,6 +820,7 @@ public class LargeImageView extends View implements BlockImageLoader.OnImageLoad
             if (accelerateInterpolator == null) {
                 accelerateInterpolator = new AccelerateInterpolator();
             }
+
             scaleHelper.startScale(mScale, newScale, centerX, centerY, accelerateInterpolator);
         } else {
             if (decelerateInterpolator == null) {

@@ -40,7 +40,7 @@ import de.greenrobot.event.EventBus;
 public class RosBridgeActivity extends Activity implements View.OnClickListener {
 
     ROSBridgeClient client;
-    String ip = "192.168.1.114";   //虚拟机的 IP
+    String ip = "192.168.1.100";   //虚拟机的 IP
     // String ip = "192.168.10.20";     //半残废机器人的IP
     // String ip = "192.168.10.200";     //机器人的IP
     String port = "9090";

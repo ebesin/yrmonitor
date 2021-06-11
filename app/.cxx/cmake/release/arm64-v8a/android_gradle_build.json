@@ -7,7 +7,7 @@
 	"cFileExtensions" : [ "c" ],
 	"cleanCommands" : 
 	[
-		"C:\\Users\\dwayne\\AppData\\Local\\Android\\Sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\android_app\\TestRosBridge-master\\TestRosBridge-master\\app\\.cxx\\cmake\\release\\arm64-v8a --target clean"
+		"D:\\enviroment\\Android\\platforms\\Sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\android_app\\TestRosBridge-master\\TestRosBridge-master\\app\\.cxx\\cmake\\release\\arm64-v8a --target clean"
 	],
 	"libraries" : 
 	{
@@ -15,7 +15,7 @@
 		{
 			"abi" : "arm64-v8a",
 			"artifactName" : "native-test",
-			"buildCommand" : "C:\\Users\\dwayne\\AppData\\Local\\Android\\Sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\android_app\\TestRosBridge-master\\TestRosBridge-master\\app\\.cxx\\cmake\\release\\arm64-v8a --target native-test",
+			"buildCommand" : "D:\\enviroment\\Android\\platforms\\Sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\android_app\\TestRosBridge-master\\TestRosBridge-master\\app\\.cxx\\cmake\\release\\arm64-v8a --target native-test",
 			"buildType" : "release",
 			"files" : 
 			[

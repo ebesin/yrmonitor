@@ -2,7 +2,7 @@
   "variant": {
     "module": {
       "rootBuildGradleFolder": "D:\\android_app\\TestRosBridge-master\\TestRosBridge-master",
-      "sdkFolder": "C:\\Users\\dwayne\\AppData\\Local\\Android\\Sdk",
+      "sdkFolder": "D:\\enviroment\\Android\\platforms\\Sdk",
       "isNativeCompilerSettingsCacheEnabled": false,
       "isBuildOnlyTargetAbiEnabled": true,
       "ideBuildTargetAbi": "arm64-v8a,armeabi-v7a,armeabi",

@@ -1,7 +1,12 @@
 package com.jiyouliang.fmap;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.view.PagerTitleStrip;
+import android.text.Editable;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -11,9 +16,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dadac.testrosbridge.RCApplication;
+import com.google.gson.Gson;
+import com.google.gson.internal.bind.DateTypeAdapter;
 import com.jilk.ros.ROSClient;
 import com.jilk.ros.rosbridge.ROSBridgeClient;
 import com.jilk.ros.rosbridge.implementation.PublishEvent;
+import com.jiyouliang.fmap.bean.Status;
 
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -29,37 +37,69 @@ import de.greenrobot.event.EventBus;
 public class RosBridgeActivity extends Activity implements View.OnClickListener {
 
     ROSBridgeClient client;
-    String ip = "192.168.1.114";   //虚拟机的 IP
+    //IP
+    String ip;
     // String ip = "192.168.10.20";     //半残废机器人的IP
     // String ip = "192.168.10.200";     //机器人的IP
     String port = "9090";
+    String topic;
 
-    boolean isSubscrible = true;
+    boolean isSubscrible = false;
     private static int flagSubscrible = 0;
+    boolean isConn = false;
+    boolean conneSucc = false;
 
+
+    private Button connect;
     private Button DC_Button_Subscrible;
     private Button DC_Button_Publish;
-    private EditText DC_EditText_EnterWord;
-    private TextView DC_TextView_ShowData;
+    private EditText datashow;
+    private EditText ip_input_text;
+    private EditText topic_input_text;
+
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_rosdatashow);
+        setContentView(R.layout.test_conn_layout);
         EventBus.getDefault().register(this);
-        onConnect(ip, port);
+
         subMenuShow();
+        init();
+    }
+
+    private void init() {
+        sharedPreferences = getSharedPreferences("data", Context.MODE_PRIVATE);
+        String ip = sharedPreferences.getString("ip", "");
+        ip_input_text.setText(ip);
+        String topic = sharedPreferences.getString("topic", "");
+        topic_input_text.setText(topic);
+        editor = sharedPreferences.edit();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (isConn) {
+            client.disconnect();
+        }
+        super.onDestroy();
     }
 
     //初始化界面的参数
     private void subMenuShow() {
-        DC_Button_Subscrible = (Button) findViewById(R.id.DC_Button_Subscrible);
+        connect = findViewById(R.id.connect);
+        connect.setOnClickListener(this);
+        DC_Button_Subscrible = (Button) findViewById(R.id.subscrible);
         DC_Button_Subscrible.setOnClickListener(this);
-        DC_Button_Publish = (Button) findViewById(R.id.DC_Button_Publish);
-        DC_Button_Publish.setOnTouchListener(new ComponentOnTouch());
-        DC_EditText_EnterWord = (EditText) findViewById(R.id.DC_EditText_EnterWord);
-        DC_TextView_ShowData = (TextView) findViewById(R.id.DC_TextView_ShowData);
+        DC_Button_Publish = (Button) findViewById(R.id.publish);
+        DC_Button_Publish.setOnClickListener(this);
+        datashow = (EditText) findViewById(R.id.datashow);
+        ip_input_text = findViewById(R.id.ip_input_text);
+        topic_input_text = findViewById(R.id.topic_input_text);
+
     }
 
 
@@ -67,52 +107,70 @@ public class RosBridgeActivity extends Activity implements View.OnClickListener 
      * @Function: 建立连接
      * @Return:
      */
-    public void onConnect(String ip, String port) {
+    public void onConnect(final String ip, String port) {
 
         client = new ROSBridgeClient("ws://" + ip + ":" + port);
-        boolean conneSucc = client.connect(new ROSClient.ConnectionStatusListener() {
+        conneSucc = client.connect(new ROSClient.ConnectionStatusListener() {
             @Override
             public void onConnect() {
                 client.setDebug(true);
                 ((RCApplication) getApplication()).setRosClient(client);
-                showTip("Connect ROS success");
+                isConn = true;
+                connect.setText("点击断开连接");
+                showTip("连接成功");
+                editor.putString("ip", ip);
+                editor.commit();
                 Log.d("dachen", "Connect ROS success");
             }
 
             @Override
             public void onDisconnect(boolean normal, String reason, int code) {
-                showTip("ROS disconnect");
+                isConn = false;
+                connect.setText("点击连接");
+                showTip("断开连接");
                 Log.d("dachen", "ROS disconnect");
             }
 
             @Override
             public void onError(Exception ex) {
                 ex.printStackTrace();
-                showTip("ROS communication error");
+                showTip("连接失败");
                 Log.d("dachen", "ROS communication error");
             }
         });
     }
 
     //接收来自Ros端的数据
-    private void ReceiveDataToRos() {
-        if (isSubscrible == true) {
-            String msg1 = "{\"op\":\"subscribe\",\"topic\":\"/chatter\"}";
+    private void ReceiveDataToRos(String topic) {
+        editor.putString("topic", topic);
+        editor.commit();
+        if (isSubscrible) {
+            String msg1 = "{\"op\":\"subscribe\",\"topic\":\"/" + topic + "\"}";
             client.send(msg1);
-        } else if (isSubscrible == false) {
-            String msg2 = "{\"op\":\"unsubscribe\",\"topic\":\"/chatter\"}";
+        } else if (!isSubscrible) {
+            String msg2 = "{\"op\":\"unsubscribe\",\"topic\":\"/" + topic + "\"}";
             client.send(msg2);
         }
     }
 
     //发送数据到ROS端
-    private void SendDataToRos(String data) {
-        String msg1 = "{ \"op\": \"publish\", \"topic\": \"/dwayne\", \"msg\": { \"data\": \"" + data + " \" }}";
+    private void SendDataToRos(String topic, String data) {
+        editor.putString("topic", topic);
+        editor.commit();
+        String msg1 = "{ \"op\": \"publish\", \"topic\": \"/" + topic + "\", \"msg\": { \"data\": \"" + data + " \" }}";
         //        String msg2 = "{\"op\":\"publish\",\"topic\":\"/cmd_vel\",\"msg\":{\"linear\":{\"x\":" + 0 + ",\"y\":" +
         //                0 + ",\"z\":0},\"angular\":{\"x\":0,\"y\":0,\"z\":" + 0.5 + "}}}";
         client.send(msg1);
     }
 
+    private void SendDataToRos2(String topic, String data) {
+        editor.putString("topic", topic);
+        editor.commit();
+        String msg1 = "{ \"op\": \"publish\", \"topic\": \"/" + topic + "\", \"msg\": " + data + "}";
+        //        String msg2 = "{\"op\":\"publish\",\"topic\":\"/cmd_vel\",\"msg\":{\"linear\":{\"x\":" + 0 + ",\"y\":" +
+        //                0 + ",\"z\":0},\"angular\":{\"x\":0,\"y\":0,\"z\":" + 0.5 + "}}}";
+        client.send(msg1);
+    }
 
     private void showTip(final String tip) {
         runOnUiThread(new Runnable() {
@@ -124,7 +182,7 @@ public class RosBridgeActivity extends Activity implements View.OnClickListener 
     }
 
     public void onEvent(final PublishEvent event) {
-        if ("/chatter".equals(event.name)) {
+        if (("/" + topic).equals(event.name)) {
             parseChatterTopic(event);
             return;
         }
@@ -134,28 +192,66 @@ public class RosBridgeActivity extends Activity implements View.OnClickListener 
     private void parseChatterTopic(PublishEvent event) {
         Log.d("event2", "receive2");
         Log.i("dwayne2", event.msg);
-        DC_TextView_ShowData.setText(event.msg);
+        datashow.setText(event.msg);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.DC_Button_Subscrible:
-                if (flagSubscrible % 2 == 0) {
-                    isSubscrible = true;
-                    DC_Button_Subscrible.setText("Subscrible");
+            case R.id.subscrible:
+                if (isConn) {
+                    if (!isSubscrible) {
+                        if (TextUtils.isEmpty(topic_input_text.getText())) {
+                            showTip("请输入topic");
+                        } else {
+                            isSubscrible = true;
+                            DC_Button_Subscrible.setText("unSubscrible");
+                        }
+                    } else {
+                        isSubscrible = false;
+                        DC_Button_Subscrible.setText("Subscrible");
+                    }
+                    topic = String.valueOf(topic_input_text.getText());
+                    ReceiveDataToRos(topic);
+                }else{
+                    showTip("请先连接");
                 }
-                if (flagSubscrible % 2 == 1) {
-                    isSubscrible = false;
-                    DC_Button_Subscrible.setText("unSubscrible");
-                }
-                flagSubscrible++;
-                ReceiveDataToRos();
                 break;
+            case R.id.publish:
+                if(isConn) {
+                    if (TextUtils.isEmpty(topic_input_text.getText())) {
+                        showTip("请输入topic");
+                    } else {
+                        topic = String.valueOf(topic_input_text.getText());
+                        Status status = new Status(1.11111, 2.222222, 3.333333, 4.4444, 5.55555);
+                        String json = new Gson().toJson(status);
+                        String text = String.valueOf(datashow.getText());
+                        SendDataToRos2(topic, text);
+                    }
+                }else{
+                    showTip("请先连接");
+                }
+                break;
+            case R.id.connect:
+                if (!isConn) {
+                    if (TextUtils.isEmpty(ip_input_text.getText())) {
+                        showTip("请输入ip");
+                    } else {
+                        ip = String.valueOf(ip_input_text.getText());
+                        onConnect(ip, port);
+                    }
+                } else {
+                    client.disconnect();
+                }
             default:
                 break;
         }
     }
+
+    private void showToast(String text) {
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
+    }
+
 
     private class ComponentOnTouch implements View.OnTouchListener {
         @Override
@@ -172,6 +268,7 @@ public class RosBridgeActivity extends Activity implements View.OnClickListener 
     }
 
     private boolean Btn_LongPress = false;
+
     class MyThread extends Thread {
         @Override
         public void run() {
@@ -181,7 +278,7 @@ public class RosBridgeActivity extends Activity implements View.OnClickListener 
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                SendDataToRos("Start");
+//                SendDataToRos("Start",);
             }
         }
     }
@@ -194,7 +291,7 @@ public class RosBridgeActivity extends Activity implements View.OnClickListener 
                 myThread.start();
                 Btn_LongPress = true;
             } else if (eventAction == MotionEvent.ACTION_UP) {
-                SendDataToRos("Stop");
+//                SendDataToRos("Stop");
                 if (myThread != null)
                     Btn_LongPress = false;
             }

@@ -3,8 +3,10 @@ package com.example.dadac.testrosbridge;
 import android.util.Log;
 
 import com.dadac.testrosbridge.RCApplication;
+import com.google.gson.Gson;
 import com.jilk.ros.ROSClient;
 import com.jilk.ros.rosbridge.ROSBridgeClient;
+import com.jiyouliang.fmap.bean.Status;
 
 import org.junit.Test;
 
@@ -29,7 +31,7 @@ public class ExampleUnitTest {
     }
 
     @Test
-    public void testConn(){
+    public void testConn() {
         client = new ROSBridgeClient("ws://" + ip + ":" + port);
         boolean conneSucc = client.connect(new ROSClient.ConnectionStatusListener() {
             @Override
@@ -57,5 +59,19 @@ public class ExampleUnitTest {
         });
         client.disconnect();
     }
-}
 
+    @Test
+    public void testString() {
+        String msg2 = "{\"op\":\"publish\",\"topic\":\"/cmd_vel\",\"msg\":{\"linear\":{\"x\":" + 0 + ",\"y\":" +
+                0 + ",\"z\":0},\"angular\":{\"x\":0,\"y\":0,\"z\":" + 0.5 + "}}}";
+        System.out.println(msg2);
+    }
+
+    @Test
+    public void testString2(){
+        Status status = new Status(1.11111,2.222222,3.333333,4.4444,5.55555);
+        String data = new Gson().toJson(status);
+        String msg1 = "{ \"op\": \"publish\", \"topic\": \"/chatter\", \"msg\": " + data + "}";
+        System.out.println(msg1);
+    }
+}

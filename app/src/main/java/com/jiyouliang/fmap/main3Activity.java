@@ -373,6 +373,9 @@ public class main3Activity extends BaseActivity implements View.OnClickListener,
     }
 
     public void smoothSlideDownMap() {
+        ViewGroup.LayoutParams lp = largeImageView.getLayoutParams();
+        lp.height = mScreenHeight;
+        largeImageView.setLayoutParams(lp);
         slideDown = true;
     }
 
@@ -513,7 +516,7 @@ public class main3Activity extends BaseActivity implements View.OnClickListener,
         }
         Point point = new Point();
         wm.getDefaultDisplay().getSize(point);
-        //屏幕高度3/5
+        //屏幕高度5/7
         mScreenHeight = point.y;
         mScreenWidth = point.x;
         //设置bottomsheet高度为屏幕 5/7
@@ -543,6 +546,9 @@ public class main3Activity extends BaseActivity implements View.OnClickListener,
         drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
         slideUpInfo.setCompoundDrawables(drawable, null, drawable, null);
         slideUpInfo.setText("下滑隐藏");
+        ViewGroup.LayoutParams lp = largeImageView.getLayoutParams();
+        lp.height = mScreenHeight * 2 / 7;
+        largeImageView.setLayoutParams(lp);
     }
 
     private void log(String msg) {
