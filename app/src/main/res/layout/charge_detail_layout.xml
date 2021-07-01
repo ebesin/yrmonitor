@@ -9,7 +9,7 @@
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="300dp"
-        android:layout_height="330dp"
+        android:layout_height="200dp"
         android:background="@drawable/charge_detail">
 
         <android.support.constraint.Guideline
@@ -58,7 +58,7 @@
             app:layout_constraintTop_toTopOf="@+id/guideline2" />
 
         <TextView
-            android:id="@+id/speed_data"
+            android:id="@+id/charge_data"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="60dp"
@@ -68,94 +68,22 @@
             app:layout_constraintTop_toTopOf="@+id/speed_text" />
 
         <TextView
-            android:id="@+id/front_wheel_angle_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="温度"
-            app:layout_constraintStart_toStartOf="@+id/speed_text"
-            app:layout_constraintTop_toBottomOf="@+id/speed_text" />
-
-        <TextView
-            android:id="@+id/front_wheel_angle_data"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="34°"
-            app:layout_constraintBottom_toBottomOf="@+id/front_wheel_angle_text"
-            app:layout_constraintStart_toStartOf="@+id/speed_data"
-            app:layout_constraintTop_toTopOf="@+id/front_wheel_angle_text" />
-
-        <TextView
-            android:id="@+id/yaw_angle_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="状态"
-            app:layout_constraintStart_toStartOf="@+id/front_wheel_angle_text"
-            app:layout_constraintTop_toBottomOf="@+id/front_wheel_angle_text" />
-
-        <TextView
-            android:id="@+id/yaw_angle_data"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="放电中"
-            app:layout_constraintBottom_toBottomOf="@+id/yaw_angle_text"
-            app:layout_constraintStart_toStartOf="@+id/front_wheel_angle_data"
-            app:layout_constraintTop_toTopOf="@+id/yaw_angle_text" />
-
-        <TextView
-            android:id="@+id/lat_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="健康状况"
-            app:layout_constraintStart_toStartOf="@+id/yaw_angle_text"
-            app:layout_constraintTop_toBottomOf="@+id/yaw_angle_text" />
-
-        <TextView
-            android:id="@+id/lat_data"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="良好"
-            app:layout_constraintBottom_toBottomOf="@+id/lat_text"
-            app:layout_constraintStart_toStartOf="@+id/yaw_angle_data"
-            app:layout_constraintTop_toTopOf="@+id/lat_text" />
-
-        <TextView
             android:id="@+id/textView18"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="电压"
-            app:layout_constraintStart_toStartOf="@+id/lat_text"
-            app:layout_constraintTop_toBottomOf="@+id/lat_text" />
+            app:layout_constraintStart_toStartOf="@+id/speed_text"
+            app:layout_constraintTop_toBottomOf="@+id/speed_text" />
 
         <TextView
-            android:id="@+id/textView19"
+            android:id="@+id/voltage_data"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="4.12 V"
             app:layout_constraintBottom_toBottomOf="@+id/textView18"
-            app:layout_constraintStart_toStartOf="@+id/lat_data"
+            app:layout_constraintStart_toStartOf="@+id/charge_data"
             app:layout_constraintTop_toTopOf="@+id/textView18" />
-
-        <TextView
-            android:id="@+id/textView20"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="电流"
-            app:layout_constraintStart_toStartOf="@+id/textView18"
-            app:layout_constraintTop_toBottomOf="@+id/textView18" />
-
-        <TextView
-            android:id="@+id/textView21"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="3mA"
-            app:layout_constraintBottom_toBottomOf="@+id/textView20"
-            app:layout_constraintStart_toStartOf="@+id/textView19"
-            app:layout_constraintTop_toTopOf="@+id/textView20" />
 
         <TextView
             android:id="@+id/textView22"
@@ -163,16 +91,16 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="容量"
-            app:layout_constraintStart_toStartOf="@+id/textView20"
-            app:layout_constraintTop_toBottomOf="@+id/textView20" />
+            app:layout_constraintStart_toStartOf="@+id/textView18"
+            app:layout_constraintTop_toBottomOf="@+id/textView18" />
 
         <TextView
-            android:id="@+id/textView23"
+            android:id="@+id/capacity_data"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="50000 mAh"
             app:layout_constraintBottom_toBottomOf="@+id/textView22"
-            app:layout_constraintStart_toStartOf="@+id/textView21"
+            app:layout_constraintStart_toStartOf="@+id/voltage_data"
             app:layout_constraintTop_toTopOf="@+id/textView22" />
 
 

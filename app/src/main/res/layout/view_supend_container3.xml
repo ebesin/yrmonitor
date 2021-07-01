@@ -26,7 +26,7 @@
             app:layout_constraintBottom_toTopOf="@id/nearby_view"
             app:layout_constraintLeft_toLeftOf="parent">
 
-            <com.jiyouliang.fmap.view.map.GPSView
+            <com.jiyouliang.monitor.view.map.GPSView
                 android:id="@+id/gps_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -39,7 +39,7 @@
 
         </RelativeLayout>
 
-        <com.jiyouliang.fmap.view.map.NearbySearchView
+        <com.jiyouliang.monitor.view.map.NearbySearchView
             android:id="@+id/nearby_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -26,7 +26,7 @@
             app:layout_constraintBottom_toTopOf="@id/nearby_view"
             app:layout_constraintLeft_toLeftOf="parent">
 
-            <com.jiyouliang.fmap.view.map.GPSView
+            <com.jiyouliang.monitor.view.map.GPSView
                 android:id="@+id/gps_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -39,7 +39,7 @@
 
         </RelativeLayout>
 
-        <com.jiyouliang.fmap.view.map.NearbySearchView
+        <com.jiyouliang.monitor.view.map.NearbySearchView
             android:id="@+id/nearby_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -55,7 +55,7 @@
     <include layout="@layout/botton_sheet2" />
 
     <!--<include layout="@layout/poi_detail_fix_bottom" />-->
-    <com.jiyouliang.fmap.view.map.PoiDetailBottomView
+    <com.jiyouliang.monitor.view.map.PoiDetailBottomView
         android:id="@+id/poi_detail_taxi"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

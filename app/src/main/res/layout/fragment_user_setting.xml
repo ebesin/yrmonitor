@@ -8,7 +8,7 @@
     android:background="@color/gray_bg"
     android:orientation="vertical">
 
-    <com.jiyouliang.fmap.view.widget.TopTitleView
+    <com.jiyouliang.monitor.view.widget.TopTitleView
         android:id="@+id/ttv"
         app:ttvCenterText="@string/setting"
         app:ttvCenterTextSize="22dp"
@@ -39,7 +39,7 @@
                 android:layout_marginTop="@dimen/padding_size" />
 
 
-            <com.jiyouliang.fmap.view.widget.SettingItemView
+            <com.jiyouliang.monitor.view.widget.SettingItemView
                 style="@style/UserSettingItemStyle"
                 app:sivHeight="52dp"
                 app:sivTitle="@string/account_and_security"
@@ -49,7 +49,7 @@
                 style="@style/DividerCommon"
                 android:layout_marginLeft="@dimen/padding_large2" />
 
-            <com.jiyouliang.fmap.view.widget.SettingItemView
+            <com.jiyouliang.monitor.view.widget.SettingItemView
                 style="@style/UserSettingItemStyle"
                 app:sivHeight="52dp"
                 app:sivTitle="@string/map_setting"
@@ -59,7 +59,7 @@
                 style="@style/DividerCommon"
                 android:layout_marginLeft="@dimen/padding_large2" />
 
-            <com.jiyouliang.fmap.view.widget.SettingItemView
+            <com.jiyouliang.monitor.view.widget.SettingItemView
                 style="@style/UserSettingItemStyle"
                 app:sivHeight="52dp"
                 app:sivTitle="@string/navigation_setting"
@@ -69,7 +69,7 @@
                 style="@style/DividerCommon"
                 android:layout_marginLeft="@dimen/padding_large2" />
 
-            <com.jiyouliang.fmap.view.widget.SettingItemView
+            <com.jiyouliang.monitor.view.widget.SettingItemView
                 style="@style/UserSettingItemStyle"
                 app:sivHeight="52dp"
                 app:sivTitle="@string/voice_setting"
@@ -79,7 +79,7 @@
                 style="@style/DividerCommon"
                 android:layout_marginLeft="@dimen/padding_large2" />
 
-            <com.jiyouliang.fmap.view.widget.SettingItemView
+            <com.jiyouliang.monitor.view.widget.SettingItemView
                 style="@style/UserSettingItemStyle"
                 app:sivHeight="52dp"
                 app:sivTitle="@string/commute_setting"
@@ -89,7 +89,7 @@
                 style="@style/DividerCommon"
                 android:layout_marginLeft="@dimen/padding_large2" />
 
-            <com.jiyouliang.fmap.view.widget.SettingItemView
+            <com.jiyouliang.monitor.view.widget.SettingItemView
                 style="@style/UserSettingItemStyle"
                 app:sivHeight="52dp"
                 app:sivTitle="@string/common_trip_ways"
@@ -99,7 +99,7 @@
                 style="@style/DividerCommon"
                 android:layout_marginLeft="@dimen/padding_large2" />
 
-            <com.jiyouliang.fmap.view.widget.SettingItemView
+            <com.jiyouliang.monitor.view.widget.SettingItemView
                 style="@style/UserSettingItemStyle"
                 app:sivHeight="52dp"
                 app:sivSubtitle="当前城市：深圳市"
@@ -114,7 +114,7 @@
                 style="@style/DividerCommon"
                 android:layout_marginTop="@dimen/padding_size" />
 
-            <com.jiyouliang.fmap.view.widget.SettingItemView
+            <com.jiyouliang.monitor.view.widget.SettingItemView
                 android:id="@+id/sivMsgPush"
                 style="@style/UserSettingItemStyle"
                 app:sivArrowVisiable="false"
@@ -129,7 +129,7 @@
                 style="@style/DividerCommon"
                 android:layout_marginLeft="@dimen/padding_large2" />
 
-            <com.jiyouliang.fmap.view.widget.SettingItemView
+            <com.jiyouliang.monitor.view.widget.SettingItemView
                 android:id="@+id/sivDownloadNew"
                 style="@style/UserSettingItemStyle"
                 app:sivArrowVisiable="false"
@@ -145,7 +145,7 @@
                 style="@style/DividerCommon"
                 android:layout_marginLeft="@dimen/padding_large2" />
 
-            <com.jiyouliang.fmap.view.widget.SettingItemView
+            <com.jiyouliang.monitor.view.widget.SettingItemView
                 style="@style/UserSettingItemStyle"
                 app:sivHeight="52dp"
                 app:sivTitle="@string/clear_cache"
@@ -157,7 +157,7 @@
                 style="@style/DividerCommon"
                 android:layout_marginTop="@dimen/padding_size" />
 
-            <com.jiyouliang.fmap.view.widget.SettingItemView
+            <com.jiyouliang.monitor.view.widget.SettingItemView
                 style="@style/UserSettingItemStyle"
                 app:sivHeight="52dp"
                 app:sivTitle="@string/check_update"
@@ -167,7 +167,7 @@
                 style="@style/DividerCommon"
                 android:layout_marginLeft="@dimen/padding_size" />
 
-            <com.jiyouliang.fmap.view.widget.SettingItemView
+            <com.jiyouliang.monitor.view.widget.SettingItemView
                 style="@style/UserSettingItemStyle"
                 app:sivHeight="52dp"
                 app:sivTitle="@string/about_map"
@@ -177,7 +177,7 @@
                 style="@style/DividerCommon"
                 android:layout_marginLeft="@dimen/padding_size" />
 
-            <com.jiyouliang.fmap.view.widget.SettingItemView
+            <com.jiyouliang.monitor.view.widget.SettingItemView
                 style="@style/UserSettingItemStyle"
                 app:sivHeight="52dp"
                 app:sivTitle="@string/map_lab"
@@ -195,7 +195,7 @@
 
                 <View style="@style/DividerCommon" />
 
-                <com.jiyouliang.fmap.view.widget.SettingItemView
+                <com.jiyouliang.monitor.view.widget.SettingItemView
                     android:id="@+id/siv_logout"
                     style="@style/UserSettingItemStyle"
                     app:sivArrowVisiable="false"

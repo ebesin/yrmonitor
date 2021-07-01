@@ -76,4 +76,15 @@
     <string name="setArgs">参数下发</string>
     <string name="setSpeed">速度控制</string>
     <string name="device_state">设备状态</string>
+    <string name="user_detail_help_count230">预计帮助230</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="green_house_plant">大棚种植地</string>
+    <string name="no_device">没有设备</string>
+    <string name="agricultural_robot1">农业机器人(001)</string>
+    <string name="agricultural_robot2">农业机器人(002)</string>
+    <string name="remote_control">远程控制</string>
+    <string name="current_direction">当前方向</string>
+    <string name="current_angle">当前角度</string>
+    <string name="current_distance">当前距离级别</string>
+    <string name="current_speed">当前速度</string>
 </resources>

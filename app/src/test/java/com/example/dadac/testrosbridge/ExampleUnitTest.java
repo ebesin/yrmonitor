@@ -1,12 +1,12 @@
 package com.example.dadac.testrosbridge;
 
-import android.util.Log;
-
-import com.dadac.testrosbridge.RCApplication;
 import com.google.gson.Gson;
 import com.jilk.ros.ROSClient;
 import com.jilk.ros.rosbridge.ROSBridgeClient;
-import com.jiyouliang.fmap.bean.Status;
+import com.jiyouliang.monitor.bean.Angular;
+import com.jiyouliang.monitor.bean.Linear;
+import com.jiyouliang.monitor.bean.Status;
+import com.jiyouliang.monitor.bean.Twist;
 
 import org.junit.Test;
 
@@ -73,5 +73,13 @@ public class ExampleUnitTest {
         String data = new Gson().toJson(status);
         String msg1 = "{ \"op\": \"publish\", \"topic\": \"/chatter\", \"msg\": " + data + "}";
         System.out.println(msg1);
+    }
+
+    @Test
+    public void testTwist(){
+        Linear linear = new Linear(0.2);
+        Angular angular = new Angular(0);
+        Twist twist = new Twist(linear,angular);
+        System.out.println(new Gson().toJson(twist));
     }
 }

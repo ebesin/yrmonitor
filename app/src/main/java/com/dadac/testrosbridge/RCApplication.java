@@ -13,6 +13,7 @@ public class RCApplication extends Application {
 
 
     ROSBridgeClient client;
+    boolean isConn = false;
 
     @Override
     public void onCreate() {
@@ -25,6 +26,14 @@ public class RCApplication extends Application {
             client.disconnect();
         super.onTerminate();
 
+    }
+
+    public boolean isConn() {
+        return isConn;
+    }
+
+    public void setConn(boolean conn) {
+        isConn = conn;
     }
 
     public ROSBridgeClient getRosClient() {

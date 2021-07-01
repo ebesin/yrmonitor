@@ -34,4 +34,6 @@
     <color name="color_tab_2">#ff8c6a</color>
     <color name="color_tab_3">#383547</color>
     <color name="color_tab_4">#444153</color>
+
+    <color name="black">#FF000000</color>
 </resources>

@@ -65,4 +65,15 @@
         <!--下部分文字内容-->
         <attr name="vitTitle" format="string|reference"/>
     </declare-styleable>
+
+    <declare-styleable name="RockerView">
+        <attr format="color|reference" name="areaBackground"/>
+        <attr format="color|reference" name="rockerBackground"/>
+        <attr format="float" name="rockerScale"/>
+        <attr format="integer" name="rockerSpeedLevel"/>
+        <attr name="rockerCallBackMode">
+            <flag name="CALL_BACK_MODE_MOVE" value="0"/>
+            <flag name="CALL_BACK_MODE_STATE_CHANGE" value="1"/>
+        </attr>
+    </declare-styleable>
 </resources>

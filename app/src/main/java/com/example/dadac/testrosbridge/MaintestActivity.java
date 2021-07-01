@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.dadac.testrosbridge.RosBridgeActivity;
-import com.jiyouliang.fmap.R;
+import com.jiyouliang.monitor.R;
 
 public class MaintestActivity extends AppCompatActivity {
 

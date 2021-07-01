@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:padding="@dimen/padding_large2">
 
-    <com.jiyouliang.fmap.view.widget.SettingItemView
+    <com.jiyouliang.monitor.view.widget.SettingItemView
         android:id="@+id/siv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
