@@ -291,7 +291,7 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
         charge_cardview.setOnClickListener(this);
         setArgs_cardView = findViewById(R.id.setArgs_cardView);
         setArgs_cardView.setOnClickListener(this);
-        setSpeed_cardView = findViewById(R.id.setSpeed_cardView);
+        setSpeed_cardView = findViewById(R.id.device_state_cardView);
         setSpeed_cardView.setOnClickListener(this);
         charge_waveView = findViewById(R.id.charge_waveView);
         charge_waveView.start();

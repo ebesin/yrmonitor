@@ -6,6 +6,7 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
@@ -115,8 +116,8 @@ public class main3Activity extends BaseActivity implements View.OnClickListener,
                     speed_data.setText(String.format("%.2fm/s", status.getSpeed()));
                     front_wheel_angle_data.setText(String.format("%.2f°", status.getFront_wheel_angle()));
                     yaw_angle_data.setText(String.format("%.2f°", status.getYaw_angle()));
-                    lat_data.setText(String.format("%.5f",status.getLat()));
-                    lng_data.setText(String.format("%.5f",status.getLng()));
+                    lat_data.setText(String.format("%.5f", status.getLat()));
+                    lng_data.setText(String.format("%.5f", status.getLng()));
                     break;
                 case 2:
                     Battery battery = (Battery) msg.obj;
@@ -208,7 +209,7 @@ public class main3Activity extends BaseActivity implements View.OnClickListener,
 
     //ros通信
     ROSBridgeClient client;
-    String ip = "192.168.1.176";   //ros的 IP
+    String ip = "192.168.1.103";   //ros的 IP
     String port = "9090";
     boolean isConn = false;
     Runnable connectRunnable = new Runnable() {
@@ -323,6 +324,7 @@ public class main3Activity extends BaseActivity implements View.OnClickListener,
 
 
     private void initData() {
+//        this.ip =  ((RCApplication) getApplication()).getIp();
 
 //        设置gps数据改变时的事件
         gpsDataViewModel = ViewModelProviders.of(this).get((GPSDataViewModel.class));
@@ -528,14 +530,14 @@ public class main3Activity extends BaseActivity implements View.OnClickListener,
     }
 
     private void SendDataToRos(String topic, String data) {
-        String msg1 = "{ \"op\": \"publish\", \"topic\": \"/" + topic + "\", \"msg\": " + data +"}";
+        String msg1 = "{ \"op\": \"publish\", \"topic\": \"/" + topic + "\", \"msg\": " + data + "}";
         //        String msg2 = "{\"op\":\"publish\",\"topic\":\"/cmd_vel\",\"msg\":{\"linear\":{\"x\":" + 0 + ",\"y\":" +
         //                0 + ",\"z\":0},\"angular\":{\"x\":0,\"y\":0,\"z\":" + 0.5 + "}}}";
         client.send(msg1);
     }
 
     //发送数据到ROS端
-    private void sendData(String topic,String data) {
+    private void sendData(String topic, String data) {
         String msg1 = "{ \"op\": \"publish\", \"topic\": \"/" + topic + "\", \"msg\": { \"data\": \"" + data + "\"}}";
         //        String msg2 = "{\"op\":\"publish\",\"topic\":\"/cmd_vel\",\"msg\":{\"linear\":{\"x\":" + 0 + ",\"y\":" +
         //                0 + ",\"z\":0},\"angular\":{\"x\":0,\"y\":0,\"z\":" + 0.5 + "}}}";
@@ -559,7 +561,7 @@ public class main3Activity extends BaseActivity implements View.OnClickListener,
             message.obj = battery;
             handler.sendMessage(message);
             Log.i("battery", event.msg);
-        }else if("/control".equals(event.name)){
+        } else if ("/control".equals(event.name)) {
             Log.i("control", event.msg);
         }
     }
@@ -709,7 +711,7 @@ public class main3Activity extends BaseActivity implements View.OnClickListener,
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            sendData("control","stop");
+                            sendData("control", "stop");
                         }
                     }).start();
                     dialog.dismiss();      //取消显示(关闭)对话框
@@ -738,7 +740,7 @@ public class main3Activity extends BaseActivity implements View.OnClickListener,
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            sendData("control","back");
+                            sendData("control", "back");
                         }
                     }).start();
                     dialog.dismiss();      //取消显示(关闭)对话框
@@ -768,10 +770,11 @@ public class main3Activity extends BaseActivity implements View.OnClickListener,
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                Linear linear = new Linear(0);
-                                Angular angular = new Angular(0);
-                                Twist twist = new Twist(linear,angular);
-                                SendDataToRos("cmd_vel",new Gson().toJson(twist));
+//                                Linear linear = new Linear(0);
+//                                Angular angular = new Angular(0);
+//                                Twist twist = new Twist(linear, angular);
+//                                SendDataToRos("cmd_vel", new Gson().toJson(twist));
+                                sendData("control", "stop");
                             }
                         }).start();
                         dialog.dismiss();      //取消显示(关闭)对话框
@@ -800,10 +803,11 @@ public class main3Activity extends BaseActivity implements View.OnClickListener,
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                Linear linear = new Linear(0.2);
-                                Angular angular = new Angular(0);
-                                Twist twist = new Twist(linear,angular);
-                                SendDataToRos("cmd_vel",new Gson().toJson(twist));
+//                                Linear linear = new Linear(0.2);
+//                                Angular angular = new Angular(0);
+//                                Twist twist = new Twist(linear,angular);
+//                                SendDataToRos("cmd_vel",new Gson().toJson(twist));
+                                sendData("control", "start");
                             }
                         }).start();
                         dialog.dismiss();      //取消显示(关闭)对话框
@@ -826,8 +830,9 @@ public class main3Activity extends BaseActivity implements View.OnClickListener,
             args_dialog.show();
         } else if (v == device_state_cardView) {
             status_dialog.show();
-        }else if(v == remote_control_cardView){
-
+        } else if (v == remote_control_cardView) {
+            Intent intent = new Intent(this, ControlActivity.class);
+            startActivity(intent);
         }
     }
 
@@ -905,9 +910,9 @@ public class main3Activity extends BaseActivity implements View.OnClickListener,
             public void onClick(DialogInterface dialog, int which) {
                 String linearText = String.valueOf(speed_data_inputview.getText());
                 String angularText = String.valueOf(angle_data_inputview.getText());
-                if(linearText.equals("") || angularText.equals("")){
+                if (linearText.equals("") || angularText.equals("")) {
                     showToast("请检查输入是否完整");
-                }else {
+                } else {
                     final Linear linear = new Linear(Double.parseDouble(linearText));
                     final Angular angular = new Angular(Double.parseDouble(angularText));
                     new Thread(new Runnable() {

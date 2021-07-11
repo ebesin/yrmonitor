@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Intent robot2_intent;
 
     ROSBridgeClient client;
-    String ip;   //ros的 IP
+    String ip = "192.168.1.103";;   //ros的 IP
     String port = "9090";
 
     Intent testIntent;
@@ -86,7 +86,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             message1.what = 1;
             handler.sendMessage(message1);
             connectToRobot2();
-
         }
     };
 
@@ -113,7 +112,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_layout);
         initView();
-
     }
 
     private void initView() {
@@ -132,7 +130,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void connectToRobot2() {
-        ip = "192.168.1.176";
+        this.ip =  ((RCApplication) getApplication()).getIp();
+
         client = new ROSBridgeClient("ws://" + ip + ":" + port);
         boolean conneSucc = client.connect(new ROSClient.ConnectionStatusListener() {
             @Override

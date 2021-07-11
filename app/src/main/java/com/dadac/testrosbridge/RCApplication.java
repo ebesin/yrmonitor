@@ -11,7 +11,7 @@ import com.jilk.ros.rosbridge.ROSBridgeClient;
  */
 public class RCApplication extends Application {
 
-
+    String ip;
     ROSBridgeClient client;
     boolean isConn = false;
 
@@ -26,6 +26,15 @@ public class RCApplication extends Application {
             client.disconnect();
         super.onTerminate();
 
+    }
+
+    public void setIp(String ip){
+        this.ip = ip;
+    }
+
+
+    public String getIp(){
+        return ip;
     }
 
     public boolean isConn() {
@@ -43,8 +52,6 @@ public class RCApplication extends Application {
     public void setRosClient(ROSBridgeClient client) {
         this.client = client;
     }
-
-
 }
 
 

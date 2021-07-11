@@ -14,11 +14,17 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.dadac.testrosbridge.RCApplication;
+import com.google.gson.Gson;
+import com.jilk.ros.rosbridge.ROSBridgeClient;
+import com.jiyouliang.monitor.bean.Angular;
+import com.jiyouliang.monitor.bean.Linear;
+import com.jiyouliang.monitor.bean.Twist;
 import com.jiyouliang.monitor.ui.BaseActivity;
 import com.jiyouliang.monitor.view.MyRockerView;
 
 
-public class ControlActivity extends BaseActivity implements View.OnClickListener{
+public class ControlActivity extends BaseActivity implements View.OnClickListener {
     private Button button;
     private MyRockerView rockerView_left;
     private MyRockerView rockerView_right;
@@ -30,21 +36,26 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
     private TextView current_angle;
 
     private int iscenter_left = 0;
-    private int speedLevel_left = 0;
+    private double speedLevel_left = 0;
     private double current_angle_left = 0;
 
     private int iscenter_right = 0;
-    private int angleLevel_right = 0;
+    private double angleLevel_right = 0;
     private double current_angle_right = 0;
 
     private Handler handler;
+
+    private ROSBridgeClient client;
+
+    private float linearValue;
+    private float angularValue;
 
 
     @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_control);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             //5.0 全透明实现
             //getWindow.setStatusBarColor(Color.TRANSPARENT)
@@ -62,16 +73,25 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
             @Override
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
-                switch (msg.what){
+                switch (msg.what) {
                     case 0:
-
+                        current_speed.setText(String.format("%.3f", linearValue));
+                        current_angle.setText(String.format("%.3f", angularValue));
+                        final Linear linear = new Linear(linearValue);
+                        final Angular angular = new Angular(angularValue);
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                SendDataToRos("cmd_vel",new Gson().toJson(new Twist(linear,angular)));
+                            }
+                        }).start();
                         break;
                     case 1:
 //                        current_distance.setText(String.valueOf(speedLevel*Math.sin(current_angle)));
-                        current_speed.setText(String.format("%.3f", iscenter_left*speedLevel_left *Math.sin(current_angle_left)));
+                        current_speed.setText(String.format("%.3f", iscenter_left * speedLevel_left * Math.sin(current_angle_left)));
                         break;
                     case 2:
-                        current_angle.setText(String.format("%.3f",iscenter_right*angleLevel_right*Math.cos(current_angle_right)));
+                        current_angle.setText(String.format("%.3f", iscenter_right * angleLevel_right * Math.cos(current_angle_right)));
                         break;
                 }
             }
@@ -89,11 +109,17 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
         current_speed = findViewById(R.id.current_speed);
         current_direction_right = findViewById(R.id.current_direction_right);
         current_angle = findViewById(R.id.current_angle);
+        client = ((RCApplication) getApplication()).getRosClient();
     }
 
+    private void SendDataToRos(String topic, String data) {
+        String msg1 = "{ \"op\": \"publish\", \"topic\": \"/" + topic + "\", \"msg\": " + data +"}";
+        //        String msg2 = "{\"op\":\"publish\",\"topic\":\"/cmd_vel\",\"msg\":{\"linear\":{\"x\":" + 0 + ",\"y\":" +
+        //                0 + ",\"z\":0},\"angular\":{\"x\":0,\"y\":0,\"z\":" + 0.5 + "}}}";
+        client.send(msg1);
+    }
 
-
-    private void setListener(){
+    private void setListener() {
 
         /**
          * 左遥感距离监听
@@ -101,11 +127,12 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
         rockerView_left.setOnDistanceLevelListener(new MyRockerView.OnDistanceLevelListener() {
             @Override
             public void onDistanceLevel(int level) {
-                speedLevel_left = level;
+                speedLevel_left = (float)level/10;
+                linearValue = (float) (iscenter_left * speedLevel_left * Math.sin(current_angle_left));
                 Message message = new Message();
-                message.what = 1;
+                message.what = 0;
                 handler.sendMessage(message);
-                Log.d("level", String.valueOf(level));
+                Log.d("level", String.valueOf(speedLevel_left));
             }
         });
 
@@ -116,8 +143,9 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
             @Override
             public void onDistanceLevel(int level) {
                 angleLevel_right = level;
+                angularValue = (float) (iscenter_right * angleLevel_right * Math.cos(current_angle_right));
                 Message message = new Message();
-                message.what = 2;
+                message.what = 0;
                 handler.sendMessage(message);
             }
         });
@@ -125,7 +153,7 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
         /**
          * 左遥感方向监听
          */
-        rockerView_left.setOnShakeListener(MyRockerView.DirectionMode.DIRECTION_2_VERTICAL,new MyRockerView.OnShakeListener() {
+        rockerView_left.setOnShakeListener(MyRockerView.DirectionMode.DIRECTION_2_VERTICAL, new MyRockerView.OnShakeListener() {
             @Override
             public void onStart() {
 
@@ -133,7 +161,7 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
 
             @Override
             public void direction(MyRockerView.Direction direction) {
-                switch (direction){
+                switch (direction) {
                     case DIRECTION_CENTER:
                         iscenter_left = 0;
                         current_direction_left.setText("无");
@@ -148,10 +176,12 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
                         iscenter_left = 1;
                         break;
                 }
+                linearValue = (float) (iscenter_left * speedLevel_left * Math.sin(current_angle_left));
                 Message message = new Message();
-                message.what = 1;
+                message.what = 0;
                 handler.sendMessage(message);
             }
+
             @Override
             public void onFinish() {
 
@@ -166,9 +196,10 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
             public void onStart() {
 
             }
+
             @Override
             public void direction(MyRockerView.Direction direction) {
-                switch (direction){
+                switch (direction) {
                     case DIRECTION_CENTER:
                         iscenter_right = 0;
                         current_direction_right.setText("无");
@@ -182,10 +213,12 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
                         current_direction_right.setText("右");
                         break;
                 }
+                angularValue = (float) (iscenter_right * angleLevel_right * Math.cos(current_angle_right));
                 Message message = new Message();
-                message.what = 2;
+                message.what = 0;
                 handler.sendMessage(message);
             }
+
             @Override
             public void onFinish() {
 
@@ -204,11 +237,13 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
             @Override
             public void angle(double angle) {
                 Log.d("angle", String.valueOf(angle));
-                current_angle_left = Math.PI*((360-angle)/180);
+                current_angle_left = Math.PI * ((360 - angle) / 180);
+                linearValue = (float) (iscenter_left * speedLevel_left * Math.sin(current_angle_left));
                 Message message = new Message();
-                message.what = 1;
+                message.what = 0;
                 handler.sendMessage(message);
             }
+
             @Override
             public void onFinish() {
 
@@ -226,9 +261,10 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
 
             @Override
             public void angle(double angle) {
-                current_angle_right = Math.PI*((180-angle)/180);
+                current_angle_right = Math.PI * ((180 - angle) / 180);
+                angularValue = (float) (iscenter_right * angleLevel_right * Math.cos(current_angle_right));
                 Message message = new Message();
-                message.what = 2;
+                message.what = 0;
                 handler.sendMessage(message);
             }
 

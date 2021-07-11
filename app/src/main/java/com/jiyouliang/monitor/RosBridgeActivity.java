@@ -111,6 +111,7 @@ public class RosBridgeActivity extends Activity implements View.OnClickListener 
                 isConn = true;
                 connect.setText("点击断开连接");
                 showTip("连接成功");
+                ((RCApplication) getApplication()).setIp(ip);
                 editor.putString("ip", ip);
                 editor.commit();
                 Log.d("dachen", "Connect ROS success");

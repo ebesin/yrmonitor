@@ -28,7 +28,8 @@
         android:theme="@style/AppTheme">
 
                 <activity
-                    android:name="com.jiyouliang.monitor.MainActivity">
+                    android:name="com.jiyouliang.monitor.MainActivity"
+                    android:screenOrientation="portrait">
                     <intent-filter>
                         <action android:name="android.intent.action.VIEW" />
 
@@ -51,9 +52,13 @@
 <!--            </intent-filter>-->
 <!--        </activity>-->
 
-        <activity android:name="com.jiyouliang.monitor.RosBridgeActivity"/>
+        <activity
+            android:name="com.jiyouliang.monitor.RosBridgeActivity"
+            android:screenOrientation="portrait"/>
 
-        <activity android:name="com.jiyouliang.monitor.ui.SplashActivity" >
+        <activity
+            android:name="com.jiyouliang.monitor.ui.SplashActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -68,15 +73,20 @@
 
         <activity
             android:name="com.jiyouliang.monitor.MapActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/MapTheme"/>
         <activity
             android:name="com.jiyouliang.monitor.main3Activity"
+            android:screenOrientation="portrait"
             android:theme="@style/MapTheme"/>
 
-
+        <activity android:name=".ControlActivity"
+            android:screenOrientation="sensorLandscape"
+            android:theme="@style/controlStyle"/>
 
         <activity
             android:name="com.jiyouliang.monitor.Map2Activity"
+            android:screenOrientation="portrait"
             android:theme="@style/MapTheme"/>
 
         <activity
