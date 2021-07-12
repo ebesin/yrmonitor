@@ -20,9 +20,10 @@ import com.common.CatLoadingView;
 import com.dadac.testrosbridge.RCApplication;
 import com.jilk.ros.ROSClient;
 import com.jilk.ros.rosbridge.ROSBridgeClient;
+import com.jiyouliang.monitor.ui.BaseActivity;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener , View.OnLongClickListener {
 
     Toolbar toolbar;
     CardView agriculture_robot1;
@@ -118,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         toolbar = findViewById(R.id.toolbar);
         agriculture_robot1 = findViewById(R.id.agriculture_robot1);
         agriculture_robot1.setOnClickListener(this);
+        agriculture_robot1.setOnLongClickListener(this);
         agriculture_robot2 = findViewById(R.id.agriculture_robot2);
         agriculture_robot2.setOnClickListener(this);
         testConn = findViewById(R.id.testConn);
@@ -170,6 +172,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Toast.makeText(MainActivity.this, tip, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public void setDialog(){
+
     }
 
 
@@ -228,5 +234,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             default:
         }
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+        if(v == agriculture_robot1){
+            showToast("长按了");
+        }
+        return true;
     }
 }

@@ -27,6 +27,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -81,9 +82,20 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.onlynight.waveview.WaveView;
+import com.google.gson.Gson;
+import com.jilk.ros.rosbridge.ROSBridgeClient;
+import com.jilk.ros.rosbridge.implementation.PublishEvent;
+import com.jiyouliang.monitor.ViewModel.BatteryViewModel;
 import com.jiyouliang.monitor.ViewModel.FanSpeedViewModel;
 import com.jiyouliang.monitor.ViewModel.GPSData;
 import com.jiyouliang.monitor.ViewModel.GPSDataViewModel;
+import com.jiyouliang.monitor.ViewModel.StatusViewModel;
+import com.jiyouliang.monitor.bean.Angular;
+import com.jiyouliang.monitor.bean.Battery;
+import com.jiyouliang.monitor.bean.Control;
+import com.jiyouliang.monitor.bean.Linear;
+import com.jiyouliang.monitor.bean.Status;
+import com.jiyouliang.monitor.bean.Twist;
 import com.jiyouliang.monitor.harware.SensorEventHelper;
 import com.jiyouliang.monitor.ui.BaseActivity;
 
@@ -104,7 +116,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickListener, NearbySearchView.OnNearbySearchViewClickListener, AMapGestureListener, AMapLocationListener, LocationSource, TrafficView.OnTrafficChangeListener, View.OnClickListener, MapViewInterface, PoiDetailBottomView.OnPoiDetailBottomClickListener, AMap.OnPOIClickListener, TextWatcher, Inputtips.InputtipsListener, MapHeaderView.OnMapHeaderViewClickListener, OnItemClickListener, GeocodeSearch.OnGeocodeSearchListener, CompoundButton.OnCheckedChangeListener {
+public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickListener, NearbySearchView.OnNearbySearchViewClickListener, AMapGestureListener, AMapLocationListener, LocationSource, TrafficView.OnTrafficChangeListener, View.OnClickListener, MapViewInterface, PoiDetailBottomView.OnPoiDetailBottomClickListener, AMap.OnPOIClickListener, TextWatcher, Inputtips.InputtipsListener, MapHeaderView.OnMapHeaderViewClickListener, OnItemClickListener, GeocodeSearch.OnGeocodeSearchListener, CompoundButton.OnCheckedChangeListener{
     private static final String TAG = "MapActivity";
     /**
      * 首次进入申请定位、sd卡权限
@@ -221,7 +233,37 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
     private LineChart lineChart;
     CardView charge_cardview;
     CardView setArgs_cardView;
-    CardView setSpeed_cardView;
+    CardView device_state_cardView;
+    CardView remote_control_cardView;
+
+    private StatusViewModel statusViewModel;
+    private BatteryViewModel batteryViewModel;
+
+    //dialog
+    AlertDialog charge_dialog;
+    AlertDialog args_dialog;
+    AlertDialog status_dialog;
+
+    Button emergency_stop;
+    Button back_to_home;
+    TextView charge_card_data;
+
+    //status dialog控件
+    TextView speed_data;
+    TextView front_wheel_angle_data;
+    TextView yaw_angle_data;
+    TextView lat_data;
+    TextView lng_data;
+
+    //battery dialog控件
+    TextView charge_data;
+    TextView voltage_data;
+    TextView capacity_data;
+
+    //args dialog控件
+    EditText speed_data_inputview;
+    EditText angle_data_inputview;
+
     Button determine;
     //用来保存数据
     List<Entry> list = new ArrayList<>();
@@ -251,6 +293,12 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
     LinearInterpolator linearInterpolator;
 
     AnimationDrawable[] animationDrawable = new AnimationDrawable[9];
+
+    //ros通信
+    ROSBridgeClient client;
+    String ip = "192.168.1.103";   //ros的 IP
+    String port = "9090";
+    boolean isConn = false;
 
 
     @Override
@@ -291,8 +339,12 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
         charge_cardview.setOnClickListener(this);
         setArgs_cardView = findViewById(R.id.setArgs_cardView);
         setArgs_cardView.setOnClickListener(this);
-        setSpeed_cardView = findViewById(R.id.device_state_cardView);
-        setSpeed_cardView.setOnClickListener(this);
+        device_state_cardView = findViewById(R.id.device_state_cardView);
+        device_state_cardView.setOnClickListener(this);
+        remote_control_cardView = findViewById(R.id.remote_control_cardView);
+        remote_control_cardView.setOnClickListener(this);
+
+
         charge_waveView = findViewById(R.id.charge_waveView);
         charge_waveView.start();
         spray_waveView = findViewById(R.id.spray_waveView);
@@ -368,7 +420,7 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
 
         setBottomSheet();
         setUpMap();
-
+        setDialog();
         mPadding = getResources().getDimensionPixelSize(R.dimen.padding_size);
         /*int statusBarHeight = DeviceUtils.getStatusBarHeight(this);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -450,13 +502,165 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
         }
     }
 
+    //订阅topic
+    private void publish() {
+        String msg1 = "{\"op\":\"subscribe\",\"topic\":\"/status\"}";
+        client.send(msg1);
+        String msg2 = "{\"op\":\"subscribe\",\"topic\":\"/battery\"}";
+        client.send(msg2);
+        String msg3 = "{\"op\":\"subscribe\",\"topic\":\"/control\"}";
+        client.send(msg3);
+    }
+
+    private void SendDataToRos(String topic, String data) {
+        String msg1 = "{ \"op\": \"publish\", \"topic\": \"/" + topic + "\", \"msg\": " + data + "}";
+        //        String msg2 = "{\"op\":\"publish\",\"topic\":\"/cmd_vel\",\"msg\":{\"linear\":{\"x\":" + 0 + ",\"y\":" +
+        //                0 + ",\"z\":0},\"angular\":{\"x\":0,\"y\":0,\"z\":" + 0.5 + "}}}";
+        client.send(msg1);
+    }
+
+    //发送数据到ROS端
+    private void sendData(String topic, String data) {
+        String msg1 = "{ \"op\": \"publish\", \"topic\": \"/" + topic + "\", \"msg\": { \"data\": \"" + data + "\"}}";
+        //        String msg2 = "{\"op\":\"publish\",\"topic\":\"/cmd_vel\",\"msg\":{\"linear\":{\"x\":" + 0 + ",\"y\":" +
+        //                0 + ",\"z\":0},\"angular\":{\"x\":0,\"y\":0,\"z\":" + 0.5 + "}}}";
+        client.send(msg1);
+    }
+
+
+    public void onEvent(@NonNull final PublishEvent event) {
+
+        if ("/status".equals(event.name)) {
+            Log.i("chatter", event.msg);
+            Status status = new Gson().fromJson(event.msg, Status.class);
+            Message message = new Message();
+            message.what = 3;
+            message.obj = status;
+            handler.sendMessage(message);
+        } else if ("/battery".equals(event.name)) {
+            Battery battery = new Gson().fromJson(event.msg, Battery.class);
+            Message message = new Message();
+            message.what = 4;
+            message.obj = battery;
+            handler.sendMessage(message);
+            Log.i("battery", event.msg);
+        } else if ("/control".equals(event.name)) {
+            Log.i("control", event.msg);
+        }
+    }
+
+
+    private void parseChatterTopic(PublishEvent event) {
+        Log.i("dwayne2", event.msg);
+    }
+
+    private void setDialog() {
+        /**
+         * status dialog
+         */
+        AlertDialog.Builder status_builder = new AlertDialog.Builder(this);  //先得到构造器
+        status_builder.setCancelable(true);           //将对话框以外的区域设置成无法点击
+        // 载入自定义布局
+        LayoutInflater inflater = getLayoutInflater();
+        View layout = inflater.inflate(R.layout.device_detail_layout, null);
+        status_builder.setView(layout);
+
+        yaw_angle_data = layout.findViewById(R.id.yaw_angle_data);
+        speed_data = layout.findViewById(R.id.speed_data);
+        lat_data = layout.findViewById(R.id.lat_data);
+        lng_data = layout.findViewById(R.id.lng_data);
+        front_wheel_angle_data = layout.findViewById(R.id.front_wheel_angle_data);
+
+        // 设置确认按钮
+        status_builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                dialog.dismiss();      //取消显示(关闭)对话框
+            }
+        });
+
+        // 设置取消按钮
+        status_builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();      //取消显示(关闭)对话框
+            }
+        });
+        status_dialog = status_builder.create();
+
+        /**
+         * charge dialog
+         */
+        AlertDialog.Builder charge_builder = new AlertDialog.Builder(this);  //先得到构造器
+        charge_builder.setCancelable(true);           //将对话框以外的区域设置成无法点击
+        // 载入自定义布局
+        LayoutInflater inflater2 = getLayoutInflater();
+        View layout2 = inflater2.inflate(R.layout.charge_detail_layout, null);
+        charge_builder.setView(layout2);
+        charge_data = layout2.findViewById(R.id.charge_data);
+        voltage_data = layout2.findViewById(R.id.voltage_data);
+        capacity_data = layout2.findViewById(R.id.capacity_data);
+        // 设置确认按钮
+        charge_builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();      //取消显示(关闭)对话框
+            }
+        });
+        charge_dialog = charge_builder.create();
+
+        /**
+         * args dialog
+         */
+        AlertDialog.Builder args_builder = new AlertDialog.Builder(this);  //先得到构造器
+        args_builder.setCancelable(true);           //将对话框以外的区域设置成无法点击
+        // 载入自定义布局
+        LayoutInflater inflater3 = getLayoutInflater();
+        View layout3 = inflater3.inflate(R.layout.set_args_layout3, null);
+        args_builder.setView(layout3);
+        speed_data_inputview = layout3.findViewById(R.id.speed_data_inputview);
+        angle_data_inputview = layout3.findViewById(R.id.angle_data_inputview);
+
+        // 设置确认按钮
+        args_builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String linearText = String.valueOf(speed_data_inputview.getText());
+                String angularText = String.valueOf(angle_data_inputview.getText());
+                if (linearText.equals("") || angularText.equals("")) {
+                    showToast("请检查输入是否完整");
+                } else {
+                    final Linear linear = new Linear(Double.parseDouble(linearText));
+                    final Angular angular = new Angular(Double.parseDouble(angularText));
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Twist twist = new Twist(linear, angular);
+                            SendDataToRos("cmd_vel", new Gson().toJson(twist));
+                        }
+                    }).start();
+                }
+                dialog.dismiss();      //取消显示(关闭)对话框
+            }
+        }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();      //取消显示(关闭)对话框
+            }
+        });
+        // 设置取消按钮
+        args_dialog = args_builder.create();
+    }
+
+
     @Override
     public void onClick(View v) {
         if (v == null) {
             return;
         }
         // 点击关闭POI detail
-        if (v == mPoiColseView) {
+        else if (v == mPoiColseView) {
             mBehavior.setHideable(true);
             resetGpsButtonPosition();
             hidePoiDetail();
@@ -464,7 +668,7 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
         }
 
         // 分享
-        if (v == mShareContainer) {
+        else if (v == mShareContainer) {
             if (mAmapLocation != null && mLatLng != null) {
                 if (isPoiClick) {
                     // 分享点击poi的位置
@@ -478,13 +682,13 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
         }
 
         // 头部返回ImageButton
-        if (v == mImgBtnBack) {
+        else if (v == mImgBtnBack) {
             mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             return;
         }
 
         // 路线,进入导航页面
-        if (v == mTvRoute) {
+        else if (v == mTvRoute) {
             if (mLatLng == null) {
                 showToast(getString(R.string.location_failed_hold_on));
                 return;
@@ -498,13 +702,13 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
         }
 
         // 点击搜索左侧返回箭头
-        if (v == mIvLeftSearch) {
+        else if (v == mIvLeftSearch) {
             hideSearchTipView();
             showMapView();
             return;
         }
 
-        if (v == aSwitch) {
+        else if (v == aSwitch) {
             final boolean ischeck = aSwitch.isChecked();
             if (!ischeck) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -516,11 +720,15 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
                 builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                sendData("control", "stop");
+                            }
+                        }).start();
                         dialog.dismiss();      //取消显示(关闭)对话框
                     }
                 });
-
                 //忽略按钮监听事件
                 builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override
@@ -540,11 +748,15 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
                 builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                sendData("control", "stop");
+                            }
+                        }).start();
                         dialog.dismiss();      //取消显示(关闭)对话框
                     }
                 });
-
                 //忽略按钮监听事件
                 builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override
@@ -555,81 +767,80 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
                 });
                 builder.create().show();         //创建并显示对话框
             }
-        }
+        }else if(v == emergency_stop){
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setIcon(R.drawable.ic_prompt);   //设置图标
+            builder.setTitle("确认吗");                //标题
+            builder.setMessage("确定紧急停止吗？");       //设置内容
+            builder.setCancelable(false);
+            //确认按钮监听事件
+            builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    final String json = new Gson().toJson(new Control("stop"));
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            sendData("control", "stop");
+                        }
+                    }).start();
+                    dialog.dismiss();      //取消显示(关闭)对话框
+                }
+            });
 
-        if (v == charge_cardview) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);  //先得到构造器
-            builder.setCancelable(true);           //将对话框以外的区域设置成无法点击
-            // 载入自定义布局
-            LayoutInflater inflater = getLayoutInflater();
-            View layout = inflater.inflate(R.layout.charge_detail_layout, null);
-            builder.setView(layout);
-
-            // 设置确认按钮
-            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            //忽略按钮监听事件
+            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();      //取消显示(关闭)对话框
                 }
             });
             builder.create().show();         //创建并显示对话框
-
-        }
-
-        if(v == setArgs_cardView){
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);  //先得到构造器
-            builder.setCancelable(true);           //将对话框以外的区域设置成无法点击
-            // 载入自定义布局
-            LayoutInflater inflater = getLayoutInflater();
-            View layout = inflater.inflate(R.layout.set_args_layout, null);
-            builder.setView(layout);
-
-            // 设置确认按钮
-            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+        }else if (v == back_to_home) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setIcon(R.drawable.ic_prompt);   //设置图标
+            builder.setTitle("确认吗");                //标题
+            builder.setMessage("确定返航吗？");       //设置内容
+            builder.setCancelable(false);
+            //确认按钮监听事件
+            builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    final String json = new Gson().toJson(new Control("back"));
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            sendData("control", "back");
+                        }
+                    }).start();
                     dialog.dismiss();      //取消显示(关闭)对话框
                 }
             });
 
-            // 设置取消按钮
+            //取消按钮监听事件
             builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();      //取消显示(关闭)对话框
                 }
             });
-            builder.create().show();
+            builder.create().show();         //创建并显示对话框
         }
-
-        if(v == setSpeed_cardView){
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);  //先得到构造器
-            builder.setCancelable(true);           //将对话框以外的区域设置成无法点击
-            // 载入自定义布局
-            LayoutInflater inflater = getLayoutInflater();
-            View layout = inflater.inflate(R.layout.set_speed_layout, null);
-            builder.setView(layout);
-
-            // 设置确认按钮
-            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();      //取消显示(关闭)对话框
-                }
-            });
-
-            // 设置取消按钮
-            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();      //取消显示(关闭)对话框
-                }
-            });
-            builder.create().show();
+        else if (v == charge_cardview) {
+            charge_dialog.show();         //创建并显示对话框
+        } else if (v == setArgs_cardView) {
+            args_dialog.show();
+        } else if (v == device_state_cardView) {
+            status_dialog.show();
+        } else if (v == remote_control_cardView) {
+            Intent intent = new Intent(this, ControlActivity.class);
+            startActivity(intent);
         }
     }
-    private void initData() {
 
+
+
+    private void initData() {
 //        设置gps数据改变时的事件
         gpsDataViewModel = ViewModelProviders.of(this).get((GPSDataViewModel.class));
         gpsDataViewModel.getGpsData().observe(this, new Observer<GPSData>() {
@@ -679,7 +890,6 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
 
     public void changeFromSpeed(int[] ints) {
         System.out.println("changefronspeed===============");
-
         for (int i = 0; i < spray_large_heads.length; i++) {
             switch (ints[i]){
                 case 20:

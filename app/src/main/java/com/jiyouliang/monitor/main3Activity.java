@@ -770,10 +770,6 @@ public class main3Activity extends BaseActivity implements View.OnClickListener,
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-//                                Linear linear = new Linear(0);
-//                                Angular angular = new Angular(0);
-//                                Twist twist = new Twist(linear, angular);
-//                                SendDataToRos("cmd_vel", new Gson().toJson(twist));
                                 sendData("control", "stop");
                             }
                         }).start();
@@ -803,17 +799,12 @@ public class main3Activity extends BaseActivity implements View.OnClickListener,
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-//                                Linear linear = new Linear(0.2);
-//                                Angular angular = new Angular(0);
-//                                Twist twist = new Twist(linear,angular);
-//                                SendDataToRos("cmd_vel",new Gson().toJson(twist));
                                 sendData("control", "start");
                             }
                         }).start();
                         dialog.dismiss();      //取消显示(关闭)对话框
                     }
                 });
-
                 //忽略按钮监听事件
                 builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override

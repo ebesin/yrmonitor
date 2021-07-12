@@ -183,6 +183,8 @@ public class RosBridgeActivity extends Activity implements View.OnClickListener 
         Log.d("dachen", event.msg);
     }
 
+
+
     private void parseChatterTopic(PublishEvent event) {
         Log.d("event2", "receive2");
         Log.i("dwayne2", event.msg);
