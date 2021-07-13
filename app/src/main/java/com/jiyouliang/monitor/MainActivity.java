@@ -1,33 +1,50 @@
 package com.jiyouliang.monitor;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.common.CatLoadingView;
 import com.dadac.testrosbridge.RCApplication;
 import com.jilk.ros.ROSClient;
 import com.jilk.ros.rosbridge.ROSBridgeClient;
+import com.jiyouliang.monitor.bean.Device;
+import com.jiyouliang.monitor.database.DatabaseHelper;
 import com.jiyouliang.monitor.ui.BaseActivity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends BaseActivity implements View.OnClickListener , View.OnLongClickListener {
 
     Toolbar toolbar;
+
     CardView agriculture_robot1;
     CardView agriculture_robot2;
+
+    List<TextView> agriculture_robots = new ArrayList<>();
     Button testConn;
     CatLoadingView mView;
     Intent robot1_intent;
@@ -39,6 +56,25 @@ public class MainActivity extends BaseActivity implements View.OnClickListener ,
 
     Intent testIntent;
     Thread thread;
+
+    AlertDialog change_device_info_dialog;
+    String device_name;
+
+    Context context;
+
+    TextView robot1_name;
+    TextView robot2_name;
+
+
+    List<Device> devices = new ArrayList<>();
+
+    EditText device_name_inputview;
+    EditText ip_inputview;
+
+    DatabaseHelper databaseHelper;
+    SQLiteDatabase writableDatabase;
+    SQLiteDatabase readableDatabase;
+
     @SuppressLint("HandlerLeak")
     Handler handler = new Handler() {
         @Override
@@ -52,8 +88,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener ,
                     startActivity(robot1_intent);
                     break;
                 case 3:
+                    Device device = (Device) msg.obj;
                     mView.dismiss();
-                    startActivity(robot2_intent);
+                    startActivity(new Intent(MainActivity.this,device.getaClass()));
                     break;
                 case 4:
                     mView.dismiss();
@@ -69,14 +106,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener ,
             Message message1 = new Message();
             message1.what = 1;
             handler.sendMessage(message1);
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            Message message2 = new Message();
-            message2.what = 2;
-            handler.sendMessage(message2);
+//            try {
+//                Thread.sleep(1000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//            Message message2 = new Message();
+//            message2.what = 2;
+//            handler.sendMessage(message2);
+            connectToRobot(devices.get(0));
         }
     };
 
@@ -86,7 +124,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener ,
             Message message1 = new Message();
             message1.what = 1;
             handler.sendMessage(message1);
-            connectToRobot2();
+            connectToRobot(devices.get(1));
         }
     };
 
@@ -116,25 +154,45 @@ public class MainActivity extends BaseActivity implements View.OnClickListener ,
     }
 
     private void initView() {
+        context = this;
+        databaseHelper = new DatabaseHelper(context);
+        writableDatabase = databaseHelper.getWritableDatabase();
+        readableDatabase = databaseHelper.getReadableDatabase();
         toolbar = findViewById(R.id.toolbar);
         agriculture_robot1 = findViewById(R.id.agriculture_robot1);
         agriculture_robot1.setOnClickListener(this);
         agriculture_robot1.setOnLongClickListener(this);
         agriculture_robot2 = findViewById(R.id.agriculture_robot2);
         agriculture_robot2.setOnClickListener(this);
+        agriculture_robot2.setOnLongClickListener(this);
+        robot1_name = findViewById(R.id.robot1_name);
+        robot2_name = findViewById(R.id.robot2_name);
+        agriculture_robots.add(robot1_name);
+        agriculture_robots.add(robot2_name);
         testConn = findViewById(R.id.testConn);
         testConn.setOnClickListener(this);
         setToolbar();
         mView = new CatLoadingView();
-        robot1_intent = new Intent(this, MapActivity.class);
-        robot2_intent = new Intent(this, main3Activity.class);
+        robot1_intent = new Intent(this, Robot1Activity.class);
+        robot2_intent = new Intent(this, Robot2Activity.class);
         testIntent = new Intent(this, RosBridgeActivity.class);
+        Cursor query = readableDatabase.query("robots", new String[]{"ID", "name","ip"},
+                null, null, null, null, null);
+        while(query.moveToNext()){
+            devices.add(new Device(query.getString(0),query.getString(1),query.getString(2)));
+        }
+        robot1_name.setText(devices.get(0).getName());
+        robot2_name.setText(devices.get(1).getName());
+        devices.get(0).setName_textView(robot1_name);
+        devices.get(0).setaClass(Robot1Activity.class);
+        devices.get(1).setName_textView(robot2_name);
+        devices.get(1).setaClass(Robot2Activity.class);
     }
 
-    public void connectToRobot2() {
+    public void connectToRobot(final Device device) {
         this.ip =  ((RCApplication) getApplication()).getIp();
 
-        client = new ROSBridgeClient("ws://" + ip + ":" + port);
+        client = new ROSBridgeClient("ws://" + device.getIp() + ":" + port);
         boolean conneSucc = client.connect(new ROSClient.ConnectionStatusListener() {
             @Override
             public void onConnect() {
@@ -144,6 +202,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener ,
                 showTip("连接成功");
                 Message message2 = new Message();
                 message2.what = 3;
+                message2.obj = device;
                 handler.sendMessage(message2);
                 Log.d("dwayne", "Connect ROS success");
             }
@@ -174,10 +233,45 @@ public class MainActivity extends BaseActivity implements View.OnClickListener ,
         });
     }
 
-    public void setDialog(){
-
+    public void createDialog(final Device device){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        LayoutInflater inflater = getLayoutInflater();
+        View layout = inflater.inflate(R.layout.change_info_layout, null);
+        builder.setView(layout);
+        device_name_inputview = layout.findViewById(R.id.device_name_inputview);
+        ip_inputview = layout.findViewById(R.id.ip_inputview);
+        device_name_inputview.setText(device.getName());
+        ip_inputview.setText(device.getIp());
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(TextUtils.isEmpty(device_name_inputview.getText()) && TextUtils.isEmpty(ip_inputview.getText())){
+                    showToast("请输入完整的设备信息");
+                }else {
+                    String name = device_name_inputview.getText().toString();
+                    String ip = ip_inputview.getText().toString();
+                    ContentValues values = new ContentValues();
+                    values.put("name",name);
+                    values.put("ip",ip);
+                    String selection = "ID = ?";
+                    writableDatabase.update("robots",values,selection,new String[]{device.getId()});
+                    device.getName_textView().setText(name);
+                    device.setName(name);
+                    device.setIp(ip);
+                    showToast("修改成功");
+                    dialog.dismiss();
+                }
+            }
+        });
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.create().show();
     }
-
 
     /**
      * 设置toolbar样式
@@ -239,7 +333,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener ,
     @Override
     public boolean onLongClick(View v) {
         if(v == agriculture_robot1){
-            showToast("长按了");
+//            showToast("长按了");
+            createDialog(devices.get(0));
+        }else if(v == agriculture_robot2){
+            createDialog(devices.get(1));
         }
         return true;
     }

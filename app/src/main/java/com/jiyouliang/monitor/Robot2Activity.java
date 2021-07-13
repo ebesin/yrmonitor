@@ -65,7 +65,7 @@ import java.util.List;
 
 import de.greenrobot.event.EventBus;
 
-public class main3Activity extends BaseActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, GPSView.OnGPSViewClickListener {
+public class Robot2Activity extends BaseActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, GPSView.OnGPSViewClickListener {
 
     private static final String TAG = "MapActivity3";
     private View mBottomSheet;
@@ -513,7 +513,7 @@ public class main3Activity extends BaseActivity implements View.OnClickListener,
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(main3Activity.this, tip, Toast.LENGTH_SHORT).show();
+                Toast.makeText(Robot2Activity.this, tip, Toast.LENGTH_SHORT).show();
             }
         });
     }

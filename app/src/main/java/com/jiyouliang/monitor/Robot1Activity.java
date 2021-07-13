@@ -21,6 +21,7 @@ import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.NestedScrollingChild;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -75,6 +76,7 @@ import com.amap.api.services.geocoder.RegeocodeResult;
 import com.amap.api.services.help.Inputtips;
 import com.amap.api.services.help.InputtipsQuery;
 import com.amap.api.services.help.Tip;
+import com.dadac.testrosbridge.RCApplication;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -94,6 +96,7 @@ import com.jiyouliang.monitor.bean.Angular;
 import com.jiyouliang.monitor.bean.Battery;
 import com.jiyouliang.monitor.bean.Control;
 import com.jiyouliang.monitor.bean.Linear;
+import com.jiyouliang.monitor.bean.Spray;
 import com.jiyouliang.monitor.bean.Status;
 import com.jiyouliang.monitor.bean.Twist;
 import com.jiyouliang.monitor.harware.SensorEventHelper;
@@ -116,7 +119,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickListener, NearbySearchView.OnNearbySearchViewClickListener, AMapGestureListener, AMapLocationListener, LocationSource, TrafficView.OnTrafficChangeListener, View.OnClickListener, MapViewInterface, PoiDetailBottomView.OnPoiDetailBottomClickListener, AMap.OnPOIClickListener, TextWatcher, Inputtips.InputtipsListener, MapHeaderView.OnMapHeaderViewClickListener, OnItemClickListener, GeocodeSearch.OnGeocodeSearchListener, CompoundButton.OnCheckedChangeListener{
+import de.greenrobot.event.EventBus;
+
+public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewClickListener, NearbySearchView.OnNearbySearchViewClickListener, AMapGestureListener, AMapLocationListener, LocationSource, TrafficView.OnTrafficChangeListener, View.OnClickListener, MapViewInterface, PoiDetailBottomView.OnPoiDetailBottomClickListener, AMap.OnPOIClickListener, TextWatcher, Inputtips.InputtipsListener, MapHeaderView.OnMapHeaderViewClickListener, OnItemClickListener, GeocodeSearch.OnGeocodeSearchListener, CompoundButton.OnCheckedChangeListener{
     private static final String TAG = "MapActivity";
     /**
      * 首次进入申请定位、sd卡权限
@@ -131,6 +136,7 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
     private AMapLocationClient mLocationClient;
     private AMapLocationClientOption mLocationOption;
     private GPSView mGpsView;
+
 
     private static boolean mFirstLocation = true;//第一次定位
     private int mCurrentGpsState = STATE_UNLOCKED;//当前定位状态
@@ -221,7 +227,14 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
                     gpsDataViewModel.setData((GPSData) msg.obj);
                     break;
                 case 2:
+                    Log.d("handler","change");
                     fanSpeedViewModel.setSpeedValue((int[]) msg.obj);
+                    break;
+                case 3:
+                    statusViewModel.setValue((Status) msg.obj);
+                    break;
+                case 4:
+                    batteryViewModel.setValue((Battery) msg.obj);
                     break;
             }
         }
@@ -305,12 +318,16 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+        EventBus.getDefault().register(this);
         initView(savedInstanceState);
         initData();
         setListener();
     }
 
+
     private void initView(Bundle savedInstanceState) {
+        client = ((RCApplication) getApplication()).getRosClient();
+        publish();
         mGpsView = (GPSView) findViewById(R.id.gps_view);
 
         //获取地图控件引用
@@ -369,7 +386,6 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
 
         large_fan = findViewById(R.id.large_fan_1);
 
-
 //        for (int i = 0; i < animationDrawable_0_speed.length; i++) {
 //            animationDrawable_20_speed[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_20_round);
 //        }
@@ -385,8 +401,6 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
 //        for (int i = 0; i < animationDrawable_0_speed.length; i++) {
 //            animationDrawable_80_speed[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_80_round);
 //        }
-
-
         animation_0_speed = AnimationUtils.loadAnimation(this, R.anim.image_0_rotation);
         animation_20_speed = AnimationUtils.loadAnimation(this, R.anim.image_20_rotation);
         animation_40_speed = AnimationUtils.loadAnimation(this, R.anim.image_40_rotation);
@@ -395,6 +409,8 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
         animation_100_speed = AnimationUtils.loadAnimation(this, R.anim.image_100_rotation);
         linearInterpolator = new LinearInterpolator();
         setFan();
+        large_fan.setImageDrawable(getResources().getDrawable(R.drawable.ic_large_fan_20));
+        large_fan.startAnimation(animation_60_speed);
         mTvLocTitle = (TextView) findViewById(R.id.tv_title);
 
         mGspContainer = findViewById(R.id.gps_view_container);
@@ -510,6 +526,8 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
         client.send(msg2);
         String msg3 = "{\"op\":\"subscribe\",\"topic\":\"/control\"}";
         client.send(msg3);
+        String msg4 = "{\"op\":\"subscribe\",\"topic\":\"/mypath\"}";
+        client.send(msg4);
     }
 
     private void SendDataToRos(String topic, String data) {
@@ -529,7 +547,7 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
 
 
     public void onEvent(@NonNull final PublishEvent event) {
-
+        Log.d(TAG, "onEvent: "+event.name);
         if ("/status".equals(event.name)) {
             Log.i("chatter", event.msg);
             Status status = new Gson().fromJson(event.msg, Status.class);
@@ -544,6 +562,13 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
             message.obj = battery;
             handler.sendMessage(message);
             Log.i("battery", event.msg);
+        }else if("/mypath".equals(event.name)){
+            Spray spray = new Gson().fromJson(event.msg,Spray.class);
+            Message message = new Message();
+            message.what = 2;
+            message.obj = spray.getDuc_array();
+            handler.sendMessage(message);
+            Log.i("mypath", event.msg);
         } else if ("/control".equals(event.name)) {
             Log.i("control", event.msg);
         }
@@ -856,7 +881,7 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
                 changeFromSpeed(ints);
             }
         });
-        setSpeed();
+//        setSpeed();
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -893,43 +918,31 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
         for (int i = 0; i < spray_large_heads.length; i++) {
             switch (ints[i]){
                 case 20:
-                    large_fan.setImageDrawable(getResources().getDrawable(R.drawable.ic_large_fan_20));
-                    large_fan.startAnimation(animation_20_speed);
                     animationDrawable[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_20_round);
                     spray_large_heads[i].setImageDrawable(animationDrawable[i]);
                     animationDrawable[i].start();
                     break;
                 case 40:
-                    large_fan.setImageDrawable(getResources().getDrawable(R.drawable.ic_large_fan_40));
-                    large_fan.startAnimation(animation_40_speed);
                     animationDrawable[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_40_round);
                     spray_large_heads[i].setImageDrawable(animationDrawable[i]);
                     animationDrawable[i].start();
                     break;
                 case 60:
-                    large_fan.setImageDrawable(getResources().getDrawable(R.drawable.ic_large_fan_60));
-                    large_fan.startAnimation(animation_60_speed);
                     animationDrawable[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_60_round);
                     spray_large_heads[i].setImageDrawable(animationDrawable[i]);
                     animationDrawable[i].start();
                     break;
                 case 80:
-                    large_fan.setImageDrawable(getResources().getDrawable(R.drawable.ic_large_fan_80));
-                    large_fan.startAnimation(animation_80_speed);
                     animationDrawable[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_80_round);
                     spray_large_heads[i].setImageDrawable(animationDrawable[i]);
                     animationDrawable[i].start();
                     break;
                 case 100:
-                    large_fan.setImageDrawable(getResources().getDrawable(R.drawable.ic_large_fan_100));
-                    large_fan.startAnimation(animation_100_speed);
                     animationDrawable[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_100_round);
                     spray_large_heads[i].setImageDrawable(animationDrawable[i]);
                     animationDrawable[i].start();
                     break;
                 default:
-                    large_fan.setImageDrawable(getResources().getDrawable(R.drawable.ic_large_fan_20));
-                    large_fan.startAnimation(animation_20_speed);
                     animationDrawable[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_20_round);
                     spray_large_heads[i].setImageDrawable(animationDrawable[i]);
                     animationDrawable[i].start();
@@ -1553,6 +1566,9 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (((RCApplication) getApplication()).isConn()) {
+            client.disconnect();
+        }
         //在activity执行onDestroy时执行mMapView.onDestroy()，销毁地图
         mMapView.onDestroy();
         mFirstLocation = true;
@@ -1568,11 +1584,8 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
         if (mLocMarker != null) {
             mLocMarker.destroy();
         }
-
         // leakcanary检测
     }
-
-
     private void addCircle(LatLng latlng, double radius) {
         CircleOptions options = new CircleOptions();
         options.strokeWidth(1f);
@@ -1612,7 +1625,7 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
      * 跳转用户登录
      */
     private void userLogin() {
-        startActivity(new Intent(MapActivity.this, UserActivity.class));
+        startActivity(new Intent(Robot1Activity.this, UserActivity.class));
     }
 
 

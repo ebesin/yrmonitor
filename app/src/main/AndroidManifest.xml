@@ -72,11 +72,11 @@
         </activity>
 
         <activity
-            android:name="com.jiyouliang.monitor.MapActivity"
+            android:name="com.jiyouliang.monitor.Robot1Activity"
             android:screenOrientation="portrait"
             android:theme="@style/MapTheme"/>
         <activity
-            android:name="com.jiyouliang.monitor.main3Activity"
+            android:name="com.jiyouliang.monitor.Robot2Activity"
             android:screenOrientation="portrait"
             android:theme="@style/MapTheme"/>
 

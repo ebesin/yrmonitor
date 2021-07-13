@@ -1,14 +1,22 @@
 package com.example.dadac.testrosbridge;
 
+import android.widget.Space;
+
 import com.google.gson.Gson;
 import com.jilk.ros.ROSClient;
 import com.jilk.ros.rosbridge.ROSBridgeClient;
 import com.jiyouliang.monitor.bean.Angular;
+import com.jiyouliang.monitor.bean.Header;
 import com.jiyouliang.monitor.bean.Linear;
+import com.jiyouliang.monitor.bean.Spray;
+import com.jiyouliang.monitor.bean.Stamp;
 import com.jiyouliang.monitor.bean.Status;
 import com.jiyouliang.monitor.bean.Twist;
 
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -81,5 +89,25 @@ public class ExampleUnitTest {
         Angular angular = new Angular(0);
         Twist twist = new Twist(linear,angular);
         System.out.println(new Gson().toJson(twist));
+    }
+
+    @Test
+    public void testSpray(){
+        Stamp stamp = new Stamp(0,0);
+        Header header = new Header(stamp,"test",87);
+        int[] duc_array = new int[9];
+        Spray spray = new Spray(header,duc_array);
+        System.out.println(new Gson().toJson(spray));
+    }
+
+    @Test
+    public void testList(){
+        List<Integer> ints = new ArrayList<>();
+        ints.add(1);
+        ints.add(1);
+        ints.add(1);
+        ints.add(1);
+        ints.add(1);
+        System.out.println(new Gson().toJson(ints));
     }
 }
