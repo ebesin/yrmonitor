@@ -526,7 +526,7 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
         client.send(msg2);
         String msg3 = "{\"op\":\"subscribe\",\"topic\":\"/control\"}";
         client.send(msg3);
-        String msg4 = "{\"op\":\"subscribe\",\"topic\":\"/mypath\"}";
+        String msg4 = "{\"op\":\"subscribe\",\"topic\":\"/pwm_control\"}";
         client.send(msg4);
     }
 
@@ -562,7 +562,7 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
             message.obj = battery;
             handler.sendMessage(message);
             Log.i("battery", event.msg);
-        }else if("/mypath".equals(event.name)){
+        }else if("/pwm_control".equals(event.name)){
             Spray spray = new Gson().fromJson(event.msg,Spray.class);
             Message message = new Message();
             message.what = 2;
@@ -943,9 +943,7 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
                     animationDrawable[i].start();
                     break;
                 default:
-                    animationDrawable[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_20_round);
-                    spray_large_heads[i].setImageDrawable(animationDrawable[i]);
-                    animationDrawable[i].start();
+
                     break;
             }
         }
