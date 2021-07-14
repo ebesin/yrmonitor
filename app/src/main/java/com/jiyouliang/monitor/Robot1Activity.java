@@ -920,30 +920,36 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
                 case 20:
                     animationDrawable[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_20_round);
                     spray_large_heads[i].setImageDrawable(animationDrawable[i]);
+                    spray_large_heads[i].setColorFilter(0xFFFFFFFF);
                     animationDrawable[i].start();
                     break;
                 case 40:
                     animationDrawable[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_40_round);
                     spray_large_heads[i].setImageDrawable(animationDrawable[i]);
+                    spray_large_heads[i].setColorFilter(0xff0000ff);
                     animationDrawable[i].start();
                     break;
                 case 60:
                     animationDrawable[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_60_round);
                     spray_large_heads[i].setImageDrawable(animationDrawable[i]);
+                    spray_large_heads[i].setColorFilter(0xffFFFF00);
                     animationDrawable[i].start();
                     break;
                 case 80:
                     animationDrawable[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_80_round);
                     spray_large_heads[i].setImageDrawable(animationDrawable[i]);
+                    spray_large_heads[i].setColorFilter(0xffFFA500);
                     animationDrawable[i].start();
                     break;
                 case 100:
                     animationDrawable[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_100_round);
                     spray_large_heads[i].setImageDrawable(animationDrawable[i]);
+                    spray_large_heads[i].setColorFilter(0xffff0000);
                     animationDrawable[i].start();
                     break;
                 default:
 
+                    spray_large_heads[i].setImageDrawable(getResources().getDrawable(R.drawable.ic_method_draw_image));
                     break;
             }
         }
