@@ -897,6 +897,7 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
                     large_fan.startAnimation(animation_20_speed);
                     animationDrawable[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_20_round);
                     spray_large_heads[i].setImageDrawable(animationDrawable[i]);
+                    spray_large_heads[i].setColorFilter(0xFFFFFFFF);
                     animationDrawable[i].start();
                     break;
                 case 40:
@@ -904,6 +905,7 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
                     large_fan.startAnimation(animation_40_speed);
                     animationDrawable[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_40_round);
                     spray_large_heads[i].setImageDrawable(animationDrawable[i]);
+                    spray_large_heads[i].setColorFilter(0xff0000ff);
                     animationDrawable[i].start();
                     break;
                 case 60:
@@ -911,6 +913,7 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
                     large_fan.startAnimation(animation_60_speed);
                     animationDrawable[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_60_round);
                     spray_large_heads[i].setImageDrawable(animationDrawable[i]);
+                    spray_large_heads[i].setColorFilter(0xffFFFF00);
                     animationDrawable[i].start();
                     break;
                 case 80:
@@ -918,6 +921,7 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
                     large_fan.startAnimation(animation_80_speed);
                     animationDrawable[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_80_round);
                     spray_large_heads[i].setImageDrawable(animationDrawable[i]);
+                    spray_large_heads[i].setColorFilter(0xffFFA500);
                     animationDrawable[i].start();
                     break;
                 case 100:
@@ -925,14 +929,11 @@ public class MapActivity extends BaseActivity implements GPSView.OnGPSViewClickL
                     large_fan.startAnimation(animation_100_speed);
                     animationDrawable[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_100_round);
                     spray_large_heads[i].setImageDrawable(animationDrawable[i]);
+                    spray_large_heads[i].setColorFilter(0xffff0000);
                     animationDrawable[i].start();
                     break;
                 default:
-                    large_fan.setImageDrawable(getResources().getDrawable(R.drawable.ic_large_fan_20));
-                    large_fan.startAnimation(animation_20_speed);
-                    animationDrawable[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_20_round);
-                    spray_large_heads[i].setImageDrawable(animationDrawable[i]);
-                    animationDrawable[i].start();
+                    spray_large_heads[i].setImageDrawable(getResources().getDrawable(R.drawable.ic_method_draw_image));
                     break;
             }
         }
