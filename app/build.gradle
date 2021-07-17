@@ -65,7 +65,6 @@ dependencies {
     implementation 'com.alibaba:fastjson:1.1.71.android'
     implementation 'com.github.bumptech.glide:glide:4.9.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
-    implementation 'com.tencent.mm.opensdk:wechat-sdk-android-without-mta:+'
 
     implementation 'com.amap.api:navi-3dmap:7.9.1_3dmap7.9.1'
     implementation 'com.amap.api:search:7.9.0'

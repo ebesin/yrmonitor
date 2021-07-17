@@ -858,7 +858,7 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
         } else if (v == device_state_cardView) {
             status_dialog.show();
         } else if (v == remote_control_cardView) {
-            Intent intent = new Intent(this, ControlActivity.class);
+            Intent intent = new Intent(this, Control2Activity.class);
             startActivity(intent);
         }
     }
@@ -948,7 +948,7 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
                     animationDrawable[i].start();
                     break;
                 default:
-
+                    spray_large_heads[i].setColorFilter(0xff1296DB);
                     spray_large_heads[i].setImageDrawable(getResources().getDrawable(R.drawable.ic_method_draw_image));
                     break;
             }
