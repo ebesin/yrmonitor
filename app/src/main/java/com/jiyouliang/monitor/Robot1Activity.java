@@ -121,7 +121,7 @@ import java.util.List;
 
 import de.greenrobot.event.EventBus;
 
-public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewClickListener, NearbySearchView.OnNearbySearchViewClickListener, AMapGestureListener, AMapLocationListener, LocationSource, TrafficView.OnTrafficChangeListener, View.OnClickListener, MapViewInterface, PoiDetailBottomView.OnPoiDetailBottomClickListener, AMap.OnPOIClickListener, TextWatcher, Inputtips.InputtipsListener, MapHeaderView.OnMapHeaderViewClickListener, OnItemClickListener, GeocodeSearch.OnGeocodeSearchListener, CompoundButton.OnCheckedChangeListener{
+public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewClickListener, NearbySearchView.OnNearbySearchViewClickListener, AMapGestureListener, AMapLocationListener, LocationSource, TrafficView.OnTrafficChangeListener, View.OnClickListener, MapViewInterface, PoiDetailBottomView.OnPoiDetailBottomClickListener, AMap.OnPOIClickListener, MapHeaderView.OnMapHeaderViewClickListener, OnItemClickListener, CompoundButton.OnCheckedChangeListener{
     private static final String TAG = "MapActivity";
     /**
      * 首次进入申请定位、sd卡权限
@@ -367,6 +367,7 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
         spray_waveView = findViewById(R.id.spray_waveView);
         spray_waveView.start();
         aSwitch = findViewById(R.id.switch1);
+        aSwitch.setChecked(true);
         aSwitch.setOnCheckedChangeListener(this);
         aSwitch.setOnClickListener(this);
 //        setChart();
@@ -886,10 +887,10 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
             @Override
             public void run() {
                 int i = 0;
-                double lng = 119.509395;
-                double lat = 32.20465;
+                double lng = 120.67888888888889;
+                double lat = 32.575833333333335;
                 while (true) {
-                    lng -= 0.00001;
+                    lng -= 0.000001;
                     GPSData gpsData = new GPSData(lat, lng);
 //                    gpsDataViewModel.setData(new GPSData(lat, lng++));
                     Message message = new Message();
@@ -904,8 +905,6 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
                 }
             }
         }).start();
-        geocodeSearch = new GeocodeSearch(this);
-        geocodeSearch.setOnGeocodeSearchListener(this);
 
         // 搜索结果RecyclerView
         mSearchAdapter = new SearchAdapter(mSearchData);
@@ -1097,13 +1096,10 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
         mTvRoute.setOnClickListener(this);
         // 搜索布局左侧返回箭头图标
         mIvLeftSearch.setOnClickListener(this);
-        // 搜索输入框
-        mEtSearchTip.addTextChangedListener(this);
-        mSearchAdapter.setOnItemClickListener(this);
     }
 
     private void setUpMap() {
-        aMap.setMapType(AMap.MAP_TYPE_SATELLITE);
+        aMap.setMapType(AMap.MAP_TYPE_NORMAL);
         aMap.setLocationSource(this);//设置定位监听
         //隐藏缩放控件
         aMap.getUiSettings().setZoomControlsEnabled(false);
@@ -1113,11 +1109,8 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
     }
 
     public void changeFromGps(GPSData gpsData) {
-//        AMapLocation location = new AMapLocation();
         System.out.println("经度：" + gpsData.getLng() + "纬度" + gpsData.getLat());
         latLonPoint = new LatLng(gpsData.getLat(), gpsData.getLng());
-//        RegeocodeQuery query = new RegeocodeQuery(latLonPoint, 20,GeocodeSearch.AMAP);
-
         if (mFirstLocation) {
             aMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLonPoint, mZoomLevel), new AMap.CancelableCallback() {
                 @Override
@@ -1212,10 +1205,8 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
             }
 
         }
-
          */
     }
-
 
     /**
      * 激活定位
@@ -1297,7 +1288,6 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
             mLocationClient.startLocation();
         }*/
     }
-
 
     /**
      * 地图手势事件回调：单指双击
@@ -1873,26 +1863,6 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
         mMoveToCenter = false;
     }
 
-    /**
-     * 高德地图位置转短串分享
-     * @param snippet 位置名称
-     * @param lat 维度
-     * @param lng 经度
-
-    private void shareLocation(String snippet, double lat, double lng) {
-    if(TextUtils.isEmpty(snippet)){
-    return;
-    }
-    // addTestLocationMarker(snippet);
-    LatLonSharePoint point = new LatLonSharePoint(lat,
-    lng, snippet);
-    // showProgressDialog();
-
-    }
-     */
-    /**
-     * 高德地图回调
-     */
     @Override
     public void onCallTaxiClick() {
 
@@ -1921,7 +1891,6 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
                 hideSearchTipView();
                 showMapView();
                 mMapMode = MapMode.NORMAL;
-
                 return true;
             }
         }
@@ -2036,57 +2005,6 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
         InputMethodUtils.showInput(this, mEtSearchTip);
     }
 
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-    }
-
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-    }
-
-    /**
-     * EditText输入内容后回调
-     *
-     * @param s
-     */
-    @Override
-    public void afterTextChanged(Editable s) {
-        if (s == null || TextUtils.isEmpty(s.toString())) {
-            mSearchProgressBar.setVisibility(View.GONE);
-            return;
-        }
-        String content = s.toString();
-        if (!TextUtils.isEmpty(content) && !TextUtils.isEmpty(mCity)) {
-            // 调用高德地图搜索提示api
-            InputtipsQuery inputquery = new InputtipsQuery(content, mCity);
-            inputquery.setCityLimit(true);
-            Inputtips inputTips = new Inputtips(this, inputquery);
-            inputTips.setInputtipsListener(this);
-            inputTips.requestInputtipsAsyn();
-            mSearchProgressBar.setVisibility(View.VISIBLE);
-        }
-
-    }
-
-    /**
-     * 高德地图搜索提示回调
-     *
-     * @param list
-     * @param i
-     */
-    @Override
-    public void onGetInputtips(List<Tip> list, int i) {
-        mSearchProgressBar.setVisibility(View.GONE);
-        if (list == null || list.size() == 0) {
-            return;
-        }
-        mSearchData.clear();
-        mSearchData.addAll(list);
-        // 刷新RecycleView
-        mSearchAdapter.notifyDataSetChanged();
-    }
 
     @Override
     public void onUserClick() {
@@ -2229,15 +2147,5 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
         return mLocMgr.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
 
-
-    @Override
-    public void onRegeocodeSearched(RegeocodeResult regeocodeResult, int i) {
-
-    }
-
-    @Override
-    public void onGeocodeSearched(GeocodeResult geocodeResult, int i) {
-
-    }
 
 }

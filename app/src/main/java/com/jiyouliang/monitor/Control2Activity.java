@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.RequiresApi;
+import android.support.design.transformation.FabTransformationScrimBehavior;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -86,6 +87,10 @@ public class Control2Activity extends BaseActivity implements View.OnClickListen
      */
     boolean right_isLeft = false;
 
+    /**
+     * 发送线程是否应该终止
+     */
+    boolean isRunning = true;
 
     private Runnable runnable;
 
@@ -136,7 +141,7 @@ public class Control2Activity extends BaseActivity implements View.OnClickListen
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        send_thread.stop();
+        isRunning = false;
     }
 
     private void initView() {
@@ -153,9 +158,10 @@ public class Control2Activity extends BaseActivity implements View.OnClickListen
         send_thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                while (!Thread.currentThread().isInterrupted()) {
-                    SendDataToRos("motion_com",new Gson().toJson(motionCom));
+                while (isRunning) {
+                    SendDataToRos("motion_com", new Gson().toJson(motionCom));
                     Log.d("send:", new Gson().toJson(motionCom));
+                    Log.d("testThread", this + "\t" + Thread.currentThread().getName());
                     try {
                         Thread.sleep(50);
                     } catch (InterruptedException e) {
@@ -164,11 +170,12 @@ public class Control2Activity extends BaseActivity implements View.OnClickListen
                 }
             }
         });
+        send_thread.setName("send_thread");
     }
 
 
     private void SendDataToRos(String topic, String data) {
-        String msg1 = "{ \"op\": \"publish\", \"topic\": \"/" + topic + "\", \"msg\": " + data +"}";
+        String msg1 = "{ \"op\": \"publish\", \"topic\": \"/" + topic + "\", \"msg\": " + data + "}";
         //        String msg2 = "{\"op\":\"publish\",\"topic\":\"/cmd_vel\",\"msg\":{\"linear\":{\"x\":" + 0 + ",\"y\":" +
         //                0 + ",\"z\":0},\"angular\":{\"x\":0,\"y\":0,\"z\":" + 0.5 + "}}}";
         client.send(msg1);
@@ -255,27 +262,27 @@ public class Control2Activity extends BaseActivity implements View.OnClickListen
                             right_isLeft = false;
                             right_isRight = false;
                             iscenter_right = 0;
-                            motionCom.setValues(0,0,0,0,1);
+                            motionCom.setValues(0, 0, 0, 0, 1);
                             current_direction_right.setText("无");
                         }
                         break;
                     case DIRECTION_LEFT:
-                        if(!right_isLeft) {
+                        if (!right_isLeft) {
                             right_isLeft = true;
                             right_isCenter = false;
                             right_isRight = false;
                             iscenter_right = 1;
-                            motionCom.setValues(0,0,1,0,0);
+                            motionCom.setValues(0, 0, 1, 0, 0);
                             current_direction_right.setText("左");
                         }
                         break;
                     case DIRECTION_RIGHT:
-                        if(!right_isRight) {
+                        if (!right_isRight) {
                             right_isRight = true;
                             right_isCenter = false;
                             right_isLeft = false;
                             iscenter_right = 1;
-                            motionCom.setValues(0,0,0,1,0);
+                            motionCom.setValues(0, 0, 0, 1, 0);
                             current_direction_right.setText("右");
                         }
                         break;
