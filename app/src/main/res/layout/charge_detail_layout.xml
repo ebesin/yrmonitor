@@ -9,7 +9,7 @@
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="300dp"
-        android:layout_height="200dp"
+        android:layout_height="150dp"
         android:background="@drawable/charge_detail">
 
         <android.support.constraint.Guideline
@@ -17,7 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.20" />
+            app:layout_constraintGuide_percent="0.3" />
 
         <ImageView
             android:id="@+id/imageView3"
@@ -62,7 +62,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="60dp"
-            android:text="50%"
+            android:text="68%"
             app:layout_constraintBottom_toBottomOf="@+id/speed_text"
             app:layout_constraintStart_toEndOf="@+id/speed_text"
             app:layout_constraintTop_toTopOf="@+id/speed_text" />
@@ -80,7 +80,7 @@
             android:id="@+id/voltage_data"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="4.12 V"
+            android:text="47.6 V"
             app:layout_constraintBottom_toBottomOf="@+id/textView18"
             app:layout_constraintStart_toStartOf="@+id/charge_data"
             app:layout_constraintTop_toTopOf="@+id/textView18" />
@@ -98,7 +98,7 @@
             android:id="@+id/capacity_data"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="50000 mAh"
+            android:text="12 Ah"
             app:layout_constraintBottom_toBottomOf="@+id/textView22"
             app:layout_constraintStart_toStartOf="@+id/voltage_data"
             app:layout_constraintTop_toTopOf="@+id/textView22" />

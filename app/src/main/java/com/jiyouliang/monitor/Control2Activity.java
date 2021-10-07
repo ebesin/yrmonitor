@@ -159,7 +159,7 @@ public class Control2Activity extends BaseActivity implements View.OnClickListen
             @Override
             public void run() {
                 while (isRunning) {
-                    SendDataToRos("motion_com", new Gson().toJson(motionCom));
+//                    SendDataToRos("motion_com", new Gson().toJson(motionCom));
                     Log.d("send:", new Gson().toJson(motionCom));
                     Log.d("testThread", this + "\t" + Thread.currentThread().getName());
                     try {

@@ -327,7 +327,7 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
 
     private void initView(Bundle savedInstanceState) {
         client = ((RCApplication) getApplication()).getRosClient();
-        publish();
+//        publish();
         mGpsView = (GPSView) findViewById(R.id.gps_view);
 
         //获取地图控件引用
@@ -588,7 +588,7 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
         status_builder.setCancelable(true);           //将对话框以外的区域设置成无法点击
         // 载入自定义布局
         LayoutInflater inflater = getLayoutInflater();
-        View layout = inflater.inflate(R.layout.device_detail_layout, null);
+        View layout = inflater.inflate(R.layout.robot1_detail_layout, null);
         status_builder.setView(layout);
 
         yaw_angle_data = layout.findViewById(R.id.yaw_angle_data);
