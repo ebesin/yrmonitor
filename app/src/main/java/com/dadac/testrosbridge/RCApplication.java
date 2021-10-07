@@ -3,6 +3,7 @@ package com.dadac.testrosbridge;
 import android.app.Application;
 
 import com.jilk.ros.rosbridge.ROSBridgeClient;
+import com.jiyouliang.monitor.database.DatabaseHelper;
 
 /**
  * @ Create by dadac on 2018/10/8.
@@ -14,10 +15,12 @@ public class RCApplication extends Application {
     String ip;
     ROSBridgeClient client;
     boolean isConn = false;
+    DatabaseHelper databaseHelper;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        databaseHelper = new DatabaseHelper(this);
     }
 
     @Override
@@ -31,7 +34,6 @@ public class RCApplication extends Application {
     public void setIp(String ip){
         this.ip = ip;
     }
-
 
     public String getIp(){
         return ip;
@@ -52,6 +54,12 @@ public class RCApplication extends Application {
     public void setRosClient(ROSBridgeClient client) {
         this.client = client;
     }
+
+    public DatabaseHelper getDatabaseHelper() {
+        return databaseHelper;
+    }
+
+
 }
 
 

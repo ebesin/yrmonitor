@@ -156,7 +156,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener ,
 
     private void initView() {
         context = this;
-        databaseHelper = new DatabaseHelper(context);
+        databaseHelper = ((RCApplication)getApplication()).getDatabaseHelper();
         writableDatabase = databaseHelper.getWritableDatabase();
         readableDatabase = databaseHelper.getReadableDatabase();
         toolbar = findViewById(R.id.toolbar);
