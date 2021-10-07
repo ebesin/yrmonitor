@@ -25,7 +25,4 @@ public class MapApplication extends Application {
         }
         LeakCanary.install(this);*/
     }
-
-
-
 }

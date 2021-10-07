@@ -3,11 +3,13 @@ package com.jiyouliang.monitor.database;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     // 数据库版本号,在更新时系统便是根据version来判断，若version号低于则会启动升级程序
-    private static final int version = 1;
+    private static final int version = 4;
+    private static final String TAG = DatabaseHelper.class.getName();
     //设置你自己的数据库名称
     public static final String DATABASE_NAME = "Monitor.db";
     //这里是构造方法，主要实现SQLiteOpenHelper的初始化工作，注意：若SQLiteOpenHelper没有初始化，则在使用时会报空指针异常
@@ -35,6 +37,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        Log.d(TAG,"Updating table from " + oldVersion + " to " + newVersion);
+        String sql="ALTER TABLE robots ADD COLUMN intent_class varchar(100);";
+        db.execSQL(sql);
+        db.execSQL("update robots set intent_class='com.jiyouliang.monitor.Robot1Activity' where ID=1");
+        db.execSQL("update robots set intent_class='com.jiyouliang.monitor.Robot2Activity' where ID=2");
     }
-
 }

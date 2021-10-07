@@ -17,6 +17,7 @@ public class BaseActivity extends AppCompatActivity {
     private View mToastView;
     private TextView mTvToast;
 
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

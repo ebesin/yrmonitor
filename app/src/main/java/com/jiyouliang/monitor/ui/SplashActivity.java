@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.View;
 
+import com.jiyouliang.monitor.Main2;
 import com.jiyouliang.monitor.MainActivity;
 import com.jiyouliang.monitor.R;
 import com.jiyouliang.monitor.util.PermissionUtil;
@@ -139,7 +140,7 @@ public class SplashActivity extends BaseActivity {
      * 进入主页
      */
     private void showMapPage() {
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, Main2.class);
         startActivity(intent);
         finish();
     }
