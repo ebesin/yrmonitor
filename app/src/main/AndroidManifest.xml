@@ -52,6 +52,8 @@
 <!--            </intent-filter>-->
 <!--        </activity>-->
 
+        <activity android:name=".Main2"/>
+
         <activity
             android:name="com.jiyouliang.monitor.RosBridgeActivity"
             android:screenOrientation="portrait"/>
