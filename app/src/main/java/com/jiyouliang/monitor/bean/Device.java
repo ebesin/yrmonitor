@@ -8,16 +8,18 @@ public class Device {
     String id;
     String name;
     String ip;
-    Class aClass;
+    String intentClass;
     TextView name_textView;
 
-    public Class getaClass() {
-        return aClass;
+
+    public String getIntentClass() {
+        return intentClass;
     }
 
-    public void setaClass(Class aClass) {
-        this.aClass = aClass;
+    public void setIntentClass(String intentClass) {
+        this.intentClass = intentClass;
     }
+
 
     public TextView getName_textView() {
         return name_textView;
@@ -35,11 +37,17 @@ public class Device {
         this.id = id;
     }
 
-
     public Device(String id, String name, String ip) {
         this.id = id;
         this.name = name;
         this.ip = ip;
+    }
+
+    public Device(String id, String name, String ip,String intentClass) {
+        this.id = id;
+        this.name = name;
+        this.ip = ip;
+        this.intentClass = intentClass;
     }
 
     public String getName() {

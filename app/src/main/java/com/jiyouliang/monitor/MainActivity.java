@@ -90,7 +90,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener ,
                 case 3:
                     Device device = (Device) msg.obj;
                     mView.dismiss();
-                    startActivity(new Intent(MainActivity.this,device.getaClass()));
+                    try {
+                        startActivity(new Intent(MainActivity.this,Class.forName(String.valueOf(device.getIntentClass()))));
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                        Log.d("error","没有对应的类");
+                        startActivity(new Intent(MainActivity.this,RosBridgeActivity.class));
+                    }
                     break;
                 case 4:
                     mView.dismiss();
@@ -177,17 +183,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener ,
         robot1_intent = new Intent(this, Robot1Activity.class);
         robot2_intent = new Intent(this, Robot2Activity.class);
         testIntent = new Intent(this, RosBridgeActivity.class);
-        Cursor query = readableDatabase.query("robots", new String[]{"ID", "name","ip"},
+        Cursor query = readableDatabase.query("robots", new String[]{"ID", "name","ip","intent_class"},
                 null, null, null, null, null);
         while(query.moveToNext()){
-            devices.add(new Device(query.getString(0),query.getString(1),query.getString(2)));
+            devices.add(new Device(query.getString(0),query.getString(1),query.getString(2),query.getString(3)));
         }
         robot1_name.setText(devices.get(0).getName());
         robot2_name.setText(devices.get(1).getName());
         devices.get(0).setName_textView(robot1_name);
-        devices.get(0).setaClass(Robot1Activity.class);
         devices.get(1).setName_textView(robot2_name);
-        devices.get(1).setaClass(Robot2Activity.class);
     }
 
     public void connectToRobot(final Device device) {

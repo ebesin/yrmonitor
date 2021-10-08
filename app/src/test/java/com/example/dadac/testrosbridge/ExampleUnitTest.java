@@ -5,7 +5,9 @@ import android.widget.Space;
 import com.google.gson.Gson;
 import com.jilk.ros.ROSClient;
 import com.jilk.ros.rosbridge.ROSBridgeClient;
+import com.jiyouliang.monitor.Robot1Activity;
 import com.jiyouliang.monitor.bean.Angular;
+import com.jiyouliang.monitor.bean.Device;
 import com.jiyouliang.monitor.bean.Header;
 import com.jiyouliang.monitor.bean.Linear;
 import com.jiyouliang.monitor.bean.Spray;
@@ -109,5 +111,10 @@ public class ExampleUnitTest {
         ints.add(1);
         ints.add(1);
         System.out.println(new Gson().toJson(ints));
+    }
+
+    @Test
+    public void testClass() throws ClassNotFoundException {
+        System.out.println(Robot1Activity.class);
     }
 }
