@@ -1,24 +1,16 @@
 package com.example.dadac.testrosbridge;
 
-import android.app.Activity;
-
-import android.content.Context;
-
 
 import androidx.lifecycle.Lifecycle;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.jilk.ros.rosbridge.operation.Publish;
-import com.jiyouliang.monitor.Main2;
-import com.jiyouliang.monitor.MainActivity;
+import com.dwayne.monitor.Main2;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import static org.junit.Assert.*;
 
 /**
  * Instrumented test, which will execute on an Android device.

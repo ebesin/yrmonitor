@@ -15,7 +15,7 @@ import android.widget.Toast;
 import com.jilk.ros.ROSClient;
 import com.jilk.ros.rosbridge.ROSBridgeClient;
 import com.jilk.ros.rosbridge.implementation.PublishEvent;
-import com.jiyouliang.monitor.R;
+import com.dwayne.monitor.R;
 
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;

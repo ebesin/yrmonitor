@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
-    <com.jiyouliang.monitor.view.widget.TopTitleView
+    <com.dwayne.monitor.view.widget.TopTitleView
         android:id="@+id/ttv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -41,7 +41,7 @@
         android:textSize="14sp" />
 
 
-    <com.jiyouliang.monitor.view.widget.KeyboardContainerView
+    <com.dwayne.monitor.view.widget.KeyboardContainerView
         android:id="@+id/keyboard_container_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -60,7 +60,7 @@
             android:textColor="#FF767A"
             android:textSize="14sp" />
 
-        <com.jiyouliang.monitor.view.widget.KeyboardInputView
+        <com.dwayne.monitor.view.widget.KeyboardInputView
             android:id="@+id/keyboard_input_view"
             android:layout_width="wrap_content"
             android:layout_height="46dp"
@@ -76,11 +76,11 @@
             android:layout_marginBottom="30dp"
             android:textColor="@color/resend_sms_color" />
 
-        <com.jiyouliang.monitor.view.widget.NumberKeyboardView
+        <com.dwayne.monitor.view.widget.NumberKeyboardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
-    </com.jiyouliang.monitor.view.widget.KeyboardContainerView>
+    </com.dwayne.monitor.view.widget.KeyboardContainerView>
 
 
 </android.support.constraint.ConstraintLayout>

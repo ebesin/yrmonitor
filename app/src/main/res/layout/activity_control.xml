@@ -30,7 +30,7 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.95" />
 
-    <com.jiyouliang.monitor.view.MyRockerView
+    <com.dwayne.monitor.view.MyRockerView
         android:id="@+id/rockerview_left"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -39,7 +39,7 @@
         app:layout_constraintBottom_toTopOf="@+id/guideline4"
         app:layout_constraintStart_toStartOf="@+id/guideline2" />
 
-    <com.jiyouliang.monitor.view.MyRockerView
+    <com.dwayne.monitor.view.MyRockerView
         android:id="@+id/rockerview_right"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -6,13 +6,13 @@
     android:background="@color/white">
 
 
-    <com.jiyouliang.monitor.factory.LargeImageView
+    <com.dwayne.monitor.factory.LargeImageView
         android:id="@+id/largeImage"
         android:background="@color/white"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <com.jiyouliang.monitor.view.map.SupendViewContainer3
+    <com.dwayne.monitor.view.map.SupendViewContainer3
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

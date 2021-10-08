@@ -3,7 +3,8 @@ package com.dadac.testrosbridge;
 import android.app.Application;
 
 import com.jilk.ros.rosbridge.ROSBridgeClient;
-import com.jiyouliang.monitor.database.DatabaseHelper;
+import com.dwayne.monitor.database.DataBaseUtil;
+import com.dwayne.monitor.database.DatabaseHelper;
 
 /**
  * @ Create by dadac on 2018/10/8.
@@ -21,6 +22,7 @@ public class RCApplication extends Application {
     public void onCreate() {
         super.onCreate();
         databaseHelper = new DatabaseHelper(this);
+        DataBaseUtil.setDatabaseHelper(databaseHelper);
     }
 
     @Override

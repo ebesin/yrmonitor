@@ -1,19 +1,17 @@
 package com.example.dadac.testrosbridge;
 
-import android.widget.Space;
-
 import com.google.gson.Gson;
 import com.jilk.ros.ROSClient;
 import com.jilk.ros.rosbridge.ROSBridgeClient;
-import com.jiyouliang.monitor.Robot1Activity;
-import com.jiyouliang.monitor.bean.Angular;
-import com.jiyouliang.monitor.bean.Device;
-import com.jiyouliang.monitor.bean.Header;
-import com.jiyouliang.monitor.bean.Linear;
-import com.jiyouliang.monitor.bean.Spray;
-import com.jiyouliang.monitor.bean.Stamp;
-import com.jiyouliang.monitor.bean.Status;
-import com.jiyouliang.monitor.bean.Twist;
+import com.dwayne.monitor.Robot1Activity;
+import com.dwayne.monitor.RosBridgeActivity;
+import com.dwayne.monitor.bean.Angular;
+import com.dwayne.monitor.bean.Header;
+import com.dwayne.monitor.bean.Linear;
+import com.dwayne.monitor.bean.Spray;
+import com.dwayne.monitor.bean.Stamp;
+import com.dwayne.monitor.bean.Status;
+import com.dwayne.monitor.bean.Twist;
 
 import org.junit.Test;
 
@@ -116,5 +114,6 @@ public class ExampleUnitTest {
     @Test
     public void testClass() throws ClassNotFoundException {
         System.out.println(Robot1Activity.class);
+        System.out.println(RosBridgeActivity.class);
     }
 }
