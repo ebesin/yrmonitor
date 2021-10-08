@@ -102,7 +102,6 @@ import com.dwayne.monitor.util.LogUtil;
 import com.dwayne.monitor.util.MyAMapUtils;
 import com.dwayne.monitor.view.base.MapViewInterface;
 import com.dwayne.monitor.view.map.GPSView;
-import com.dwayne.monitor.view.map.MapHeaderView;
 import com.dwayne.monitor.view.map.NearbySearchView;
 import com.dwayne.monitor.view.map.PoiDetailBottomView;
 import com.dwayne.monitor.view.map.TrafficView;
@@ -114,7 +113,7 @@ import java.util.List;
 
 import de.greenrobot.event.EventBus;
 
-public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewClickListener, NearbySearchView.OnNearbySearchViewClickListener, AMapGestureListener, AMapLocationListener, LocationSource, TrafficView.OnTrafficChangeListener, View.OnClickListener, MapViewInterface, PoiDetailBottomView.OnPoiDetailBottomClickListener, AMap.OnPOIClickListener, MapHeaderView.OnMapHeaderViewClickListener, OnItemClickListener, CompoundButton.OnCheckedChangeListener{
+public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewClickListener, NearbySearchView.OnNearbySearchViewClickListener, AMapGestureListener, AMapLocationListener, LocationSource, TrafficView.OnTrafficChangeListener, View.OnClickListener, MapViewInterface, PoiDetailBottomView.OnPoiDetailBottomClickListener, AMap.OnPOIClickListener, OnItemClickListener, CompoundButton.OnCheckedChangeListener {
     private static final String TAG = "MapActivity";
     /**
      * 首次进入申请定位、sd卡权限
@@ -198,7 +197,6 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
     private RecyclerView mRecycleViewSearch;
     private ImageView mIvLeftSearch;
     private EditText mEtSearchTip;
-    private SearchAdapter mSearchAdapter;
     private String mCity;
     private ProgressBar mSearchProgressBar;
     private LocationManager mLocMgr;
@@ -222,7 +220,7 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
                     gpsDataViewModel.setData((GPSData) msg.obj);
                     break;
                 case 2:
-                    Log.d("handler","change");
+                    Log.d("handler", "change");
                     fanSpeedViewModel.setSpeedValue((int[]) msg.obj);
                     break;
                 case 3:
@@ -380,21 +378,6 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
 
         large_fan = findViewById(R.id.large_fan_1);
 
-//        for (int i = 0; i < animationDrawable_0_speed.length; i++) {
-//            animationDrawable_20_speed[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_20_round);
-//        }
-//
-//        for (int i = 0; i < animationDrawable_0_speed.length; i++) {
-//            animationDrawable_40_speed[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_40_round);
-//        }
-//
-//        for (int i = 0; i < animationDrawable_0_speed.length; i++) {
-//            animationDrawable_60_speed[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_60_round);
-//        }
-//
-//        for (int i = 0; i < animationDrawable_0_speed.length; i++) {
-//            animationDrawable_80_speed[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_80_round);
-//        }
         animation_0_speed = AnimationUtils.loadAnimation(this, R.anim.image_0_rotation);
         animation_20_speed = AnimationUtils.loadAnimation(this, R.anim.image_20_rotation);
         animation_40_speed = AnimationUtils.loadAnimation(this, R.anim.image_40_rotation);
@@ -444,10 +427,10 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while(true){
+                while (true) {
                     int[] temp = new int[9];
-                    for(int i = 0;i<fanSpeedViewModel.getSpeedValue().length;i++){
-                        temp[i] = (fanSpeedViewModel.getSpeedValue()[i]+20)%100;
+                    for (int i = 0; i < fanSpeedViewModel.getSpeedValue().length; i++) {
+                        temp[i] = (fanSpeedViewModel.getSpeedValue()[i] + 20) % 100;
                     }
                     Message message = new Message();
                     message.what = 2;
@@ -541,7 +524,7 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
 
 
     public void onEvent(@NonNull final PublishEvent event) {
-        Log.d(TAG, "onEvent: "+event.name);
+        Log.d(TAG, "onEvent: " + event.name);
         if ("/status".equals(event.name)) {
             Log.i("chatter", event.msg);
             Status status = new Gson().fromJson(event.msg, Status.class);
@@ -556,8 +539,8 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
             message.obj = battery;
             handler.sendMessage(message);
             Log.i("battery", event.msg);
-        }else if("/pwm_control".equals(event.name)){
-            Spray spray = new Gson().fromJson(event.msg,Spray.class);
+        } else if ("/pwm_control".equals(event.name)) {
+            Spray spray = new Gson().fromJson(event.msg, Spray.class);
             Message message = new Message();
             message.what = 2;
             message.obj = spray.getDuc_array();
@@ -722,12 +705,9 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
 
         // 点击搜索左侧返回箭头
         else if (v == mIvLeftSearch) {
-            hideSearchTipView();
             showMapView();
             return;
-        }
-
-        else if (v == aSwitch) {
+        } else if (v == aSwitch) {
             final boolean ischeck = aSwitch.isChecked();
             if (!ischeck) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -786,7 +766,7 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
                 });
                 builder.create().show();         //创建并显示对话框
             }
-        }else if(v == emergency_stop){
+        } else if (v == emergency_stop) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setIcon(R.drawable.ic_prompt);   //设置图标
             builder.setTitle("确认吗");                //标题
@@ -815,7 +795,7 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
                 }
             });
             builder.create().show();         //创建并显示对话框
-        }else if (v == back_to_home) {
+        } else if (v == back_to_home) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setIcon(R.drawable.ic_prompt);   //设置图标
             builder.setTitle("确认吗");                //标题
@@ -844,8 +824,7 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
                 }
             });
             builder.create().show();         //创建并显示对话框
-        }
-        else if (v == charge_cardview) {
+        } else if (v == charge_cardview) {
             charge_dialog.show();         //创建并显示对话框
         } else if (v == setArgs_cardView) {
             args_dialog.show();
@@ -856,7 +835,6 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
             startActivity(intent);
         }
     }
-
 
 
     private void initData() {
@@ -899,16 +877,13 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
             }
         }).start();
 
-        // 搜索结果RecyclerView
-        mSearchAdapter = new SearchAdapter(mSearchData);
-        mRecycleViewSearch.setAdapter(mSearchAdapter);
         mLocMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
     }
 
     public void changeFromSpeed(int[] ints) {
         System.out.println("changefronspeed===============");
         for (int i = 0; i < spray_large_heads.length; i++) {
-            switch (ints[i]){
+            switch (ints[i]) {
                 case 20:
                     animationDrawable[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_20_round);
                     spray_large_heads[i].setImageDrawable(animationDrawable[i]);
@@ -1573,6 +1548,7 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
         }
         // leakcanary检测
     }
+
     private void addCircle(LatLng latlng, double radius) {
         CircleOptions options = new CircleOptions();
         options.strokeWidth(1f);
@@ -1881,7 +1857,6 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
                     return super.onKeyDown(keyCode, event);
                 }
             } else if (mode == MapMode.SEARCH) {
-                hideSearchTipView();
                 showMapView();
                 mMapMode = MapMode.NORMAL;
                 return true;
@@ -1976,51 +1951,6 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
 
     }
 
-    /**
-     * 隐藏搜索提示布局
-     */
-    private void hideSearchTipView() {
-        InputMethodUtils.hideInput(this);
-        mLLSearchContainer.setVisibility(View.GONE);
-        mEtSearchTip.setVisibility(View.VISIBLE);
-        mEtSearchTip.setFocusable(true);
-        mEtSearchTip.setFocusableInTouchMode(true);
-        mSearchData.clear();
-        mSearchAdapter.notifyDataSetChanged();
-        mEtSearchTip.setText("");
-    }
-
-    /**
-     * 显示搜索提示布局
-     */
-    private void showSearchTipView() {
-        mLLSearchContainer.setVisibility(View.VISIBLE);
-        InputMethodUtils.showInput(this, mEtSearchTip);
-    }
-
-
-    @Override
-    public void onUserClick() {
-        userLogin();
-    }
-
-    @Override
-    public void onSearchClick() {
-        // 显示搜索layout,隐藏地图图层,并设置当前地图操作模式
-        showSearchTipView();
-        hideMapView();
-        mMapMode = MapMode.SEARCH;
-    }
-
-    @Override
-    public void onVoiceClick() {
-
-    }
-
-    @Override
-    public void onQrScanClick() {
-
-    }
 
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
@@ -2034,7 +1964,6 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
             if (tip == null) {
                 return;
             }
-            hideSearchTipView();
             showMapView();
             mMoveToCenter = false;
             isPoiClick = true;
@@ -2061,75 +1990,6 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
         SEARCH
     }
 
-    /**
-     * 搜索Adapter
-     */
-    private static class SearchAdapter extends RecyclerView.Adapter<SearchViewHolder> implements View.OnClickListener {
-
-        private List<Tip> mData;
-        private OnItemClickListener mListener;
-
-        public SearchAdapter(List<Tip> data) {
-            this.mData = data;
-        }
-
-        /**
-         * 设置RecycleView条目点击
-         *
-         * @param listener
-         */
-        public void setOnItemClickListener(OnItemClickListener listener) {
-            this.mListener = listener;
-        }
-
-        @NonNull
-        @Override
-        public SearchViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int position) {
-            View itemView = ((LayoutInflater) viewGroup.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-                    .inflate(R.layout.search_tip_recycle_item, viewGroup, false);
-            itemView.setTag(position);
-            itemView.setOnClickListener(this);
-            return new SearchViewHolder(itemView);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull SearchViewHolder holder, int position) {
-            Tip tip = mData.get(position);
-            holder.tvSearchTitle.setText(tip.getName());
-            holder.tvSearchLoc.setText(tip.getAddress());
-        }
-
-        @Override
-        public int getItemCount() {
-            if (mData != null && mData.size() > 0) {
-                return mData.size();
-            }
-            return 0;
-        }
-
-        @Override
-        public void onClick(View v) {
-            if (v != null && mListener != null) {
-                int postion = (int) v.getTag();
-                mListener.onItemClick(v, postion);
-            }
-        }
-    }
-
-
-    /**
-     * 搜索ViewHolder
-     */
-    private static class SearchViewHolder extends RecyclerView.ViewHolder {
-        TextView tvSearchTitle;
-        TextView tvSearchLoc;
-
-        public SearchViewHolder(@NonNull View itemView) {
-            super(itemView);
-            tvSearchTitle = itemView.findViewById(R.id.tv_search_title);
-            tvSearchLoc = itemView.findViewById(R.id.tv_search_loc);
-        }
-    }
 
     /**
      * 是否打开GPS
