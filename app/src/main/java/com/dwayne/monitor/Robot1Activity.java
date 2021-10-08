@@ -204,6 +204,8 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
     private LocationManager mLocMgr;
     private LatLng latLonPoint;
 
+    LineChart lineChart;
+
 
     /**
      * 数据
