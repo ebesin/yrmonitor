@@ -57,7 +57,7 @@
     <string name="slipt_up_to_more">上滑查看详细信息</string>
     <string name="slipt_up_to_less">下滑关闭</string>
 
-    <!--微信相关-->
+
     <string name="errcode_success">发送成功</string>
     <string name="errcode_cancel">发送取消</string>
     <string name="errcode_deny">发送被拒绝</string>
@@ -71,7 +71,7 @@
     <string name="sear_loc_bus_subway">查找地点、公交、地铁</string>
     <string name="please_open_gps">请开启定位</string>
     <string name="header_name">跃然创客</string>
-    <string name="Plantation">种植园</string>
+    <string name="Plantation">大棚</string>
     <string name="Electricity">电池:  65%</string>
     <string name="setArgs">参数下发</string>
     <string name="setSpeed">速度控制</string>

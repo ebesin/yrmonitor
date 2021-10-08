@@ -7,7 +7,7 @@
     android:background="@color/white"
     tools:context=".ui.user.LoginActivity">
 
-    <com.jiyouliang.monitor.view.widget.TopTitleView
+    <com.dwayne.monitor.view.widget.TopTitleView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingRight="@dimen/padding_large2"
@@ -33,7 +33,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/ttv" />
 
-    <com.jiyouliang.monitor.view.widget.ClearEditText
+    <com.dwayne.monitor.view.widget.ClearEditText
         android:id="@+id/et_phone"
         android:layout_width="match_parent"
         android:layout_height="@dimen/input_height"
@@ -58,7 +58,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@id/et_phone" />
 
-    <com.jiyouliang.monitor.view.widget.ButtonLoadingView
+    <com.dwayne.monitor.view.widget.ButtonLoadingView
         android:id="@+id/btn_send_sms"
         style="@style/BtnLoginStyle"
         android:layout_marginLeft="@dimen/padding_large2"

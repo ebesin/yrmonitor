@@ -62,7 +62,7 @@
     <string name="map_lab">小德实验室</string>
     <string name="logout">退出登录</string>
 
-    <!--微信相关-->
+
     <string name="errcode_success">发送成功</string>
     <string name="errcode_cancel">发送取消</string>
     <string name="errcode_deny">发送被拒绝</string>
@@ -76,7 +76,7 @@
     <string name="sear_loc_bus_subway">查找地点、公交、地铁</string>
     <string name="please_open_gps">请开启定位</string>
     <string name="header_name">跃然创客</string>
-    <string name="Plantation">种植园</string>
+    <string name="Plantation">大棚</string>
     <string name="green_house_plant">大棚种植地</string>
     <string name="no_device">没有设备</string>
     <string name="agricultural_robot1">农业机器人(001)</string>

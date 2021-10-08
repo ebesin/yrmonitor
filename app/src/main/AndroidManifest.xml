@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.jiyouliang.monitor">
+    package="com.dwayne.monitor">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -27,39 +27,32 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-                <activity
-                    android:name="com.jiyouliang.monitor.MainActivity"
-                    android:screenOrientation="portrait">
-                    <intent-filter>
-                        <action android:name="android.intent.action.VIEW" />
+        <activity
+            android:name="com.dwayne.monitor.MainActivity"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
 
-                        <category android:name="android.intent.category.DEFAULT" />
-                    </intent-filter>
-                </activity>
-
-<!--        <activity android:name=".MaintestActivity">-->
-
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
-
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
-
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.VIEW" />-->
-
-<!--                <category android:name="android.intent.category.DEFAULT" />-->
-<!--            </intent-filter>-->
-<!--        </activity>-->
-
-        <activity android:name=".Main2"/>
 
         <activity
-            android:name="com.jiyouliang.monitor.RosBridgeActivity"
-            android:screenOrientation="portrait"/>
+            android:name="com.dwayne.monitor.Main2"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
 
         <activity
-            android:name="com.jiyouliang.monitor.ui.SplashActivity"
+            android:name="com.dwayne.monitor.RosBridgeActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name="com.dwayne.monitor.ui.SplashActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -74,36 +67,38 @@
         </activity>
 
         <activity
-            android:name="com.jiyouliang.monitor.Robot1Activity"
+            android:name="com.dwayne.monitor.Robot1Activity"
             android:screenOrientation="portrait"
-            android:theme="@style/MapTheme"/>
+            android:theme="@style/MapTheme" />
         <activity
-            android:name="com.jiyouliang.monitor.Robot2Activity"
+            android:name="com.dwayne.monitor.Robot2Activity"
             android:screenOrientation="portrait"
-            android:theme="@style/MapTheme"/>
+            android:theme="@style/MapTheme" />
 
-        <activity android:name=".ControlActivity"
+        <activity
+            android:name="com.dwayne.monitor.ControlActivity"
             android:screenOrientation="sensorLandscape"
-            android:theme="@style/controlStyle"/>
+            android:theme="@style/controlStyle" />
 
-        <activity android:name=".Control2Activity"
+        <activity
+            android:name="com.dwayne.monitor.Control2Activity"
             android:screenOrientation="sensorLandscape"
-            android:theme="@style/controlStyle"/>
+            android:theme="@style/controlStyle" />
 
         <activity
-            android:name="com.jiyouliang.monitor.Map2Activity"
+            android:name="com.dwayne.monitor.Map2Activity"
             android:screenOrientation="portrait"
-            android:theme="@style/MapTheme"/>
+            android:theme="@style/MapTheme" />
 
         <activity
-            android:name="com.jiyouliang.monitor.ui.user.UserActivity"
+            android:name="com.dwayne.monitor.ui.user.UserActivity"
             android:theme="@style/MyTranslucentTheme"
             android:windowSoftInputMode="adjustPan|stateHidden" />
         <activity
-            android:name="com.jiyouliang.monitor.ui.user.UserDetailActivity"
+            android:name="com.dwayne.monitor.ui.user.UserDetailActivity"
             android:theme="@style/MyTranslucentTheme" />
-        <activity android:name="com.jiyouliang.monitor.ui.user.LoginActivity" />
-        <activity android:name="com.jiyouliang.monitor.ui.user.UserLoginSendSmsActivity" />
+        <activity android:name="com.dwayne.monitor.ui.user.LoginActivity" />
+        <activity android:name="com.dwayne.monitor.ui.user.UserLoginSendSmsActivity" />
 
         <meta-data
             android:name="com.amap.api.v2.apikey"

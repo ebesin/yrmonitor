@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <com.jiyouliang.monitor.view.map.SupendViewContainer
+    <com.dwayne.monitor.view.map.SupendViewContainer
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

@@ -6,7 +6,7 @@
     android:background="@drawable/user_detail_bg"
     android:orientation="vertical">
 
-    <com.jiyouliang.monitor.view.widget.TopTitleView
+    <com.dwayne.monitor.view.widget.TopTitleView
         android:id="@+id/ttv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,7 +17,7 @@
         app:ttvRightSize="21dp"
         app:ttvRightTitleVisiable="false" />
 
-    <com.jiyouliang.monitor.view.widget.ReboundLinearLayout
+    <com.dwayne.monitor.view.widget.ReboundLinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -26,6 +26,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-    </com.jiyouliang.monitor.view.widget.ReboundLinearLayout>
+    </com.dwayne.monitor.view.widget.ReboundLinearLayout>
 
 </LinearLayout>

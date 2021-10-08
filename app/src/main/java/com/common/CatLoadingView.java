@@ -12,7 +12,7 @@ import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 
-import com.jiyouliang.monitor.R;
+import com.dwayne.monitor.R;
 
 public class CatLoadingView extends DialogFragment {
     public CatLoadingView() {

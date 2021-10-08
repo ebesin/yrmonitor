@@ -6,7 +6,7 @@
     android:background="@color/white"
     android:orientation="vertical">
 
-    <com.jiyouliang.monitor.view.widget.TopTitleView
+    <com.dwayne.monitor.view.widget.TopTitleView
         android:id="@+id/ttv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -37,7 +37,7 @@
         android:paddingLeft="@dimen/padding_large2"
         android:paddingRight="@dimen/padding_large2">
 
-        <com.jiyouliang.monitor.view.widget.SettingItemView
+        <com.dwayne.monitor.view.widget.SettingItemView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -54,7 +54,7 @@
         android:paddingLeft="@dimen/padding_large2"
         android:paddingRight="@dimen/padding_large2">
 
-        <com.jiyouliang.monitor.view.widget.SettingItemView
+        <com.dwayne.monitor.view.widget.SettingItemView
             android:layout_width="match_parent"
             android:id="@+id/siv_nickname"
             android:layout_height="wrap_content"
@@ -73,7 +73,7 @@
         android:paddingLeft="@dimen/padding_large2"
         android:paddingRight="@dimen/padding_large2">
 
-        <com.jiyouliang.monitor.view.widget.SettingItemView
+        <com.dwayne.monitor.view.widget.SettingItemView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -91,7 +91,7 @@
         android:paddingLeft="@dimen/padding_large2"
         android:paddingRight="@dimen/padding_large2">
 
-        <com.jiyouliang.monitor.view.widget.SettingItemView
+        <com.dwayne.monitor.view.widget.SettingItemView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -113,7 +113,7 @@
         android:paddingLeft="@dimen/padding_large2"
         android:paddingRight="@dimen/padding_large2">
 
-        <com.jiyouliang.monitor.view.widget.SettingItemView
+        <com.dwayne.monitor.view.widget.SettingItemView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"

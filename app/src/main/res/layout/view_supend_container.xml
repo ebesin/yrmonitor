@@ -26,7 +26,7 @@
             app:layout_constraintBottom_toTopOf="@id/nearby_view"
             app:layout_constraintLeft_toLeftOf="parent">
 
-            <com.jiyouliang.monitor.view.map.GPSView
+            <com.dwayne.monitor.view.map.GPSView
                 android:id="@+id/gps_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -39,7 +39,7 @@
 
         </RelativeLayout>
 
-        <com.jiyouliang.monitor.view.map.NearbySearchView
+        <com.dwayne.monitor.view.map.NearbySearchView
             android:id="@+id/nearby_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -55,7 +55,7 @@
     <include layout="@layout/botton_sheet1" />
 
     <!--<include layout="@layout/poi_detail_fix_bottom" />-->
-    <com.jiyouliang.monitor.view.map.PoiDetailBottomView
+    <com.dwayne.monitor.view.map.PoiDetailBottomView
         android:id="@+id/poi_detail_taxi"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -129,9 +129,8 @@
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:visibility="visible"
-        android:layout_height="match_parent">
-
+        android:layout_height="match_parent"
+        android:visibility="visible">
 
 
         <include
@@ -139,9 +138,6 @@
             android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
-
-
 
 
     </android.support.constraint.ConstraintLayout>
