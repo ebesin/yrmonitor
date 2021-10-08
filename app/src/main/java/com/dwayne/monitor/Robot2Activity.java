@@ -233,7 +233,7 @@ public class Robot2Activity extends BaseActivity implements View.OnClickListener
         //建立连接,订阅topic
 //        new Thread(connectRunnable).start();
         client = ((RCApplication) getApplication()).getRosClient();
-        publish();
+//        publish();
         largeImageView = findViewById(R.id.largeImage);
         try {
             largeImageView.setImage(new InputStreamBitmapDecoderFactory(getAssets().open("map2.png")));
