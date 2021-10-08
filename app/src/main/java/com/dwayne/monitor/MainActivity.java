@@ -141,10 +141,15 @@ public class MainActivity extends BaseActivity{
                                 startActivity(new Intent(MainActivity.this, RosBridgeActivity.class));
                             }
                         }else{
-                            Message message = new Message();
-                            message.what = 1;
-                            handler.sendMessage(message);
-                            connectToRobot(device);
+//                            Message message = new Message();
+//                            message.what = 1;
+//                            handler.sendMessage(message);
+//                            connectToRobot(device);
+                            try {
+                                startActivity(new Intent(MainActivity.this, Class.forName(device.getIntentClass())));
+                            } catch (ClassNotFoundException e) {
+                                startActivity(new Intent(MainActivity.this, RosBridgeActivity.class));
+                            }
                         }
                     }
                 }).start();
