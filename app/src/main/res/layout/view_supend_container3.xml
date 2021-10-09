@@ -53,6 +53,4 @@
 
     <include layout="@layout/botton_sheet2" />
 
-
-
 </android.support.design.widget.CoordinatorLayout>

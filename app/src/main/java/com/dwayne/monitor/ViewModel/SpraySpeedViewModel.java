@@ -6,11 +6,11 @@ import android.arch.lifecycle.ViewModel;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class FanSpeedViewModel3 extends ViewModel {
+public class SpraySpeedViewModel extends ViewModel {
     private MutableLiveData<int []> speed = new MutableLiveData<>();
     private final int num;
 
-    public FanSpeedViewModel3(int i) {
+    public SpraySpeedViewModel(int i) {
         num = i;
         int[] ints = new int[num];
         Arrays.fill(ints,0);

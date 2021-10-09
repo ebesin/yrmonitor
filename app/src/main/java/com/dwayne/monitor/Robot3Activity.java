@@ -38,6 +38,7 @@ import com.dwayne.monitor.ViewModel.BatteryViewModel;
 import com.dwayne.monitor.ViewModel.FanSpeedViewModel2;
 import com.dwayne.monitor.ViewModel.GPSData;
 import com.dwayne.monitor.ViewModel.GPSDataViewModel;
+import com.dwayne.monitor.ViewModel.SpraySpeedViewModel;
 import com.dwayne.monitor.ViewModel.StatusViewModel;
 import com.dwayne.monitor.bean.Angular;
 import com.dwayne.monitor.bean.Battery;
@@ -51,6 +52,7 @@ import com.dwayne.monitor.ui.BaseActivity;
 import com.dwayne.monitor.util.DeviceUtils;
 import com.dwayne.monitor.util.LogUtil;
 import com.dwayne.monitor.view.map.GPSView;
+import com.dwayne.monitor.view.model.NewBunkerModelView;
 import com.github.mikephil.charting.data.Entry;
 import com.github.onlynight.waveview.WaveView;
 import com.google.gson.Gson;
@@ -140,29 +142,8 @@ public class Robot3Activity extends BaseActivity implements View.OnClickListener
     Button back_to_home;
     TextView charge_card_data;
 
-    //4个风机
-    private final ImageView[] fans = new ImageView[4];
-    //8个喷头
-    private final ImageView[] spray_heads = new ImageView[8];
-    //保存喷头数据的数组
-    private final int[] speed = new int[8];
-
-    //控制旋转文件，代表了风机的6种转速
-    Animation animation_0_speed;
-    Animation animation_20_speed;
-    Animation animation_40_speed;
-    Animation animation_60_speed;
-    Animation animation_80_speed;
-    Animation animation_100_speed;
-
-    //代表了喷嘴的5种喷量大小
-    AnimationDrawable[] animationDrawable_0_speed = new AnimationDrawable[8];
-    AnimationDrawable[] animationDrawable_20_speed = new AnimationDrawable[8];
-    AnimationDrawable[] animationDrawable_40_speed = new AnimationDrawable[8];
-    AnimationDrawable[] animationDrawable_60_speed = new AnimationDrawable[8];
-    AnimationDrawable[] animationDrawable_80_speed = new AnimationDrawable[8];
-
-    LinearInterpolator linearInterpolator;
+    //modelview
+    private NewBunkerModelView newBunkerModelView;
 
     Gson gson = new Gson();
 
@@ -251,6 +232,7 @@ public class Robot3Activity extends BaseActivity implements View.OnClickListener
         mTvLocation = (TextView) findViewById(R.id.tv_my_loc);
         slideUpInfo = findViewById(R.id.slide_up_info);
         //数据显示控件
+        newBunkerModelView = findViewById(R.id.new_bunker_model_view);
         emergency_stop = findViewById(R.id.emergency_stop);
         emergency_stop.setOnClickListener(this);
         back_to_home = findViewById(R.id.back_to_home);
@@ -271,48 +253,6 @@ public class Robot3Activity extends BaseActivity implements View.OnClickListener
         aSwitch = findViewById(R.id.switch1);
         aSwitch.setOnCheckedChangeListener(this);
         aSwitch.setOnClickListener(this);
-//        setChart();
-        Arrays.fill(speed, 0);
-
-        //风机与旋转
-        fans[0] = findViewById(R.id.fan_no_1);
-        fans[1] = findViewById(R.id.fan_no_2);
-        fans[2] = findViewById(R.id.fan_no_3);
-        fans[3] = findViewById(R.id.fan_no_4);
-
-        spray_heads[0] = findViewById(R.id.spray_head_1);
-        spray_heads[1] = findViewById(R.id.spray_head_2);
-        spray_heads[2] = findViewById(R.id.spray_head_3);
-        spray_heads[3] = findViewById(R.id.spray_head_4);
-        spray_heads[4] = findViewById(R.id.spray_head_5);
-        spray_heads[5] = findViewById(R.id.spray_head_6);
-        spray_heads[6] = findViewById(R.id.spray_head_7);
-        spray_heads[7] = findViewById(R.id.spray_head_8);
-
-        animation_0_speed = AnimationUtils.loadAnimation(this, R.anim.image_0_rotation);
-        animation_20_speed = AnimationUtils.loadAnimation(this, R.anim.image_20_rotation);
-        animation_40_speed = AnimationUtils.loadAnimation(this, R.anim.image_40_rotation);
-        animation_60_speed = AnimationUtils.loadAnimation(this, R.anim.image_60_rotation);
-        animation_80_speed = AnimationUtils.loadAnimation(this, R.anim.image_80_rotation);
-        animation_100_speed = AnimationUtils.loadAnimation(this, R.anim.image_100_rotation);
-
-        for (int i = 0; i < animationDrawable_0_speed.length; i++) {
-            animationDrawable_20_speed[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_20_round);
-        }
-
-        for (int i = 0; i < animationDrawable_0_speed.length; i++) {
-            animationDrawable_40_speed[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_40_round);
-        }
-
-        for (int i = 0; i < animationDrawable_0_speed.length; i++) {
-            animationDrawable_60_speed[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_60_round);
-        }
-
-        for (int i = 0; i < animationDrawable_0_speed.length; i++) {
-            animationDrawable_80_speed[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_80_round);
-        }
-        linearInterpolator = new LinearInterpolator();
-        setFan();
         setBottomSheet();
         setDialog();
     }
@@ -324,7 +264,6 @@ public class Robot3Activity extends BaseActivity implements View.OnClickListener
         gpsDataViewModel.getGpsData().observe(this, new Observer<GPSData>() {
             @Override
             public void onChanged(@Nullable GPSData gpsData) {
-
             }
         });
 
@@ -332,12 +271,10 @@ public class Robot3Activity extends BaseActivity implements View.OnClickListener
         fanSpeedViewModel2.getSpeed().observe(this, new Observer<int[]>() {
             @Override
             public void onChanged(@Nullable int[] ints) {
-                changeFromSpeed(ints);
+                newBunkerModelView.changeFromSpeed(ints);
             }
         });
-
         setSpeed();
-
         statusViewModel = ViewModelProviders.of(this).get(StatusViewModel.class);
         statusViewModel.getStatusMutableLiveData().observe(this, new Observer<Status>() {
             @Override
@@ -348,7 +285,6 @@ public class Robot3Activity extends BaseActivity implements View.OnClickListener
                 viewhandler.sendMessage(message);
             }
         });
-
         batteryViewModel = ViewModelProviders.of(this).get(BatteryViewModel.class);
         batteryViewModel.getBatteryMutableLiveData().observe(this, new Observer<Battery>() {
             @Override
@@ -391,7 +327,6 @@ public class Robot3Activity extends BaseActivity implements View.OnClickListener
 
             private float lastSlide;//上次slideOffset
             private float currSlide;//当前slideOffset
-
 
             //BottomSheet状态改变回调
             @Override
@@ -575,51 +510,6 @@ public class Robot3Activity extends BaseActivity implements View.OnClickListener
             client.disconnect();
         }
         super.onDestroy();
-    }
-
-    private void setFan() {
-        animation_0_speed.setInterpolator(linearInterpolator);
-        animation_20_speed.setInterpolator(linearInterpolator);
-        animation_40_speed.setInterpolator(linearInterpolator);
-        animation_60_speed.setInterpolator(linearInterpolator);
-        animation_80_speed.setInterpolator(linearInterpolator);
-        animation_100_speed.setInterpolator(linearInterpolator);
-    }
-
-    public void changeFromSpeed(int[] ints) {
-        for (int i = 0; i < fans.length; i++) {
-            switch (ints[i]) {
-                case 20:
-                    fans[i].setImageDrawable(getResources().getDrawable(R.drawable.ic_fan_20));
-                    fans[i].startAnimation(animation_20_speed);
-                    spray_heads[i].setImageDrawable(animationDrawable_20_speed[i]);
-                    animationDrawable_20_speed[i].start();
-                    break;
-                case 40:
-                    fans[i].setImageDrawable(getResources().getDrawable(R.drawable.ic_fan_40));
-                    fans[i].startAnimation(animation_40_speed);
-                    spray_heads[i].setImageDrawable(animationDrawable_40_speed[i]);
-                    animationDrawable_40_speed[i].start();
-                    break;
-                case 60:
-                    fans[i].setImageDrawable(getResources().getDrawable(R.drawable.ic_fan_60));
-                    fans[i].startAnimation(animation_60_speed);
-                    spray_heads[i].setImageDrawable(animationDrawable_60_speed[i]);
-                    animationDrawable_60_speed[i].start();
-                    break;
-                case 80:
-                    fans[i].setImageDrawable(getResources().getDrawable(R.drawable.ic_fan_80));
-                    fans[i].startAnimation(animation_80_speed);
-                    spray_heads[i].setImageDrawable(animationDrawable_80_speed[i]);
-                    animationDrawable_80_speed[i].start();
-                    break;
-                default:
-                    fans[i].setImageDrawable(getResources().getDrawable(R.drawable.ic_fan_20));
-                    spray_heads[i].startAnimation(animation_0_speed);
-                    spray_heads[i].setImageDrawable(animationDrawable_80_speed[i]);
-                    animationDrawable_80_speed[i].start();
-            }
-        }
     }
 
     public void showPoiDetail(String locTitle, String locInfo) {
