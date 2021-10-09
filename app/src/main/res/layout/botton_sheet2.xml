@@ -126,7 +126,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2">
 
-
+<!--
         <android.support.constraint.ConstraintLayout
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -314,6 +314,15 @@
                 app:layout_constraintTop_toTopOf="@+id/fan_no_8"
                 app:srcCompat="@drawable/progress_80_round" />
         </android.support.constraint.ConstraintLayout>
+-->
+        <com.dwayne.monitor.view.model.HunterModelView
+            android:id="@+id/hunter_model_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/guideline14"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <android.support.constraint.Guideline
             android:id="@+id/guideline14"
@@ -508,9 +517,9 @@
                         android:id="@+id/textView24"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:ems="1"
                         android:text="@string/setArgs"
                         android:textSize="14sp"
-                        android:ems="1"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -584,9 +593,9 @@
                         android:id="@+id/textView31"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:ems="1"
                         android:text="@string/remote_control"
                         android:textSize="14sp"
-                        android:ems="1"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"

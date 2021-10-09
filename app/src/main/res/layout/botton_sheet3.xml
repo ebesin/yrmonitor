@@ -126,7 +126,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2">
 
-
+<!--
         <android.support.constraint.ConstraintLayout
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -266,6 +266,15 @@
                 app:layout_constraintTop_toBottomOf="@+id/spray_head_7"
                 app:srcCompat="@drawable/progress_80_round" />
         </android.support.constraint.ConstraintLayout>
+-->
+        <com.dwayne.monitor.view.model.NewBunkerModelView
+            android:id="@+id/new_bunker_model_view"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/guideline14"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <android.support.constraint.Guideline
             android:id="@+id/guideline14"
