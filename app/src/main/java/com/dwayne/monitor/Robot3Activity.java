@@ -77,12 +77,10 @@ public class Robot3Activity extends BaseActivity implements View.OnClickListener
     private int mScreenWidth;
     private View mPoiColseView;
     private GPSView mGpsView;
-
     private TextView mTvLocTitle;
     private TextView mTvLocation;
 
     private TextView slideUpInfo;
-
 
     @SuppressLint("HandlerLeak")
     Handler handler = new Handler() {
@@ -129,29 +127,27 @@ public class Robot3Activity extends BaseActivity implements View.OnClickListener
         }
     };
 
+    //地图
+    LargeImageView largeImageView;
 
-    CardView charge_cardview;
-    CardView setArgs_cardView;
-    CardView device_state_cardView;
-    CardView remote_control_cardView;
     Button determine;
     //用来保存数据
     List<Entry> list = new ArrayList<>();
 
-    //电池波纹
-    WaveView charge_waveView;
-    WaveView spray_waveView;
 
-    //开关
-    Switch aSwitch;
+    //一些暂时没用的按钮
+    Button emergency_stop;
+    Button back_to_home;
+    TextView charge_card_data;
 
-    //9个风机
-    private final ImageView[] fans = new ImageView[8];
+    //4个风机
+    private final ImageView[] fans = new ImageView[4];
+    //8个喷头
     private final ImageView[] spray_heads = new ImageView[8];
+    //保存喷头数据的数组
     private final int[] speed = new int[8];
 
-
-    //控制旋转文件
+    //控制旋转文件，代表了风机的6种转速
     Animation animation_0_speed;
     Animation animation_20_speed;
     Animation animation_40_speed;
@@ -159,6 +155,7 @@ public class Robot3Activity extends BaseActivity implements View.OnClickListener
     Animation animation_80_speed;
     Animation animation_100_speed;
 
+    //代表了喷嘴的5种喷量大小
     AnimationDrawable[] animationDrawable_0_speed = new AnimationDrawable[8];
     AnimationDrawable[] animationDrawable_20_speed = new AnimationDrawable[8];
     AnimationDrawable[] animationDrawable_40_speed = new AnimationDrawable[8];
@@ -169,26 +166,28 @@ public class Robot3Activity extends BaseActivity implements View.OnClickListener
 
     Gson gson = new Gson();
 
-    //地图
-    LargeImageView largeImageView;
-
     /**
-     * 数据
+     * 数据模型
      */
     private GPSDataViewModel gpsDataViewModel;
     private FanSpeedViewModel2 fanSpeedViewModel2;
     private StatusViewModel statusViewModel;
     private BatteryViewModel batteryViewModel;
 
-    //dialog
+    //卡片式控件
+    CardView charge_cardview;
+    CardView setArgs_cardView;
+    CardView device_state_cardView;
+    CardView remote_control_cardView;
+
+    //电池波纹
+    WaveView charge_waveView;
+    WaveView spray_waveView;
+
+    //点击是弹出的dialog
     AlertDialog charge_dialog;
     AlertDialog args_dialog;
     AlertDialog status_dialog;
-
-
-    Button emergency_stop;
-    Button back_to_home;
-    TextView charge_card_data;
 
     //status dialog控件
     TextView speed_data;
@@ -206,6 +205,8 @@ public class Robot3Activity extends BaseActivity implements View.OnClickListener
     EditText speed_data_inputview;
     EditText angle_data_inputview;
 
+    //开关
+    Switch aSwitch;
 
     //ros通信
     ROSBridgeClient client;
@@ -222,7 +223,7 @@ public class Robot3Activity extends BaseActivity implements View.OnClickListener
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_map3);
+        setContentView(R.layout.activity_map4);
         EventBus.getDefault().register(this);
         initView(savedInstanceState);
         initData();
@@ -233,7 +234,7 @@ public class Robot3Activity extends BaseActivity implements View.OnClickListener
         //建立连接,订阅topic
 //        new Thread(connectRunnable).start();
         client = ((RCApplication) getApplication()).getRosClient();
-        publish();
+//        publish();
         largeImageView = findViewById(R.id.largeImage);
         try {
             largeImageView.setImage(new InputStreamBitmapDecoderFactory(getAssets().open("map2.png")));
@@ -272,15 +273,12 @@ public class Robot3Activity extends BaseActivity implements View.OnClickListener
         aSwitch.setOnClickListener(this);
 //        setChart();
         Arrays.fill(speed, 0);
+
         //风机与旋转
         fans[0] = findViewById(R.id.fan_no_1);
         fans[1] = findViewById(R.id.fan_no_2);
         fans[2] = findViewById(R.id.fan_no_3);
         fans[3] = findViewById(R.id.fan_no_4);
-        fans[4] = findViewById(R.id.fan_no_5);
-        fans[5] = findViewById(R.id.fan_no_6);
-        fans[6] = findViewById(R.id.fan_no_7);
-        fans[7] = findViewById(R.id.fan_no_8);
 
         spray_heads[0] = findViewById(R.id.spray_head_1);
         spray_heads[1] = findViewById(R.id.spray_head_2);
@@ -298,7 +296,6 @@ public class Robot3Activity extends BaseActivity implements View.OnClickListener
         animation_80_speed = AnimationUtils.loadAnimation(this, R.anim.image_80_rotation);
         animation_100_speed = AnimationUtils.loadAnimation(this, R.anim.image_100_rotation);
 
-
         for (int i = 0; i < animationDrawable_0_speed.length; i++) {
             animationDrawable_20_speed[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_20_round);
         }
@@ -314,18 +311,14 @@ public class Robot3Activity extends BaseActivity implements View.OnClickListener
         for (int i = 0; i < animationDrawable_0_speed.length; i++) {
             animationDrawable_80_speed[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_80_round);
         }
-
         linearInterpolator = new LinearInterpolator();
         setFan();
-
         setBottomSheet();
         setDialog();
     }
 
 
     private void initData() {
-//        this.ip =  ((RCApplication) getApplication()).getIp();
-
 //        设置gps数据改变时的事件
         gpsDataViewModel = ViewModelProviders.of(this).get((GPSDataViewModel.class));
         gpsDataViewModel.getGpsData().observe(this, new Observer<GPSData>() {
@@ -334,6 +327,7 @@ public class Robot3Activity extends BaseActivity implements View.OnClickListener
 
             }
         });
+
         fanSpeedViewModel2 = ViewModelProviders.of(this).get(FanSpeedViewModel2.class);
         fanSpeedViewModel2.getSpeed().observe(this, new Observer<int[]>() {
             @Override
@@ -341,6 +335,7 @@ public class Robot3Activity extends BaseActivity implements View.OnClickListener
                 changeFromSpeed(ints);
             }
         });
+
         setSpeed();
 
         statusViewModel = ViewModelProviders.of(this).get(StatusViewModel.class);
@@ -366,6 +361,7 @@ public class Robot3Activity extends BaseActivity implements View.OnClickListener
         });
     }
 
+    //创建线程模拟数据变化
     private void setSpeed() {
         new Thread(new Runnable() {
             @Override

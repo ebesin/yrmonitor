@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     android:background="@color/transparent">
 
-
     <LinearLayout
         android:id="@+id/gps_view_container"
         android:layout_width="match_parent"
@@ -32,9 +31,6 @@
                 android:background="@drawable/gps_loc_selector"
                 android:src="@drawable/icon_gps_unlocked" />
 
-
-
-
         </RelativeLayout>
 
         <com.dwayne.monitor.view.map.NearbySearchView
@@ -51,8 +47,6 @@
 
     </LinearLayout>
 
-    <include layout="@layout/botton_sheet2" />
-
-
+    <include layout="@layout/botton_sheet3" />
 
 </android.support.design.widget.CoordinatorLayout>

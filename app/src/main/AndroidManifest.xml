@@ -74,6 +74,10 @@
             android:name="com.dwayne.monitor.Robot2Activity"
             android:screenOrientation="portrait"
             android:theme="@style/MapTheme" />
+        <activity
+            android:name="com.dwayne.monitor.Robot3Activity"
+            android:screenOrientation="portrait"
+            android:theme="@style/MapTheme" />
 
         <activity
             android:name="com.dwayne.monitor.ControlActivity"
