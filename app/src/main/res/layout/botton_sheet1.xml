@@ -238,6 +238,7 @@
         </android.support.constraint.ConstraintLayout>
 -->
         <com.dwayne.monitor.view.model.OldBunkerModelView
+            android:id="@+id/old_bunker_model_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toTopOf="@+id/guideline14"

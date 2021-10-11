@@ -70,6 +70,7 @@ import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.geocoder.GeocodeSearch;
 import com.amap.api.services.help.Tip;
 import com.dadac.testrosbridge.RCApplication;
+import com.dwayne.monitor.view.model.OldBunkerModelView;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -204,7 +205,6 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
 
     LineChart lineChart;
 
-
     /**
      * 数据
      */
@@ -281,24 +281,7 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
     //开关
     Switch aSwitch;
 
-    //9个风机
-
-    private final ImageView[] spray_large_heads = new ImageView[9];
-
-    private ImageView large_fan;
-
-    private final int[] speed = new int[9];
-
-    //控制旋转文件
-    Animation animation_0_speed;
-    Animation animation_20_speed;
-    Animation animation_40_speed;
-    Animation animation_60_speed;
-    Animation animation_80_speed;
-    Animation animation_100_speed;
-    LinearInterpolator linearInterpolator;
-
-    AnimationDrawable[] animationDrawable = new AnimationDrawable[9];
+    OldBunkerModelView oldBunkerModelView;
 
     //ros通信
     ROSBridgeClient client;
@@ -363,31 +346,7 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
         aSwitch.setOnClickListener(this);
 //        setChart();
 
-        Arrays.fill(speed, 0);
-
-        //风机与旋转
-        spray_large_heads[0] = findViewById(R.id.spray_large_head_1);
-        spray_large_heads[1] = findViewById(R.id.spray_large_head_2);
-        spray_large_heads[2] = findViewById(R.id.spray_large_head_3);
-        spray_large_heads[3] = findViewById(R.id.spray_large_head_4);
-        spray_large_heads[4] = findViewById(R.id.spray_large_head_5);
-        spray_large_heads[5] = findViewById(R.id.spray_large_head_6);
-        spray_large_heads[6] = findViewById(R.id.spray_large_head_7);
-        spray_large_heads[7] = findViewById(R.id.spray_large_head_8);
-        spray_large_heads[8] = findViewById(R.id.spray_large_head_9);
-
-        large_fan = findViewById(R.id.large_fan_1);
-
-        animation_0_speed = AnimationUtils.loadAnimation(this, R.anim.image_0_rotation);
-        animation_20_speed = AnimationUtils.loadAnimation(this, R.anim.image_20_rotation);
-        animation_40_speed = AnimationUtils.loadAnimation(this, R.anim.image_40_rotation);
-        animation_60_speed = AnimationUtils.loadAnimation(this, R.anim.image_60_rotation);
-        animation_80_speed = AnimationUtils.loadAnimation(this, R.anim.image_80_rotation);
-        animation_100_speed = AnimationUtils.loadAnimation(this, R.anim.image_100_rotation);
-        linearInterpolator = new LinearInterpolator();
-        setFan();
-        large_fan.setImageDrawable(getResources().getDrawable(R.drawable.ic_large_fan_20));
-        large_fan.startAnimation(animation_60_speed);
+        oldBunkerModelView = findViewById(R.id.old_bunker_model_view);
         mTvLocTitle = (TextView) findViewById(R.id.tv_title);
 
         mGspContainer = findViewById(R.id.gps_view_container);
@@ -444,15 +403,6 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
                 }
             }
         }).start();
-    }
-
-    private void setFan() {
-        animation_0_speed.setInterpolator(linearInterpolator);
-        animation_20_speed.setInterpolator(linearInterpolator);
-        animation_40_speed.setInterpolator(linearInterpolator);
-        animation_60_speed.setInterpolator(linearInterpolator);
-        animation_80_speed.setInterpolator(linearInterpolator);
-        animation_100_speed.setInterpolator(linearInterpolator);
     }
 
     private void setChart() {
@@ -850,10 +800,10 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
         fanSpeedViewModel.getSpeed().observe(this, new Observer<int[]>() {
             @Override
             public void onChanged(@Nullable int[] ints) {
-                changeFromSpeed(ints);
+                oldBunkerModelView.changeFromSpeed(ints);
             }
         });
-//        setSpeed();
+        setSpeed();
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -878,48 +828,6 @@ public class Robot1Activity extends BaseActivity implements GPSView.OnGPSViewCli
         }).start();
 
         mLocMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-    }
-
-    public void changeFromSpeed(int[] ints) {
-        System.out.println("changefronspeed===============");
-        for (int i = 0; i < spray_large_heads.length; i++) {
-            switch (ints[i]) {
-                case 20:
-                    animationDrawable[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_20_round);
-                    spray_large_heads[i].setImageDrawable(animationDrawable[i]);
-                    spray_large_heads[i].setColorFilter(0xFFFFFFFF);
-                    animationDrawable[i].start();
-                    break;
-                case 40:
-                    animationDrawable[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_40_round);
-                    spray_large_heads[i].setImageDrawable(animationDrawable[i]);
-                    spray_large_heads[i].setColorFilter(0xff0000ff);
-                    animationDrawable[i].start();
-                    break;
-                case 60:
-                    animationDrawable[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_60_round);
-                    spray_large_heads[i].setImageDrawable(animationDrawable[i]);
-                    spray_large_heads[i].setColorFilter(0xffFFFF00);
-                    animationDrawable[i].start();
-                    break;
-                case 80:
-                    animationDrawable[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_80_round);
-                    spray_large_heads[i].setImageDrawable(animationDrawable[i]);
-                    spray_large_heads[i].setColorFilter(0xffFFA500);
-                    animationDrawable[i].start();
-                    break;
-                case 100:
-                    animationDrawable[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_100_round);
-                    spray_large_heads[i].setImageDrawable(animationDrawable[i]);
-                    spray_large_heads[i].setColorFilter(0xffff0000);
-                    animationDrawable[i].start();
-                    break;
-                default:
-                    spray_large_heads[i].setColorFilter(0xff1296DB);
-                    spray_large_heads[i].setImageDrawable(getResources().getDrawable(R.drawable.ic_method_draw_image));
-                    break;
-            }
-        }
     }
 
     /**
