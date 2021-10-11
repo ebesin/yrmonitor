@@ -2,9 +2,11 @@ package com.dwayne.monitor;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothClass;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Build;
@@ -19,11 +21,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.CursorAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.common.CatLoadingView;
 import com.dadac.testrosbridge.RCApplication;
+import com.dwayne.monitor.dao.DeviceTypeDao;
 import com.jilk.ros.ROSClient;
 import com.jilk.ros.rosbridge.ROSBridgeClient;
 import com.dwayne.monitor.adapter.DeviceAdapter;
@@ -35,8 +43,12 @@ import com.dwayne.monitor.ui.BaseActivity;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.widget.CursorAdapter.FLAG_AUTO_REQUERY;
 
-public class MainActivity extends BaseActivity{
+
+public class MainActivity extends BaseActivity {
+
+    final String TAG = "MainActivity";
 
     Toolbar toolbar;
 
@@ -60,8 +72,14 @@ public class MainActivity extends BaseActivity{
 
     Context context;
     DeviceDao deviceDao;
+    DeviceTypeDao deviceTypeDao;
     EditText device_name_inputview;
     EditText ip_inputview;
+
+    List<String> allTypeName;
+    ArrayAdapter<String> arrayAdapter;
+    Spinner spinner;
+
 
     DatabaseHelper databaseHelper;
     SQLiteDatabase writableDatabase;
@@ -83,10 +101,10 @@ public class MainActivity extends BaseActivity{
                     Device device = (Device) msg.obj;
                     mView.dismiss();
                     try {
-                        startActivity(new Intent(MainActivity.this, Class.forName(String.valueOf(device.getIntentClass()))));
+                        startActivity(new Intent(MainActivity.this, Class.forName(String.valueOf(deviceTypeDao.getIntentClassByName(device.getType())))));
                     } catch (ClassNotFoundException e) {
                         e.printStackTrace();
-                        Log.d("error", "没有对应的类");
+                        Log.d(TAG, "没有对应的类");
                         startActivity(new Intent(MainActivity.this, RosBridgeActivity.class));
                     }
                     break;
@@ -114,40 +132,51 @@ public class MainActivity extends BaseActivity{
         setToolbar();
         mView = new CatLoadingView();
         recyclerView = findViewById(R.id.device_recyclerview);
-        recyclerView.setLayoutManager(new GridLayoutManager(this,2, GridLayoutManager.VERTICAL,false));
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false));
         deviceAdapter = new DeviceAdapter();
         setClickListener();
         recyclerView.setAdapter(deviceAdapter);
         deviceDao = new DeviceDao();
+        deviceTypeDao = new DeviceTypeDao();
         devices = deviceDao.getAllDevices();
         deviceAdapter.setDevices(devices);
+        allTypeName = deviceTypeDao.getAllTypeName();
+        arrayAdapter = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, allTypeName);
+        arrayAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
         refreshDevice();
     }
 
-    public void setClickListener(){
+    public void setClickListener() {
         deviceAdapter.setOnItemCLickListener(new DeviceAdapter.OnItemCLickListener() {
             @Override
             public void onItemClick(final Device device, DeviceAdapter.ViewHolder holder, int position) {
-                Log.d("click","点击了--------------");
+                Log.d("click", "点击了--------------");
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        if(device.getIp().equals("")) {
+                        if (device.getIp().equals("")) {
                             try {
-                                startActivity(new Intent(MainActivity.this, Class.forName(device.getIntentClass())));
+                                startActivity(new Intent(MainActivity.this, Class.forName(deviceTypeDao.getIntentClassByName(device.getType()))));
                             } catch (ClassNotFoundException e) {
                                 e.printStackTrace();
-                                Log.d("error","没有对应的类");
+                                Log.d(TAG, "没有对应的类");
+                                startActivity(new Intent(MainActivity.this, RosBridgeActivity.class));
+                            } catch (Exception e) {
+                                Log.d(TAG, e.getMessage());
                                 startActivity(new Intent(MainActivity.this, RosBridgeActivity.class));
                             }
-                        }else{
+                        } else {
 //                            Message message = new Message();
 //                            message.what = 1;
 //                            handler.sendMessage(message);
 //                            connectToRobot(device);
                             try {
-                                startActivity(new Intent(MainActivity.this, Class.forName(device.getIntentClass())));
+                                startActivity(new Intent(MainActivity.this, Class.forName(deviceTypeDao.getIntentClassByName(device.getType()))));
                             } catch (ClassNotFoundException e) {
+                                Log.d(TAG, "没有对应的类");
+                                startActivity(new Intent(MainActivity.this, RosBridgeActivity.class));
+                            } catch (Exception e) {
+                                Log.d(TAG, e.getMessage());
                                 startActivity(new Intent(MainActivity.this, RosBridgeActivity.class));
                             }
                         }
@@ -178,14 +207,14 @@ public class MainActivity extends BaseActivity{
                 message.what = 3;
                 message.obj = device;
                 handler.sendMessage(message);
-                Log.d("dwayne", "Connect ROS success");
+                Log.d(TAG, "Connect ROS success");
             }
 
             @Override
             public void onDisconnect(boolean normal, String reason, int code) {
                 showTip("断开连接");
                 ((RCApplication) getApplication()).setConn(false);
-                Log.d("dwayne", "ROS disconnect");
+                Log.d(TAG, "ROS disconnect");
             }
 
             @Override
@@ -193,7 +222,7 @@ public class MainActivity extends BaseActivity{
                 ex.printStackTrace();
                 ((RCApplication) getApplication()).setConn(false);
                 showTip("连接失败");
-                Log.d("dwayne", "ROS communication error");
+                Log.d(TAG, "ROS communication error");
             }
         });
     }
@@ -209,7 +238,7 @@ public class MainActivity extends BaseActivity{
 
     public void createDialog(final int index) {
         final Device device = devices.get(index);
-        if(device.getIp().equals("")){
+        if (device.getIp().equals("")) {
             showToast("该设备仅提供测试连接，请勿修改");
             return;
         }
@@ -220,6 +249,10 @@ public class MainActivity extends BaseActivity{
         builder.setView(layout);
         device_name_inputview = layout.findViewById(R.id.device_name_inputview);
         ip_inputview = layout.findViewById(R.id.ip_inputview);
+        spinner = layout.findViewById(R.id.spinner);
+        spinner.setAdapter(arrayAdapter);
+        spinner.setSelection(getIndex(index));
+
         device_name_inputview.setText(device.getName());
         ip_inputview.setText(device.getIp());
         builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
@@ -230,8 +263,9 @@ public class MainActivity extends BaseActivity{
                 } else {
                     String name = device_name_inputview.getText().toString();
                     String ip = ip_inputview.getText().toString();
-                    boolean b = deviceDao.updateNameAndIpById(device.getId(), name, ip);
-                    if(!b){
+                    String type = spinner.getSelectedItem().toString();
+                    boolean b = deviceDao.updataAllInfoById(device.getId(), name, ip,type);
+                    if (!b) {
                         showToast("更新设备信息失败");
                         return;
                     }
@@ -251,7 +285,17 @@ public class MainActivity extends BaseActivity{
         builder.create().show();
     }
 
-    public void refreshDevice(){
+    private int getIndex(int i) {
+        Device device = devices.get(i);
+        for (int k = 0; k < allTypeName.size(); k++) {
+            if(device.getType().equals(allTypeName.get(k))){
+                return k;
+            }
+        }
+        return -1;
+    }
+
+    public void refreshDevice() {
         devices = deviceDao.getAllDevices();
         deviceAdapter.setDevices(devices);
         deviceAdapter.notifyDataSetChanged();

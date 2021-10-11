@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Point;
-import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -22,23 +21,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dadac.testrosbridge.RCApplication;
 import com.dwayne.monitor.ViewModel.BatteryViewModel;
-import com.dwayne.monitor.ViewModel.FanSpeedViewModel2;
+import com.dwayne.monitor.ViewModel.HenterSpraySpeedViewModel;
 import com.dwayne.monitor.ViewModel.GPSData;
 import com.dwayne.monitor.ViewModel.GPSDataViewModel;
-import com.dwayne.monitor.ViewModel.SpraySpeedViewModel;
 import com.dwayne.monitor.ViewModel.StatusViewModel;
 import com.dwayne.monitor.bean.Angular;
 import com.dwayne.monitor.bean.Battery;
@@ -62,12 +56,11 @@ import com.jilk.ros.rosbridge.implementation.PublishEvent;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
 
-public class Robot3Activity extends BaseActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, GPSView.OnGPSViewClickListener {
+public class NewBunkerActivity extends BaseActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, GPSView.OnGPSViewClickListener {
 
     private static final String TAG = "MapActivity3";
     private View mBottomSheet;
@@ -151,7 +144,7 @@ public class Robot3Activity extends BaseActivity implements View.OnClickListener
      * 数据模型
      */
     private GPSDataViewModel gpsDataViewModel;
-    private FanSpeedViewModel2 fanSpeedViewModel2;
+    private HenterSpraySpeedViewModel fanSpeedViewModel2;
     private StatusViewModel statusViewModel;
     private BatteryViewModel batteryViewModel;
 
@@ -267,7 +260,7 @@ public class Robot3Activity extends BaseActivity implements View.OnClickListener
             }
         });
 
-        fanSpeedViewModel2 = ViewModelProviders.of(this).get(FanSpeedViewModel2.class);
+        fanSpeedViewModel2 = ViewModelProviders.of(this).get(HenterSpraySpeedViewModel.class);
         fanSpeedViewModel2.getSpeed().observe(this, new Observer<int[]>() {
             @Override
             public void onChanged(@Nullable int[] ints) {
@@ -444,7 +437,7 @@ public class Robot3Activity extends BaseActivity implements View.OnClickListener
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(Robot3Activity.this, tip, Toast.LENGTH_SHORT).show();
+                Toast.makeText(NewBunkerActivity.this, tip, Toast.LENGTH_SHORT).show();
             }
         });
     }

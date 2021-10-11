@@ -1,9 +1,12 @@
 package com.example.dadac.testrosbridge;
 
+import com.dwayne.monitor.HunterActivity;
+import com.dwayne.monitor.NewBunkerActivity;
+import com.dwayne.monitor.view.model.HunterModelView;
 import com.google.gson.Gson;
 import com.jilk.ros.ROSClient;
 import com.jilk.ros.rosbridge.ROSBridgeClient;
-import com.dwayne.monitor.Robot1Activity;
+import com.dwayne.monitor.OldBunkerActivity;
 import com.dwayne.monitor.RosBridgeActivity;
 import com.dwayne.monitor.bean.Angular;
 import com.dwayne.monitor.bean.Header;
@@ -113,7 +116,9 @@ public class ExampleUnitTest {
 
     @Test
     public void testClass() throws ClassNotFoundException {
-        System.out.println(Robot1Activity.class);
+        System.out.println(OldBunkerActivity.class);
+        System.out.println(NewBunkerActivity.class);
+        System.out.println(HunterActivity.class);
         System.out.println(RosBridgeActivity.class);
     }
 }

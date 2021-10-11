@@ -9,7 +9,7 @@
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="300dp"
-        android:layout_height="170dp"
+        android:layout_height="200dp"
         android:background="@drawable/charge_detail">
 
         <android.support.constraint.Guideline
@@ -82,6 +82,16 @@
             app:layout_constraintStart_toStartOf="@+id/speed_text"
             app:layout_constraintTop_toBottomOf="@+id/speed_text" />
 
+        <TextView
+            android:id="@+id/front_wheel_angle_text2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="设备类型"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="@+id/front_wheel_angle_text"
+            app:layout_constraintTop_toBottomOf="@+id/front_wheel_angle_text" />
+
         <EditText
             android:id="@+id/ip_inputview"
             android:layout_width="0dp"
@@ -93,6 +103,17 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/device_name_inputview"
             app:layout_constraintTop_toTopOf="@+id/front_wheel_angle_text" />
+
+        <Spinner
+            android:id="@+id/spinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@+id/front_wheel_angle_text2"
+            android:textAlignment="center"
+            app:layout_constraintEnd_toEndOf="@+id/ip_inputview"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="@+id/ip_inputview"
+            app:layout_constraintTop_toTopOf="@+id/front_wheel_angle_text2" />
 
 
     </android.support.constraint.ConstraintLayout>

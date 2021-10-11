@@ -67,15 +67,15 @@
         </activity>
 
         <activity
-            android:name="com.dwayne.monitor.Robot1Activity"
+            android:name="com.dwayne.monitor.OldBunkerActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MapTheme" />
         <activity
-            android:name="com.dwayne.monitor.Robot2Activity"
+            android:name="com.dwayne.monitor.HunterActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MapTheme" />
         <activity
-            android:name="com.dwayne.monitor.Robot3Activity"
+            android:name="com.dwayne.monitor.NewBunkerActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MapTheme" />
 
@@ -88,11 +88,6 @@
             android:name="com.dwayne.monitor.Control2Activity"
             android:screenOrientation="sensorLandscape"
             android:theme="@style/controlStyle" />
-
-        <activity
-            android:name="com.dwayne.monitor.Map2Activity"
-            android:screenOrientation="portrait"
-            android:theme="@style/MapTheme" />
 
         <activity
             android:name="com.dwayne.monitor.ui.user.UserActivity"

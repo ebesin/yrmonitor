@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -24,9 +23,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -34,9 +31,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -69,13 +63,10 @@ import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.MyLocationStyle;
 import com.amap.api.maps.model.Poi;
 import com.amap.api.services.core.LatLonPoint;
-import com.amap.api.services.geocoder.GeocodeResult;
 import com.amap.api.services.geocoder.GeocodeSearch;
-import com.amap.api.services.geocoder.RegeocodeResult;
-import com.amap.api.services.help.Inputtips;
-import com.amap.api.services.help.InputtipsQuery;
 import com.amap.api.services.help.Tip;
 import com.dadac.testrosbridge.RCApplication;
+import com.dwayne.monitor.view.model.OldBunkerModelView;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -84,34 +75,40 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.onlynight.waveview.WaveView;
 import com.google.gson.Gson;
-import com.jilk.ros.ROSClient;
 import com.jilk.ros.rosbridge.ROSBridgeClient;
 import com.jilk.ros.rosbridge.implementation.PublishEvent;
-import com.dwayne.monitor.ViewModel.FanSpeedViewModel2;
+import com.dwayne.monitor.ViewModel.BatteryViewModel;
+import com.dwayne.monitor.ViewModel.OldBunkerSpraySpeedViewModel;
 import com.dwayne.monitor.ViewModel.GPSData;
 import com.dwayne.monitor.ViewModel.GPSDataViewModel;
+import com.dwayne.monitor.ViewModel.StatusViewModel;
+import com.dwayne.monitor.bean.Angular;
+import com.dwayne.monitor.bean.Battery;
+import com.dwayne.monitor.bean.Control;
+import com.dwayne.monitor.bean.Linear;
+import com.dwayne.monitor.bean.Spray;
+import com.dwayne.monitor.bean.Status;
+import com.dwayne.monitor.bean.Twist;
 import com.dwayne.monitor.harware.SensorEventHelper;
 import com.dwayne.monitor.ui.BaseActivity;
+
 import com.dwayne.monitor.ui.user.UserActivity;
 import com.dwayne.monitor.util.DeviceUtils;
-import com.dwayne.monitor.util.InputMethodUtils;
 import com.dwayne.monitor.util.LogUtil;
 import com.dwayne.monitor.util.MyAMapUtils;
 import com.dwayne.monitor.view.base.MapViewInterface;
 import com.dwayne.monitor.view.map.GPSView;
-import com.dwayne.monitor.view.map.MapHeaderView;
 import com.dwayne.monitor.view.map.NearbySearchView;
 import com.dwayne.monitor.view.map.PoiDetailBottomView;
 import com.dwayne.monitor.view.map.TrafficView;
 import com.dwayne.monitor.view.widget.OnItemClickListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
 
-public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClickListener, NearbySearchView.OnNearbySearchViewClickListener, AMapGestureListener, AMapLocationListener, LocationSource, TrafficView.OnTrafficChangeListener, View.OnClickListener, MapViewInterface, PoiDetailBottomView.OnPoiDetailBottomClickListener, AMap.OnPOIClickListener, TextWatcher, Inputtips.InputtipsListener, MapHeaderView.OnMapHeaderViewClickListener, OnItemClickListener, GeocodeSearch.OnGeocodeSearchListener, CompoundButton.OnCheckedChangeListener {
+public class OldBunkerActivity extends BaseActivity implements GPSView.OnGPSViewClickListener, NearbySearchView.OnNearbySearchViewClickListener, AMapGestureListener, AMapLocationListener, LocationSource, TrafficView.OnTrafficChangeListener, View.OnClickListener, MapViewInterface, PoiDetailBottomView.OnPoiDetailBottomClickListener, AMap.OnPOIClickListener, OnItemClickListener, CompoundButton.OnCheckedChangeListener {
     private static final String TAG = "MapActivity";
     /**
      * 首次进入申请定位、sd卡权限
@@ -126,6 +123,7 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
     private AMapLocationClient mLocationClient;
     private AMapLocationClientOption mLocationOption;
     private GPSView mGpsView;
+
 
     private static boolean mFirstLocation = true;//第一次定位
     private int mCurrentGpsState = STATE_UNLOCKED;//当前定位状态
@@ -194,18 +192,18 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
     private RecyclerView mRecycleViewSearch;
     private ImageView mIvLeftSearch;
     private EditText mEtSearchTip;
-    private SearchAdapter mSearchAdapter;
     private String mCity;
     private ProgressBar mSearchProgressBar;
     private LocationManager mLocMgr;
     private LatLng latLonPoint;
 
+    LineChart lineChart;
 
     /**
      * 数据
      */
     private GPSDataViewModel gpsDataViewModel;
-    private FanSpeedViewModel2 fanSpeedViewModel2;
+    private OldBunkerSpraySpeedViewModel fanSpeedViewModel;
     GeocodeSearch geocodeSearch;
     @SuppressLint("HandlerLeak")
     Handler handler = new Handler() {
@@ -216,7 +214,14 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
                     gpsDataViewModel.setData((GPSData) msg.obj);
                     break;
                 case 2:
-                    fanSpeedViewModel2.setSpeedValue((int[]) msg.obj);
+                    Log.d("handler", "change");
+                    fanSpeedViewModel.setSpeedValue((int[]) msg.obj);
+                    break;
+                case 3:
+                    statusViewModel.setValue((Status) msg.obj);
+                    break;
+                case 4:
+                    batteryViewModel.setValue((Battery) msg.obj);
                     break;
             }
         }
@@ -225,10 +230,40 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
     /**
      * 数据信息
      */
-    private LineChart lineChart;
+
     CardView charge_cardview;
     CardView setArgs_cardView;
     CardView device_state_cardView;
+    CardView remote_control_cardView;
+
+    private StatusViewModel statusViewModel;
+    private BatteryViewModel batteryViewModel;
+
+    //dialog
+    AlertDialog charge_dialog;
+    AlertDialog args_dialog;
+    AlertDialog status_dialog;
+
+    Button emergency_stop;
+    Button back_to_home;
+    TextView charge_card_data;
+
+    //status dialog控件
+    TextView speed_data;
+    TextView front_wheel_angle_data;
+    TextView yaw_angle_data;
+    TextView lat_data;
+    TextView lng_data;
+
+    //battery dialog控件
+    TextView charge_data;
+    TextView voltage_data;
+    TextView capacity_data;
+
+    //args dialog控件
+    EditText speed_data_inputview;
+    EditText angle_data_inputview;
+
     Button determine;
     //用来保存数据
     List<Entry> list = new ArrayList<>();
@@ -240,60 +275,33 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
     //开关
     Switch aSwitch;
 
-    //9个风机
-    private final ImageView[] fans = new ImageView[8];
-    private final ImageView[] spray_heads = new ImageView[8];
-    private final int[] speed = new int[8];
-
-
-    //控制旋转文件
-    Animation animation_0_speed;
-    Animation animation_20_speed;
-    Animation animation_40_speed;
-    Animation animation_60_speed;
-    Animation animation_80_speed;
-    Animation animation_100_speed;
-
-    AnimationDrawable[] animationDrawable_0_speed = new AnimationDrawable[8];
-    AnimationDrawable[] animationDrawable_20_speed = new AnimationDrawable[8];
-    AnimationDrawable[] animationDrawable_40_speed = new AnimationDrawable[8];
-    AnimationDrawable[] animationDrawable_60_speed = new AnimationDrawable[8];
-    AnimationDrawable[] animationDrawable_80_speed = new AnimationDrawable[8];
-
-    LinearInterpolator linearInterpolator;
-
-    Gson gson = new Gson();
-
+    OldBunkerModelView oldBunkerModelView;
 
     //ros通信
     ROSBridgeClient client;
-    String ip = "192.168.1.100";   //ros的 IP
+    String ip = "192.168.1.103";   //ros的 IP
     String port = "9090";
-    Runnable connectRunnable = new Runnable() {
-        @Override
-        public void run() {
-            connect(ip,port);
-        }
-    };
+    boolean isConn = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_map2);
+        setContentView(R.layout.activity_map);
         EventBus.getDefault().register(this);
         initView(savedInstanceState);
         initData();
         setListener();
     }
 
+
     private void initView(Bundle savedInstanceState) {
-        //建立连接,订阅topic
-        new Thread(connectRunnable).start();
+        client = ((RCApplication) getApplication()).getRosClient();
+//        publish();
         mGpsView = (GPSView) findViewById(R.id.gps_view);
 
         //获取地图控件引用
         mMapView = (TextureMapView) findViewById(R.id.map);
-
         aMap = mMapView.getMap();
         //显示实时交通
         aMap.setTrafficEnabled(true);
@@ -318,64 +326,28 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
         setArgs_cardView.setOnClickListener(this);
         device_state_cardView = findViewById(R.id.device_state_cardView);
         device_state_cardView.setOnClickListener(this);
+        remote_control_cardView = findViewById(R.id.remote_control_cardView);
+        remote_control_cardView.setOnClickListener(this);
+
+
         charge_waveView = findViewById(R.id.charge_waveView);
         charge_waveView.start();
         spray_waveView = findViewById(R.id.spray_waveView);
         spray_waveView.start();
         aSwitch = findViewById(R.id.switch1);
+        aSwitch.setChecked(true);
         aSwitch.setOnCheckedChangeListener(this);
         aSwitch.setOnClickListener(this);
-        Arrays.fill(speed, 0);
-        //风机与旋转
-        fans[0] = findViewById(R.id.fan_no_1);
-        fans[1] = findViewById(R.id.fan_no_2);
-        fans[2] = findViewById(R.id.fan_no_3);
-        fans[3] = findViewById(R.id.fan_no_4);
-        fans[4] = findViewById(R.id.fan_no_5);
-        fans[5] = findViewById(R.id.fan_no_6);
-        fans[6] = findViewById(R.id.fan_no_7);
-        fans[7] = findViewById(R.id.fan_no_8);
+//        setChart();
 
-        spray_heads[0] = findViewById(R.id.spray_head_1);
-        spray_heads[1] = findViewById(R.id.spray_head_2);
-        spray_heads[2] = findViewById(R.id.spray_head_3);
-        spray_heads[3] = findViewById(R.id.spray_head_4);
-        spray_heads[4] = findViewById(R.id.spray_head_5);
-        spray_heads[5] = findViewById(R.id.spray_head_6);
-        spray_heads[6] = findViewById(R.id.spray_head_7);
-        spray_heads[7] = findViewById(R.id.spray_head_8);
-
-        animation_0_speed = AnimationUtils.loadAnimation(this, R.anim.image_0_rotation);
-        animation_20_speed = AnimationUtils.loadAnimation(this, R.anim.image_20_rotation);
-        animation_40_speed = AnimationUtils.loadAnimation(this, R.anim.image_40_rotation);
-        animation_60_speed = AnimationUtils.loadAnimation(this, R.anim.image_60_rotation);
-        animation_80_speed = AnimationUtils.loadAnimation(this, R.anim.image_80_rotation);
-        animation_100_speed = AnimationUtils.loadAnimation(this, R.anim.image_100_rotation);
-
-        for (int i = 0; i < animationDrawable_0_speed.length; i++) {
-            animationDrawable_20_speed[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_20_round);
-        }
-
-        for (int i = 0; i < animationDrawable_0_speed.length; i++) {
-            animationDrawable_40_speed[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_40_round);
-        }
-
-        for (int i = 0; i < animationDrawable_0_speed.length; i++) {
-            animationDrawable_60_speed[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_60_round);
-        }
-
-        for (int i = 0; i < animationDrawable_0_speed.length; i++) {
-            animationDrawable_80_speed[i] = (AnimationDrawable) getResources().getDrawable(R.drawable.progress_80_round);
-        }
-
-        linearInterpolator = new LinearInterpolator();
-        setFan();
+        oldBunkerModelView = findViewById(R.id.old_bunker_model_view);
         mTvLocTitle = (TextView) findViewById(R.id.tv_title);
 
         mGspContainer = findViewById(R.id.gps_view_container);
 
 
         mTvLocation = (TextView) findViewById(R.id.tv_my_loc);
+
         // 分享组件
         mShareContainer = (LinearLayout) findViewById(R.id.rl_right);
         mImgBtnBack = (ImageButton) findViewById(R.id.ib_back);
@@ -394,7 +366,7 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
 
         setBottomSheet();
         setUpMap();
-
+        setDialog();
         mPadding = getResources().getDimensionPixelSize(R.dimen.padding_size);
         /*int statusBarHeight = DeviceUtils.getStatusBarHeight(this);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -409,9 +381,9 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
             @Override
             public void run() {
                 while (true) {
-                    int[] temp = new int[8];
-                    for (int i = 0; i < fanSpeedViewModel2.getSpeedValue().length; i++) {
-                        temp[i] = (fanSpeedViewModel2.getSpeedValue()[i] + 20) % 100;
+                    int[] temp = new int[9];
+                    for (int i = 0; i < fanSpeedViewModel.getSpeedValue().length; i++) {
+                        temp[i] = (fanSpeedViewModel.getSpeedValue()[i] + 20) % 100;
                     }
                     Message message = new Message();
                     message.what = 2;
@@ -425,15 +397,6 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
                 }
             }
         }).start();
-    }
-
-    private void setFan() {
-        animation_0_speed.setInterpolator(linearInterpolator);
-        animation_20_speed.setInterpolator(linearInterpolator);
-        animation_40_speed.setInterpolator(linearInterpolator);
-        animation_60_speed.setInterpolator(linearInterpolator);
-        animation_80_speed.setInterpolator(linearInterpolator);
-        animation_100_speed.setInterpolator(linearInterpolator);
     }
 
     private void setChart() {
@@ -469,65 +432,6 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
         lineChart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
     }
 
-    /**
-     * @Function: 建立连接
-     * @Return:
-     */
-    public void connect(String ip, String port) {
-
-        client = new ROSBridgeClient("ws://" + ip + ":" + port);
-        boolean conneSucc = client.connect(new ROSClient.ConnectionStatusListener() {
-            @Override
-            public void onConnect() {
-                client.setDebug(true);
-                ((RCApplication) getApplication()).setRosClient(client);
-                publish();
-                Log.d("dwayne", "Connect ROS success");
-            }
-
-            @Override
-            public void onDisconnect(boolean normal, String reason, int code) {
-                Log.d("dwayne", "ROS disconnect");
-            }
-
-            @Override
-            public void onError(Exception ex) {
-                ex.printStackTrace();
-                Log.d("dwayne", "ROS communication error");
-            }
-        });
-    }
-
-    //订阅topic
-    private void publish() {
-        String msg1 = "{\"op\":\"subscribe\",\"topic\":\"/chatter\"}";
-        client.send(msg1);
-    }
-
-    //发送数据到ROS端
-    private void sendData(String data) {
-        String msg1 = "{ \"op\": \"publish\", \"topic\": \"/dwayne\", \"msg\": { \"data\": \"" + data + " \" }}";
-        //        String msg2 = "{\"op\":\"publish\",\"topic\":\"/cmd_vel\",\"msg\":{\"linear\":{\"x\":" + 0 + ",\"y\":" +
-        //                0 + ",\"z\":0},\"angular\":{\"x\":0,\"y\":0,\"z\":" + 0.5 + "}}}";
-        client.send(msg1);
-    }
-
-
-    public void onEvent(@NonNull final PublishEvent event) {
-        Log.d("event","receive"+event.msg);
-        if ("/chatter".equals(event.name)) {
-            parseChatterTopic(event);
-            return;
-        }
-        Log.d("dwayne", event.msg);
-    }
-
-
-    private void parseChatterTopic(PublishEvent event) {
-        Log.d("event2","receive2");
-            Log.i("dwayne2", event.msg);
-    }
-
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if (buttonView.getId() == R.id.switch1) {
@@ -535,13 +439,174 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
         }
     }
 
+    //订阅topic
+    private void publish() {
+        String msg1 = "{\"op\":\"subscribe\",\"topic\":\"/status\"}";
+        client.send(msg1);
+        String msg2 = "{\"op\":\"subscribe\",\"topic\":\"/battery\"}";
+        client.send(msg2);
+        String msg3 = "{\"op\":\"subscribe\",\"topic\":\"/control\"}";
+        client.send(msg3);
+        String msg4 = "{\"op\":\"subscribe\",\"topic\":\"/pwm_control\"}";
+        client.send(msg4);
+    }
+
+    private void SendDataToRos(String topic, String data) {
+        String msg1 = "{ \"op\": \"publish\", \"topic\": \"/" + topic + "\", \"msg\": " + data + "}";
+        //        String msg2 = "{\"op\":\"publish\",\"topic\":\"/cmd_vel\",\"msg\":{\"linear\":{\"x\":" + 0 + ",\"y\":" +
+        //                0 + ",\"z\":0},\"angular\":{\"x\":0,\"y\":0,\"z\":" + 0.5 + "}}}";
+        client.send(msg1);
+    }
+
+    //发送数据到ROS端
+    private void sendData(String topic, String data) {
+        String msg1 = "{ \"op\": \"publish\", \"topic\": \"/" + topic + "\", \"msg\": { \"data\": \"" + data + "\"}}";
+        //        String msg2 = "{\"op\":\"publish\",\"topic\":\"/cmd_vel\",\"msg\":{\"linear\":{\"x\":" + 0 + ",\"y\":" +
+        //                0 + ",\"z\":0},\"angular\":{\"x\":0,\"y\":0,\"z\":" + 0.5 + "}}}";
+        client.send(msg1);
+    }
+
+
+    public void onEvent(@NonNull final PublishEvent event) {
+        Log.d(TAG, "onEvent: " + event.name);
+        if ("/status".equals(event.name)) {
+            Log.i("chatter", event.msg);
+            Status status = new Gson().fromJson(event.msg, Status.class);
+            Message message = new Message();
+            message.what = 3;
+            message.obj = status;
+            handler.sendMessage(message);
+        } else if ("/battery".equals(event.name)) {
+            Battery battery = new Gson().fromJson(event.msg, Battery.class);
+            Message message = new Message();
+            message.what = 4;
+            message.obj = battery;
+            handler.sendMessage(message);
+            Log.i("battery", event.msg);
+        } else if ("/pwm_control".equals(event.name)) {
+            Spray spray = new Gson().fromJson(event.msg, Spray.class);
+            Message message = new Message();
+            message.what = 2;
+            message.obj = spray.getDuc_array();
+            handler.sendMessage(message);
+            Log.i("mypath", event.msg);
+        } else if ("/control".equals(event.name)) {
+            Log.i("control", event.msg);
+        }
+    }
+
+
+    private void parseChatterTopic(PublishEvent event) {
+        Log.i("dwayne2", event.msg);
+    }
+
+    private void setDialog() {
+        /**
+         * status dialog
+         */
+        AlertDialog.Builder status_builder = new AlertDialog.Builder(this);  //先得到构造器
+        status_builder.setCancelable(true);           //将对话框以外的区域设置成无法点击
+        // 载入自定义布局
+        LayoutInflater inflater = getLayoutInflater();
+        View layout = inflater.inflate(R.layout.robot1_detail_layout, null);
+        status_builder.setView(layout);
+
+        yaw_angle_data = layout.findViewById(R.id.yaw_angle_data);
+        speed_data = layout.findViewById(R.id.speed_data);
+        lat_data = layout.findViewById(R.id.lat_data);
+        lng_data = layout.findViewById(R.id.lng_data);
+        front_wheel_angle_data = layout.findViewById(R.id.front_wheel_angle_data);
+
+        // 设置确认按钮
+        status_builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                dialog.dismiss();      //取消显示(关闭)对话框
+            }
+        });
+
+        // 设置取消按钮
+        status_builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();      //取消显示(关闭)对话框
+            }
+        });
+        status_dialog = status_builder.create();
+
+        /**
+         * charge dialog
+         */
+        AlertDialog.Builder charge_builder = new AlertDialog.Builder(this);  //先得到构造器
+        charge_builder.setCancelable(true);           //将对话框以外的区域设置成无法点击
+        // 载入自定义布局
+        LayoutInflater inflater2 = getLayoutInflater();
+        View layout2 = inflater2.inflate(R.layout.charge_detail_layout, null);
+        charge_builder.setView(layout2);
+        charge_data = layout2.findViewById(R.id.charge_data);
+        voltage_data = layout2.findViewById(R.id.voltage_data);
+        capacity_data = layout2.findViewById(R.id.capacity_data);
+        // 设置确认按钮
+        charge_builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();      //取消显示(关闭)对话框
+            }
+        });
+        charge_dialog = charge_builder.create();
+
+        /**
+         * args dialog
+         */
+        AlertDialog.Builder args_builder = new AlertDialog.Builder(this);  //先得到构造器
+        args_builder.setCancelable(true);           //将对话框以外的区域设置成无法点击
+        // 载入自定义布局
+        LayoutInflater inflater3 = getLayoutInflater();
+        View layout3 = inflater3.inflate(R.layout.set_args_layout3, null);
+        args_builder.setView(layout3);
+        speed_data_inputview = layout3.findViewById(R.id.speed_data_inputview);
+        angle_data_inputview = layout3.findViewById(R.id.angle_data_inputview);
+
+        // 设置确认按钮
+        args_builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String linearText = String.valueOf(speed_data_inputview.getText());
+                String angularText = String.valueOf(angle_data_inputview.getText());
+                if (linearText.equals("") || angularText.equals("")) {
+                    showToast("请检查输入是否完整");
+                } else {
+                    final Linear linear = new Linear(Double.parseDouble(linearText));
+                    final Angular angular = new Angular(Double.parseDouble(angularText));
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Twist twist = new Twist(linear, angular);
+                            SendDataToRos("cmd_vel", new Gson().toJson(twist));
+                        }
+                    }).start();
+                }
+                dialog.dismiss();      //取消显示(关闭)对话框
+            }
+        }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();      //取消显示(关闭)对话框
+            }
+        });
+        // 设置取消按钮
+        args_dialog = args_builder.create();
+    }
+
+
     @Override
     public void onClick(View v) {
         if (v == null) {
             return;
         }
         // 点击关闭POI detail
-        if (v == mPoiColseView) {
+        else if (v == mPoiColseView) {
             mBehavior.setHideable(true);
             resetGpsButtonPosition();
             hidePoiDetail();
@@ -549,7 +614,7 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
         }
 
         // 分享
-        if (v == mShareContainer) {
+        else if (v == mShareContainer) {
             if (mAmapLocation != null && mLatLng != null) {
                 if (isPoiClick) {
                     // 分享点击poi的位置
@@ -563,13 +628,13 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
         }
 
         // 头部返回ImageButton
-        if (v == mImgBtnBack) {
+        else if (v == mImgBtnBack) {
             mBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             return;
         }
 
         // 路线,进入导航页面
-        if (v == mTvRoute) {
+        else if (v == mTvRoute) {
             if (mLatLng == null) {
                 showToast(getString(R.string.location_failed_hold_on));
                 return;
@@ -583,13 +648,10 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
         }
 
         // 点击搜索左侧返回箭头
-        if (v == mIvLeftSearch) {
-            hideSearchTipView();
+        else if (v == mIvLeftSearch) {
             showMapView();
             return;
-        }
-
-        if (v == aSwitch) {
+        } else if (v == aSwitch) {
             final boolean ischeck = aSwitch.isChecked();
             if (!ischeck) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -601,11 +663,15 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
                 builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                sendData("control", "stop");
+                            }
+                        }).start();
                         dialog.dismiss();      //取消显示(关闭)对话框
                     }
                 });
-
                 //忽略按钮监听事件
                 builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override
@@ -625,11 +691,15 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
                 builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                sendData("control", "stop");
+                            }
+                        }).start();
                         dialog.dismiss();      //取消显示(关闭)对话框
                     }
                 });
-
                 //忽略按钮监听事件
                 builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
                     @Override
@@ -640,82 +710,78 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
                 });
                 builder.create().show();         //创建并显示对话框
             }
-        }
+        } else if (v == emergency_stop) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setIcon(R.drawable.ic_prompt);   //设置图标
+            builder.setTitle("确认吗");                //标题
+            builder.setMessage("确定紧急停止吗？");       //设置内容
+            builder.setCancelable(false);
+            //确认按钮监听事件
+            builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    final String json = new Gson().toJson(new Control("stop"));
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            sendData("control", "stop");
+                        }
+                    }).start();
+                    dialog.dismiss();      //取消显示(关闭)对话框
+                }
+            });
 
-        if (v == charge_cardview) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);  //先得到构造器
-            builder.setCancelable(true);           //将对话框以外的区域设置成无法点击
-            // 载入自定义布局
-            LayoutInflater inflater = getLayoutInflater();
-            View layout = inflater.inflate(R.layout.charge_detail_layout, null);
-            builder.setView(layout);
-
-            // 设置确认按钮
-            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            //忽略按钮监听事件
+            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();      //取消显示(关闭)对话框
                 }
             });
             builder.create().show();         //创建并显示对话框
-
-        }
-
-        if (v == setArgs_cardView) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);  //先得到构造器
-            builder.setCancelable(true);           //将对话框以外的区域设置成无法点击
-            // 载入自定义布局
-            LayoutInflater inflater = getLayoutInflater();
-            View layout = inflater.inflate(R.layout.set_args_layout2, null);
-            builder.setView(layout);
-
-            // 设置确认按钮
-            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+        } else if (v == back_to_home) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setIcon(R.drawable.ic_prompt);   //设置图标
+            builder.setTitle("确认吗");                //标题
+            builder.setMessage("确定返航吗？");       //设置内容
+            builder.setCancelable(false);
+            //确认按钮监听事件
+            builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    final String json = new Gson().toJson(new Control("back"));
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            sendData("control", "back");
+                        }
+                    }).start();
                     dialog.dismiss();      //取消显示(关闭)对话框
                 }
             });
 
-            // 设置取消按钮
+            //取消按钮监听事件
             builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();      //取消显示(关闭)对话框
                 }
             });
-            builder.create().show();
-        }
-
-        if (v == device_state_cardView) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);  //先得到构造器
-            builder.setCancelable(true);           //将对话框以外的区域设置成无法点击
-            // 载入自定义布局
-            LayoutInflater inflater = getLayoutInflater();
-            View layout = inflater.inflate(R.layout.device_detail_layout, null);
-            builder.setView(layout);
-
-            // 设置确认按钮
-            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();      //取消显示(关闭)对话框
-                }
-            });
-
-            // 设置取消按钮
-            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();      //取消显示(关闭)对话框
-                }
-            });
-            builder.create().show();
+            builder.create().show();         //创建并显示对话框
+        } else if (v == charge_cardview) {
+            charge_dialog.show();         //创建并显示对话框
+        } else if (v == setArgs_cardView) {
+            args_dialog.show();
+        } else if (v == device_state_cardView) {
+            status_dialog.show();
+        } else if (v == remote_control_cardView) {
+            Intent intent = new Intent(this, Control2Activity.class);
+            startActivity(intent);
         }
     }
 
-    private void initData() {
 
+    private void initData() {
 //        设置gps数据改变时的事件
         gpsDataViewModel = ViewModelProviders.of(this).get((GPSDataViewModel.class));
         gpsDataViewModel.getGpsData().observe(this, new Observer<GPSData>() {
@@ -724,11 +790,11 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
                 changeFromGps(gpsData);
             }
         });
-        fanSpeedViewModel2 = ViewModelProviders.of(this).get(FanSpeedViewModel2.class);
-        fanSpeedViewModel2.getSpeed().observe(this, new Observer<int[]>() {
+        fanSpeedViewModel = ViewModelProviders.of(this).get(OldBunkerSpraySpeedViewModel.class);
+        fanSpeedViewModel.getSpeed().observe(this, new Observer<int[]>() {
             @Override
             public void onChanged(@Nullable int[] ints) {
-                changeFromSpeed(ints);
+                oldBunkerModelView.changeFromSpeed(ints);
             }
         });
         setSpeed();
@@ -736,10 +802,10 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
             @Override
             public void run() {
                 int i = 0;
-                double lng = 119.509395;
-                double lat = 32.20465;
+                double lng = 120.67888888888889;
+                double lat = 32.575833333333335;
                 while (true) {
-                    lng -= 0.00001;
+                    lng -= 0.000001;
                     GPSData gpsData = new GPSData(lat, lng);
 //                    gpsDataViewModel.setData(new GPSData(lat, lng++));
                     Message message = new Message();
@@ -754,51 +820,8 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
                 }
             }
         }).start();
-        geocodeSearch = new GeocodeSearch(this);
-        geocodeSearch.setOnGeocodeSearchListener(this);
 
-        // 搜索结果RecyclerView
-        mSearchAdapter = new SearchAdapter(mSearchData);
-        mRecycleViewSearch.setAdapter(mSearchAdapter);
         mLocMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-    }
-
-    public void changeFromSpeed(int[] ints) {
-        System.out.println("changefronspeed===============");
-        for (int i = 0; i < fans.length; i++) {
-            System.out.println(i + "iiiiiiiiiiiiiiiiiiiiiiiiiiii");
-            switch (ints[i]) {
-                case 20:
-                    fans[i].setImageDrawable(getResources().getDrawable(R.drawable.ic_fan_20));
-                    fans[i].startAnimation(animation_20_speed);
-                    spray_heads[i].setImageDrawable(animationDrawable_20_speed[i]);
-                    animationDrawable_20_speed[i].start();
-                    break;
-                case 40:
-                    fans[i].setImageDrawable(getResources().getDrawable(R.drawable.ic_fan_40));
-                    fans[i].startAnimation(animation_40_speed);
-                    spray_heads[i].setImageDrawable(animationDrawable_40_speed[i]);
-                    animationDrawable_40_speed[i].start();
-                    break;
-                case 60:
-                    fans[i].setImageDrawable(getResources().getDrawable(R.drawable.ic_fan_60));
-                    fans[i].startAnimation(animation_60_speed);
-                    spray_heads[i].setImageDrawable(animationDrawable_60_speed[i]);
-                    animationDrawable_60_speed[i].start();
-                    break;
-                case 80:
-                    fans[i].setImageDrawable(getResources().getDrawable(R.drawable.ic_fan_80));
-                    fans[i].startAnimation(animation_80_speed);
-                    spray_heads[i].setImageDrawable(animationDrawable_80_speed[i]);
-                    animationDrawable_80_speed[i].start();
-                    break;
-                default:
-                    fans[i].setImageDrawable(getResources().getDrawable(R.drawable.ic_fan_20));
-                    spray_heads[i].startAnimation(animation_0_speed);
-                    spray_heads[i].setImageDrawable(animationDrawable_80_speed[i]);
-                    animationDrawable_80_speed[i].start();
-            }
-        }
     }
 
     /**
@@ -847,7 +870,6 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
         if (null != mPoiColseView) {
             mPoiColseView.setOnClickListener(this);
         }
-
         mBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
 
             private float lastSlide;//上次slideOffset
@@ -944,13 +966,10 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
         mTvRoute.setOnClickListener(this);
         // 搜索布局左侧返回箭头图标
         mIvLeftSearch.setOnClickListener(this);
-        // 搜索输入框
-        mEtSearchTip.addTextChangedListener(this);
-        mSearchAdapter.setOnItemClickListener(this);
     }
 
     private void setUpMap() {
-        aMap.setMapType(AMap.MAP_TYPE_SATELLITE);
+        aMap.setMapType(AMap.MAP_TYPE_NORMAL);
         aMap.setLocationSource(this);//设置定位监听
         //隐藏缩放控件
         aMap.getUiSettings().setZoomControlsEnabled(false);
@@ -960,11 +979,8 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
     }
 
     public void changeFromGps(GPSData gpsData) {
-//        AMapLocation location = new AMapLocation();
         System.out.println("经度：" + gpsData.getLng() + "纬度" + gpsData.getLat());
         latLonPoint = new LatLng(gpsData.getLat(), gpsData.getLng());
-//        RegeocodeQuery query = new RegeocodeQuery(latLonPoint, 20,GeocodeSearch.AMAP);
-
         if (mFirstLocation) {
             aMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLonPoint, mZoomLevel), new AMap.CancelableCallback() {
                 @Override
@@ -1059,10 +1075,8 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
             }
 
         }
-
          */
     }
-
 
     /**
      * 激活定位
@@ -1144,7 +1158,6 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
             mLocationClient.startLocation();
         }*/
     }
-
 
     /**
      * 地图手势事件回调：单指双击
@@ -1417,6 +1430,9 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (((RCApplication) getApplication()).isConn()) {
+            client.disconnect();
+        }
         //在activity执行onDestroy时执行mMapView.onDestroy()，销毁地图
         mMapView.onDestroy();
         mFirstLocation = true;
@@ -1432,10 +1448,8 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
         if (mLocMarker != null) {
             mLocMarker.destroy();
         }
-
         // leakcanary检测
     }
-
 
     private void addCircle(LatLng latlng, double radius) {
         CircleOptions options = new CircleOptions();
@@ -1476,7 +1490,7 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
      * 跳转用户登录
      */
     private void userLogin() {
-        startActivity(new Intent(Map2Activity.this, UserActivity.class));
+        startActivity(new Intent(OldBunkerActivity.this, UserActivity.class));
     }
 
 
@@ -1555,7 +1569,6 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
             }
         });
     }
-
 
     /**
      * 将GpsButton移动到原来位置
@@ -1721,26 +1734,6 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
         mMoveToCenter = false;
     }
 
-    /**
-     * 高德地图位置转短串分享
-     * @param snippet 位置名称
-     * @param lat 维度
-     * @param lng 经度
-
-    private void shareLocation(String snippet, double lat, double lng) {
-    if(TextUtils.isEmpty(snippet)){
-    return;
-    }
-    // addTestLocationMarker(snippet);
-    LatLonSharePoint point = new LatLonSharePoint(lat,
-    lng, snippet);
-    // showProgressDialog();
-
-    }
-     */
-    /**
-     * 高德地图回调
-     */
     @Override
     public void onCallTaxiClick() {
 
@@ -1766,10 +1759,8 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
                     return super.onKeyDown(keyCode, event);
                 }
             } else if (mode == MapMode.SEARCH) {
-                hideSearchTipView();
                 showMapView();
                 mMapMode = MapMode.NORMAL;
-
                 return true;
             }
         }
@@ -1862,102 +1853,6 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
 
     }
 
-    /**
-     * 隐藏搜索提示布局
-     */
-    private void hideSearchTipView() {
-        InputMethodUtils.hideInput(this);
-        mLLSearchContainer.setVisibility(View.GONE);
-        mEtSearchTip.setVisibility(View.VISIBLE);
-        mEtSearchTip.setFocusable(true);
-        mEtSearchTip.setFocusableInTouchMode(true);
-        mSearchData.clear();
-        mSearchAdapter.notifyDataSetChanged();
-        mEtSearchTip.setText("");
-    }
-
-    /**
-     * 显示搜索提示布局
-     */
-    private void showSearchTipView() {
-        mLLSearchContainer.setVisibility(View.VISIBLE);
-        InputMethodUtils.showInput(this, mEtSearchTip);
-    }
-
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-    }
-
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-    }
-
-    /**
-     * EditText输入内容后回调
-     *
-     * @param s
-     */
-    @Override
-    public void afterTextChanged(Editable s) {
-        if (s == null || TextUtils.isEmpty(s.toString())) {
-            mSearchProgressBar.setVisibility(View.GONE);
-            return;
-        }
-        String content = s.toString();
-        if (!TextUtils.isEmpty(content) && !TextUtils.isEmpty(mCity)) {
-            // 调用高德地图搜索提示api
-            InputtipsQuery inputquery = new InputtipsQuery(content, mCity);
-            inputquery.setCityLimit(true);
-            Inputtips inputTips = new Inputtips(this, inputquery);
-            inputTips.setInputtipsListener(this);
-            inputTips.requestInputtipsAsyn();
-            mSearchProgressBar.setVisibility(View.VISIBLE);
-        }
-
-    }
-
-    /**
-     * 高德地图搜索提示回调
-     *
-     * @param list
-     * @param i
-     */
-    @Override
-    public void onGetInputtips(List<Tip> list, int i) {
-        mSearchProgressBar.setVisibility(View.GONE);
-        if (list == null || list.size() == 0) {
-            return;
-        }
-        mSearchData.clear();
-        mSearchData.addAll(list);
-        // 刷新RecycleView
-        mSearchAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onUserClick() {
-        userLogin();
-    }
-
-    @Override
-    public void onSearchClick() {
-        // 显示搜索layout,隐藏地图图层,并设置当前地图操作模式
-        showSearchTipView();
-        hideMapView();
-        mMapMode = MapMode.SEARCH;
-    }
-
-    @Override
-    public void onVoiceClick() {
-
-    }
-
-    @Override
-    public void onQrScanClick() {
-
-    }
 
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
@@ -1971,7 +1866,6 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
             if (tip == null) {
                 return;
             }
-            hideSearchTipView();
             showMapView();
             mMoveToCenter = false;
             isPoiClick = true;
@@ -1998,75 +1892,6 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
         SEARCH
     }
 
-    /**
-     * 搜索Adapter
-     */
-    private static class SearchAdapter extends RecyclerView.Adapter<SearchViewHolder> implements View.OnClickListener {
-
-        private List<Tip> mData;
-        private OnItemClickListener mListener;
-
-        public SearchAdapter(List<Tip> data) {
-            this.mData = data;
-        }
-
-        /**
-         * 设置RecycleView条目点击
-         *
-         * @param listener
-         */
-        public void setOnItemClickListener(OnItemClickListener listener) {
-            this.mListener = listener;
-        }
-
-        @NonNull
-        @Override
-        public SearchViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int position) {
-            View itemView = ((LayoutInflater) viewGroup.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-                    .inflate(R.layout.search_tip_recycle_item, viewGroup, false);
-            itemView.setTag(position);
-            itemView.setOnClickListener(this);
-            return new SearchViewHolder(itemView);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull SearchViewHolder holder, int position) {
-            Tip tip = mData.get(position);
-            holder.tvSearchTitle.setText(tip.getName());
-            holder.tvSearchLoc.setText(tip.getAddress());
-        }
-
-        @Override
-        public int getItemCount() {
-            if (mData != null && mData.size() > 0) {
-                return mData.size();
-            }
-            return 0;
-        }
-
-        @Override
-        public void onClick(View v) {
-            if (v != null && mListener != null) {
-                int postion = (int) v.getTag();
-                mListener.onItemClick(v, postion);
-            }
-        }
-    }
-
-
-    /**
-     * 搜索ViewHolder
-     */
-    private static class SearchViewHolder extends RecyclerView.ViewHolder {
-        TextView tvSearchTitle;
-        TextView tvSearchLoc;
-
-        public SearchViewHolder(@NonNull View itemView) {
-            super(itemView);
-            tvSearchTitle = itemView.findViewById(R.id.tv_search_title);
-            tvSearchLoc = itemView.findViewById(R.id.tv_search_loc);
-        }
-    }
 
     /**
      * 是否打开GPS
@@ -2077,15 +1902,5 @@ public class Map2Activity extends BaseActivity implements GPSView.OnGPSViewClick
         return mLocMgr.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
 
-
-    @Override
-    public void onRegeocodeSearched(RegeocodeResult regeocodeResult, int i) {
-
-    }
-
-    @Override
-    public void onGeocodeSearched(GeocodeResult geocodeResult, int i) {
-
-    }
 
 }

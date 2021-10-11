@@ -5,10 +5,10 @@ import android.arch.lifecycle.ViewModel;
 
 import java.util.Arrays;
 
-public class FanSpeedViewModel extends ViewModel {
+public class OldBunkerSpraySpeedViewModel extends ViewModel {
     private MutableLiveData<int []> speed = new MutableLiveData<>();
 
-    public FanSpeedViewModel() {
+    public OldBunkerSpraySpeedViewModel() {
         int[] ints = new int[9];
         Arrays.fill(ints,0);
         speed.setValue(ints);

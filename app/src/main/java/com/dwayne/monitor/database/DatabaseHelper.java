@@ -8,7 +8,7 @@ import android.util.Log;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     // 数据库版本号,在更新时系统便是根据version来判断，若version号低于则会启动升级程序
-    private static final int version = 5;
+    private static final int version = 7;
     private static final String TAG = DatabaseHelper.class.getName();
     //设置你自己的数据库名称
     public static final String DATABASE_NAME = "Monitor.db";
@@ -38,6 +38,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.d(TAG,"Updating table from " + oldVersion + " to " + newVersion);
-        db.execSQL("insert into robots(name,ip,intent_class) Values('测试连接','','com.jiyouliang.monitor.RosBridgeActivity')");
+        db.execSQL("alter table robots add column type varchar(100)");
     }
 }

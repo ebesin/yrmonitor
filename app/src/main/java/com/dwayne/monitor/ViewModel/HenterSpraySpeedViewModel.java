@@ -6,10 +6,10 @@ import android.arch.lifecycle.ViewModel;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class FanSpeedViewModel2 extends ViewModel {
+public class HenterSpraySpeedViewModel extends ViewModel {
     private MutableLiveData<int []> speed = new MutableLiveData<>();
 
-    public FanSpeedViewModel2() {
+    public HenterSpraySpeedViewModel() {
         int[] ints = new int[8];
         Arrays.fill(ints,0);
         speed.setValue(ints);
