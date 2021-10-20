@@ -28,11 +28,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String TABLECONTACTS = "create table robots(" + "ID INTEGER PRIMARY KEY AUTOINCREMENT," + // rowID
                 "name TEXT," +
-                "ip TEXT" +
+                "ip TEXT," +
+                "intent_class varchar(100),"+
+                "type varchar(100)"+
                 ");";
         db.execSQL(TABLECONTACTS);
-        db.execSQL("insert into robots(name,ip) Values('农业机器人（001）','192.168.1.103')");
-        db.execSQL("insert into robots(name,ip) Values('农业机器人（002）','192.168.1.103')");
+        db.execSQL("insert into robots(name,ip,intent_class,type) Values('履带式喷雾车','192.168.1.103','com.dwayne.monitor.OldBunkerActivity','履带车v1')");
+        db.execSQL("insert into robots(name,ip,intent_class,type) Values('阿克曼喷雾车','192.168.1.176','com.dwayne.monitor.HunterActivity','阿克曼车')");
+        db.execSQL("insert into robots(name,ip,intent_class,type) Values('新型履带式喷雾车','192.168.1.195','com.dwayne.monitor.NewBunkerActivity','履带车v2')");
+        db.execSQL("insert into robots(name,ip,intent_class,type) Values('测试连接','','com.dwayne.monitor.RosBridgeActivity','测试')");
+
+        String CREATE_DEVICE_TYPE = "create table device_type(" + "ID INTEGER PRIMARY KEY AUTOINCREMENT," + // rowID
+                "name varchar(100)," +
+                "intent_class varchar(100)," +
+                "type varchar(100)"+
+                ");";
+        db.execSQL(CREATE_DEVICE_TYPE);
+        db.execSQL("insert into device_type(name,intent_class,type) values('履带车v1','com.dwayne.monitor.OldBunkerActivity','履带车v1')");
+        db.execSQL("insert into device_type(name,intent_class,type) values('履带车v2','com.dwayne.monitor.NewBunkerActivity','履带车v2')");
+        db.execSQL("insert into device_type(name,intent_class,type) values('阿克曼车','com.dwayne.monitor.HunterActivity','阿克曼车')");
+        db.execSQL("insert into device_type(name,intent_class,type) values('测试','com.dwayne.monitor.RosBridgeActivity','测试')");
     }
 
     @Override
