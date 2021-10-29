@@ -3,17 +3,24 @@ package com.dwayne.monitor.ui;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.dwayne.monitor.MainActivity;
 import com.dwayne.monitor.R;
+import com.dwayne.monitor.mqtt.MqttClient;
 import com.dwayne.monitor.util.PermissionUtil;
+import com.dwayne.monitor.util.ToastUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,19 +44,46 @@ public class SplashActivity extends BaseActivity {
     private ImageView mIvCenter;
     private ImageView mIvBottom;*/
     private boolean hasOnResumeChecked;
+    MqttClient mqttClient;
+    Context context;
+
+    private Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-
         initView();
     }
 
     private void initView() {
-        /*mIvTop = (ImageView) findViewById(R.id.iv_top);
-        mIvCenter = (ImageView) findViewById(R.id.iv_center);
-        mIvBottom = (ImageView) findViewById(R.id.iv_bottom);*/
+        context = this;
+        handler=new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(@NonNull Message msg) {
+                switch (msg.what){
+                    case 1:
+                        ToastUtil.showToast(context, (String) msg.obj);
+                        mAnimator.end();
+                }
+                return false;
+            }
+        });
+        mqttClient = MqttClient.getInstance(this);
+        mqttClient.setOnConnectListener(new MqttClient.OnConnectListener() {
+            @Override
+            public void OnConnectSuccess() {
+                mAnimator.end();
+            }
+
+            @Override
+            public void OnConnectFail(String failMsg) {
+                Message message = new Message();
+                message.what = 1;
+                message.obj = failMsg;
+                handler.sendMessage(message);
+            }
+        });
     }
 
     @Override
@@ -67,7 +101,7 @@ public class SplashActivity extends BaseActivity {
         mAnimator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
-
+                mqttClient.connectMQTT();
             }
 
             /**

@@ -2,6 +2,7 @@ package com.example.dadac.testrosbridge;
 
 import com.dwayne.monitor.HunterActivity;
 import com.dwayne.monitor.NewBunkerActivity;
+import com.dwayne.monitor.enums.ConnectMode;
 import com.dwayne.monitor.view.model.HunterModelView;
 import com.google.gson.Gson;
 import com.jilk.ros.ROSClient;
@@ -16,8 +17,10 @@ import com.dwayne.monitor.bean.Stamp;
 import com.dwayne.monitor.bean.Status;
 import com.dwayne.monitor.bean.Twist;
 
+import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.junit.Test;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -120,5 +123,15 @@ public class ExampleUnitTest {
         System.out.println(NewBunkerActivity.class);
         System.out.println(HunterActivity.class);
         System.out.println(RosBridgeActivity.class);
+    }
+
+    @Test
+    public void testMqtt(){
+
+    }
+
+    @Test
+    public void testEnum(){
+        System.out.println(ConnectMode.REMOTEMODE.getMode());
     }
 }

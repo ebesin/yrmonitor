@@ -9,6 +9,24 @@ public class Device {
     String intentClass;
     TextView name_textView;
     String type;
+    String connectMode;
+    String port;
+
+    public String getPort() {
+        return port;
+    }
+
+    public void setPort(String port) {
+        this.port = port;
+    }
+
+    public String getConnectMode() {
+        return connectMode;
+    }
+
+    public void setConnectMode(String connectMode) {
+        this.connectMode = connectMode;
+    }
 
     public String getType() {
         return type;
@@ -49,11 +67,13 @@ public class Device {
         this.ip = ip;
     }
 
-    public Device(String id, String name, String ip,String type) {
+    public Device(String id, String name, String ip,String type,String connectMode,String port) {
         this.id = id;
         this.name = name;
         this.ip = ip;
         this.type = type;
+        this.connectMode = connectMode;
+        this.port = port;
     }
 
     public String getName() {

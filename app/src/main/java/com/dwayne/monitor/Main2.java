@@ -33,7 +33,6 @@ public class Main2 extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_layout2);
         initView();
-        initData();
     }
 
     public void initView(){
@@ -48,13 +47,4 @@ public class Main2 extends Activity {
         recyclerView.setAdapter(deviceAdapter);
     }
 
-    public void initData(){
-        Cursor query = readableDatabase.query("robots", new String[]{"ID", "name","ip","intent_class"},
-                null, null, null, null, null);
-        while(query.moveToNext()){
-            devices.add(new Device(query.getString(0),query.getString(1),query.getString(2),query.getString(3)));
-        }
-//        deviceAdapter.setDevices(devices);
-        deviceAdapter.notifyDataSetChanged();
-    }
 }

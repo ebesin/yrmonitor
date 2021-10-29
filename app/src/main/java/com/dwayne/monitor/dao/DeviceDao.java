@@ -17,10 +17,10 @@ public class DeviceDao implements DeviceImpl{
         SQLiteDatabase readableDatabase = DataBaseUtil.getReadableDatabase();
         if(readableDatabase!=null){
             List<Device> devices = new ArrayList<>();
-            Cursor query = readableDatabase.query("robots", new String[]{"ID", "name", "ip", "type"},
+            Cursor query = readableDatabase.query("robots", new String[]{"ID", "name", "ip", "type","connectMode","port"},
                     null, null, null, null, null);
             while (query.moveToNext()) {
-                devices.add(new Device(query.getString(0), query.getString(1), query.getString(2), query.getString(3)));
+                devices.add(new Device(query.getString(0), query.getString(1), query.getString(2), query.getString(3),query.getString(4),query.getString(5)));
             }
             return devices;
         }
@@ -53,11 +53,13 @@ public class DeviceDao implements DeviceImpl{
     }
 
     @Override
-    public boolean updataAllInfoById(String id, String name, String ip, String type) {
+    public boolean updataAllInfoById(String id, String name, String ip, String type,String connectMode,String port) {
         ContentValues values = new ContentValues();
         values.put("name", name);
         values.put("ip", ip);
         values.put("type",type);
+        values.put("connectMode",connectMode);
+        values.put("port",port);
         String selection = "ID = ?";
         SQLiteDatabase writableDatabase = DataBaseUtil.getWritableDatabase();
         if(writableDatabase!=null){
@@ -66,6 +68,4 @@ public class DeviceDao implements DeviceImpl{
         }
         return false;
     }
-
-
 }

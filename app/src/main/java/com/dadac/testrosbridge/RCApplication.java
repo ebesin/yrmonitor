@@ -2,6 +2,7 @@ package com.dadac.testrosbridge;
 
 import android.app.Application;
 
+import com.dwayne.monitor.mqtt.MqttClient;
 import com.jilk.ros.rosbridge.ROSBridgeClient;
 import com.dwayne.monitor.database.DataBaseUtil;
 import com.dwayne.monitor.database.DatabaseHelper;
@@ -15,6 +16,7 @@ public class RCApplication extends Application {
 
     String ip;
     ROSBridgeClient client;
+    MqttClient mqttClient;
     boolean isConn = false;
     DatabaseHelper databaseHelper;
 
@@ -23,6 +25,7 @@ public class RCApplication extends Application {
         super.onCreate();
         databaseHelper = new DatabaseHelper(this);
         DataBaseUtil.setDatabaseHelper(databaseHelper);
+        mqttClient = MqttClient.getInstance(this);
     }
 
     @Override

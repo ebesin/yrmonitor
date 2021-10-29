@@ -2,17 +2,16 @@ package com.dwayne.monitor;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.bluetooth.BluetoothClass;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -21,17 +20,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.CursorAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.common.CatLoadingView;
 import com.dadac.testrosbridge.RCApplication;
+import com.dwayne.monitor.dao.ConnectModeDao;
 import com.dwayne.monitor.dao.DeviceTypeDao;
+import com.dwayne.monitor.dao.PortDao;
+import com.dwayne.monitor.enums.ConnectMode;
+import com.dwayne.monitor.enums.DeviceType;
+import com.dwayne.monitor.mqtt.MqttClient;
 import com.jilk.ros.ROSClient;
 import com.jilk.ros.rosbridge.ROSBridgeClient;
 import com.dwayne.monitor.adapter.DeviceAdapter;
@@ -40,10 +41,13 @@ import com.dwayne.monitor.dao.DeviceDao;
 import com.dwayne.monitor.database.DatabaseHelper;
 import com.dwayne.monitor.ui.BaseActivity;
 
+import org.eclipse.paho.android.service.MqttAndroidClient;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttSecurityException;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import static android.widget.CursorAdapter.FLAG_AUTO_REQUERY;
+import java.util.Objects;
 
 
 public class MainActivity extends BaseActivity {
@@ -58,63 +62,60 @@ public class MainActivity extends BaseActivity {
 
     CatLoadingView mView;
     Intent robot1_intent;
-    Intent robot2_intent;
 
     ROSBridgeClient client;
     String ip = "192.168.1.103";
     ;   //ros的 IP
     String port = "9090";
 
-    Intent testIntent;
+    Intent deviceActivity;
+    Bundle bundle;
 
 
     AlertDialog change_device_info_dialog;
 
     Context context;
+
     DeviceDao deviceDao;
     DeviceTypeDao deviceTypeDao;
+    ConnectModeDao connectModeDao;
+    PortDao portDao;
+
     EditText device_name_inputview;
     EditText ip_inputview;
+    EditText port_inputview;
 
     List<String> allTypeName;
+    List<String> allConnectMode;
     ArrayAdapter<String> arrayAdapter;
-    Spinner spinner;
+    ArrayAdapter<String> arrayAdapter2;
+    Spinner deviceTypeSpinner;
+    Spinner connectModeSpinner;
 
 
-    DatabaseHelper databaseHelper;
-    SQLiteDatabase writableDatabase;
-    SQLiteDatabase readableDatabase;
-
-    @SuppressLint("HandlerLeak")
-    Handler handler = new Handler() {
+    Handler handler = new Handler(new Handler.Callback() {
         @Override
-        public void handleMessage(Message msg) {
+        public boolean handleMessage(@NonNull Message msg) {
             switch (msg.what) {
                 case 1:
                     mView.show(getSupportFragmentManager(), "");
                     break;
-                case 2:
-                    mView.dismiss();
-                    startActivity(robot1_intent);
-                    break;
                 case 3:
-                    Device device = (Device) msg.obj;
                     mView.dismiss();
                     try {
-                        startActivity(new Intent(MainActivity.this, Class.forName(String.valueOf(deviceTypeDao.getIntentClassByName(device.getType())))));
+                        Bundle bundle = msg.getData();
+                        Intent intent = new Intent(context, Class.forName(String.valueOf(bundle.getString("device_activity"))));
+                        intent.putExtras(bundle);
+                        startActivity(intent);
                     } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
-                        Log.d(TAG, "没有对应的类");
+                        Log.d(TAG, "没有对应的类\n" + e.getCause());
                         startActivity(new Intent(MainActivity.this, RosBridgeActivity.class));
                     }
                     break;
-                case 4:
-                    mView.dismiss();
-                    startActivity(testIntent);
-                    break;
             }
+            return false;
         }
-    };
+    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,9 +126,6 @@ public class MainActivity extends BaseActivity {
 
     private void initView() {
         context = this;
-        databaseHelper = ((RCApplication) getApplication()).getDatabaseHelper();
-        writableDatabase = databaseHelper.getWritableDatabase();
-        readableDatabase = databaseHelper.getReadableDatabase();
         toolbar = findViewById(R.id.toolbar);
         setToolbar();
         mView = new CatLoadingView();
@@ -138,11 +136,17 @@ public class MainActivity extends BaseActivity {
         recyclerView.setAdapter(deviceAdapter);
         deviceDao = new DeviceDao();
         deviceTypeDao = new DeviceTypeDao();
+        connectModeDao = new ConnectModeDao();
+        portDao = new PortDao();
+
         devices = deviceDao.getAllDevices();
         deviceAdapter.setDevices(devices);
         allTypeName = deviceTypeDao.getAllTypeName();
+        allConnectMode = connectModeDao.getAllConnectMode();
         arrayAdapter = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, allTypeName);
         arrayAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+        arrayAdapter2 = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, allConnectMode);
+        arrayAdapter2.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
         refreshDevice();
     }
 
@@ -154,6 +158,7 @@ public class MainActivity extends BaseActivity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        //如果ip为空则为测试连接界面，跳转到测试连接界面
                         if (device.getIp().equals("")) {
                             try {
                                 startActivity(new Intent(MainActivity.this, Class.forName(deviceTypeDao.getIntentClassByName(device.getType()))));
@@ -162,22 +167,30 @@ public class MainActivity extends BaseActivity {
                                 Log.d(TAG, "没有对应的类");
                                 startActivity(new Intent(MainActivity.this, RosBridgeActivity.class));
                             } catch (Exception e) {
-                                Log.d(TAG, e.getMessage());
+                                Log.d(TAG, Objects.requireNonNull(e.getMessage()));
                                 startActivity(new Intent(MainActivity.this, RosBridgeActivity.class));
                             }
                         } else {
-//                            Message message = new Message();
-//                            message.what = 1;
-//                            handler.sendMessage(message);
-//                            connectToRobot(device);
-                            try {
-                                startActivity(new Intent(MainActivity.this, Class.forName(deviceTypeDao.getIntentClassByName(device.getType()))));
-                            } catch (ClassNotFoundException e) {
-                                Log.d(TAG, "没有对应的类");
-                                startActivity(new Intent(MainActivity.this, RosBridgeActivity.class));
-                            } catch (Exception e) {
-                                Log.d(TAG, e.getMessage());
-                                startActivity(new Intent(MainActivity.this, RosBridgeActivity.class));
+                            Message message = new Message();
+                            message.what = 1;
+                            handler.sendMessage(message);
+                            //如果为远程连接模式则进行mqtt消息订阅并跳转到相应界面
+                            if (device.getConnectMode().equals(ConnectMode.REMOTEMODE.getMode())) {
+                                subscribeTopic(device);
+                            }
+                            //如果为局域网连接方式则建立socket连接并跳转到界面
+                            else if (device.getConnectMode().equals(ConnectMode.LANMODE.getMode())) {
+                                connectToRobot(device);
+                            }
+                            //否则直接跳转
+                            else {
+                                Message msg = new Message();
+                                msg.what = 3;
+                                bundle = new Bundle();
+                                bundle.putSerializable("connect_mode", ConnectMode.TESTMODE);
+                                bundle.putString("device_activity", deviceTypeDao.getIntentClassByName(device.getType()));
+                                msg.setData(bundle);
+                                handler.sendMessage(msg);
                             }
                         }
                     }
@@ -194,18 +207,28 @@ public class MainActivity extends BaseActivity {
     }
 
     public void connectToRobot(final Device device) {
-        this.ip = ((RCApplication) getApplication()).getIp();
-        client = new ROSBridgeClient("ws://" + device.getIp() + ":" + port);
+        client = new ROSBridgeClient("ws://" + device.getIp() + ":" + device.getPort());
         boolean conneSucc = client.connect(new ROSClient.ConnectionStatusListener() {
             @Override
             public void onConnect() {
                 client.setDebug(true);
                 ((RCApplication) getApplication()).setRosClient(client);
                 ((RCApplication) getApplication()).setConn(true);
+//                String msg1 = "{\"op\":\"subscribe\",\"topic\":\"/status\"}";
+                client.send("{\"op\":\"subscribe\",\"topic\":\"/status\"}");
+//                String msg2 = "{\"op\":\"subscribe\",\"topic\":\"/battery\"}";
+                client.send("{\"op\":\"subscribe\",\"topic\":\"/battery\"}");
+//                String msg3 = "{\"op\":\"subscribe\",\"topic\":\"/control\"}";
+                client.send("{\"op\":\"subscribe\",\"topic\":\"/control\"}");
+//                String msg4 = "{\"op\":\"subscribe\",\"topic\":\"/pwm_control\"}";
+                client.send("{\"op\":\"subscribe\",\"topic\":\"/pwm_control\"}");
                 showTip("连接成功");
                 Message message = new Message();
                 message.what = 3;
-                message.obj = device;
+                bundle = new Bundle();
+                bundle.putSerializable("connect_mode", ConnectMode.LANMODE);
+                bundle.putString("device_activity", deviceTypeDao.getIntentClassByName(device.getType()));
+                message.setData(bundle);
                 handler.sendMessage(message);
                 Log.d(TAG, "Connect ROS success");
             }
@@ -227,6 +250,56 @@ public class MainActivity extends BaseActivity {
         });
     }
 
+    private void subscribeTopic(Device device) {
+        MqttAndroidClient mqttAndroidClient = MqttClient.getInstance(this).getmMqttClient();
+        if (device.getType().equals(DeviceType.HUNTER.getType())) {
+            //连接成功后订阅主题
+            try {
+                Log.d(TAG, "subscribe MqttTopic==================" );
+                mqttAndroidClient.subscribe("/Hunter/status", 0);
+                mqttAndroidClient.subscribe("/Hunter/battery", 0);
+                mqttAndroidClient.subscribe("/Hunter/spray", 0);
+            } catch (MqttSecurityException e) {
+                e.printStackTrace();
+                Log.d(TAG, "MqttSecurityException--------->" + e.getMessage());
+            } catch (MqttException e) {
+                e.printStackTrace();
+                Log.d(TAG, "MqttException--------->" + e.getMessage());
+            }
+        } else if (device.getType().equals(DeviceType.OLDBUNKER.getType())) {
+            try {
+                mqttAndroidClient.subscribe("/OldBunker/status", 0);
+                mqttAndroidClient.subscribe("/OldBunker/battery", 0);
+                mqttAndroidClient.subscribe("/OldBunker/spray", 0);
+            } catch (MqttSecurityException e) {
+                e.printStackTrace();
+                Log.d(TAG, "MqttSecurityException--------->" + e.getMessage());
+            } catch (MqttException e) {
+                e.printStackTrace();
+                Log.d(TAG, "MqttException--------->" + e.getMessage());
+            }
+        } else {
+            try {
+                mqttAndroidClient.subscribe("/NewBunker/status", 0);
+                mqttAndroidClient.subscribe("/NewBunker/battery", 0);
+                mqttAndroidClient.subscribe("/NewBunker/spray", 0);
+            } catch (MqttSecurityException e) {
+                e.printStackTrace();
+                Log.d(TAG, "MqttSecurityException--------->" + e.getMessage());
+            } catch (MqttException e) {
+                e.printStackTrace();
+                Log.d(TAG, "MqttException--------->" + e.getMessage());
+            }
+        }
+        Message message = new Message();
+        message.what = 3;
+        bundle = new Bundle();
+        bundle.putSerializable("connect_mode", ConnectMode.REMOTEMODE);
+        bundle.putString("device_activity", deviceTypeDao.getIntentClassByName(device.getType()));
+        message.setData(bundle);
+        handler.sendMessage(message);
+    }
+
     private void showTip(final String tip) {
         runOnUiThread(new Runnable() {
             @Override
@@ -236,6 +309,7 @@ public class MainActivity extends BaseActivity {
         });
     }
 
+    //根据不同的设备创建dialog，用于修改设备信息
     public void createDialog(final int index) {
         final Device device = devices.get(index);
         if (device.getIp().equals("")) {
@@ -249,12 +323,20 @@ public class MainActivity extends BaseActivity {
         builder.setView(layout);
         device_name_inputview = layout.findViewById(R.id.device_name_inputview);
         ip_inputview = layout.findViewById(R.id.ip_inputview);
-        spinner = layout.findViewById(R.id.spinner);
-        spinner.setAdapter(arrayAdapter);
-        spinner.setSelection(getIndex(index));
+        port_inputview = layout.findViewById(R.id.port_inputview);
+        deviceTypeSpinner = layout.findViewById(R.id.device_type_spinner);
+        deviceTypeSpinner.setAdapter(arrayAdapter);
+
+        deviceTypeSpinner.setSelection(getDeviceTypeIndex(index));
+
+        connectModeSpinner = layout.findViewById(R.id.connect_mode_spinner);
+        connectModeSpinner.setAdapter(arrayAdapter2);
+        connectModeSpinner.setSelection(getConnectModeIndex(index));
 
         device_name_inputview.setText(device.getName());
         ip_inputview.setText(device.getIp());
+        port_inputview.setText(device.getPort());
+
         builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -263,8 +345,10 @@ public class MainActivity extends BaseActivity {
                 } else {
                     String name = device_name_inputview.getText().toString();
                     String ip = ip_inputview.getText().toString();
-                    String type = spinner.getSelectedItem().toString();
-                    boolean b = deviceDao.updataAllInfoById(device.getId(), name, ip,type);
+                    String type = deviceTypeSpinner.getSelectedItem().toString();
+                    String connectMode = connectModeSpinner.getSelectedItem().toString();
+                    String port = port_inputview.getText().toString();
+                    boolean b = deviceDao.updataAllInfoById(device.getId(), name, ip, type, connectMode,port);
                     if (!b) {
                         showToast("更新设备信息失败");
                         return;
@@ -285,10 +369,21 @@ public class MainActivity extends BaseActivity {
         builder.create().show();
     }
 
-    private int getIndex(int i) {
+
+    private int getDeviceTypeIndex(int i) {
         Device device = devices.get(i);
         for (int k = 0; k < allTypeName.size(); k++) {
-            if(device.getType().equals(allTypeName.get(k))){
+            if (device.getType().equals(allTypeName.get(k))) {
+                return k;
+            }
+        }
+        return -1;
+    }
+
+    private int getConnectModeIndex(int i) {
+        Device device = devices.get(i);
+        for (int k = 0; k < allConnectMode.size(); k++) {
+            if (device.getConnectMode().equals(allConnectMode.get(k))) {
                 return k;
             }
         }

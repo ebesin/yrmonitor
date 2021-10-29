@@ -208,7 +208,10 @@
         <!-- <item name="android:background">@drawable/nav_page</item> -->
         <item name="android:background">@color/navpage</item>
     </style>
-    
+
+    <style name="spinner" parent="Widget.AppCompat.Light.DropDownItem.Spinner">
+        <item name="android:textSize">12sp</item>
+    </style>
 
 
 </resources>

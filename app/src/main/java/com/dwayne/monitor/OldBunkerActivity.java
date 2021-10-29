@@ -66,6 +66,7 @@ import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.geocoder.GeocodeSearch;
 import com.amap.api.services.help.Tip;
 import com.dadac.testrosbridge.RCApplication;
+import com.dwayne.monitor.enums.ConnectMode;
 import com.dwayne.monitor.view.model.OldBunkerModelView;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -103,13 +104,17 @@ import com.dwayne.monitor.view.map.PoiDetailBottomView;
 import com.dwayne.monitor.view.map.TrafficView;
 import com.dwayne.monitor.view.widget.OnItemClickListener;
 
+import org.eclipse.paho.android.service.MqttAndroidClient;
+import org.eclipse.paho.client.mqttv3.MqttException;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import de.greenrobot.event.EventBus;
 
 public class OldBunkerActivity extends BaseActivity implements GPSView.OnGPSViewClickListener, NearbySearchView.OnNearbySearchViewClickListener, AMapGestureListener, AMapLocationListener, LocationSource, TrafficView.OnTrafficChangeListener, View.OnClickListener, MapViewInterface, PoiDetailBottomView.OnPoiDetailBottomClickListener, AMap.OnPOIClickListener, OnItemClickListener, CompoundButton.OnCheckedChangeListener {
-    private static final String TAG = "MapActivity";
+    private static final String TAG = "OldBunkerActivity";
     /**
      * 首次进入申请定位、sd卡权限
      */
@@ -205,27 +210,9 @@ public class OldBunkerActivity extends BaseActivity implements GPSView.OnGPSView
     private GPSDataViewModel gpsDataViewModel;
     private OldBunkerSpraySpeedViewModel fanSpeedViewModel;
     GeocodeSearch geocodeSearch;
-    @SuppressLint("HandlerLeak")
-    Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case 1:
-                    gpsDataViewModel.setData((GPSData) msg.obj);
-                    break;
-                case 2:
-                    Log.d("handler", "change");
-                    fanSpeedViewModel.setSpeedValue((int[]) msg.obj);
-                    break;
-                case 3:
-                    statusViewModel.setValue((Status) msg.obj);
-                    break;
-                case 4:
-                    batteryViewModel.setValue((Battery) msg.obj);
-                    break;
-            }
-        }
-    };
+
+    Handler handler;
+    Handler viewhandler;
 
     /**
      * 数据信息
@@ -278,26 +265,76 @@ public class OldBunkerActivity extends BaseActivity implements GPSView.OnGPSView
     OldBunkerModelView oldBunkerModelView;
 
     //ros通信
-    ROSBridgeClient client;
-    String ip = "192.168.1.103";   //ros的 IP
-    String port = "9090";
-    boolean isConn = false;
+    ROSBridgeClient rosBridgeClient = null;
+    MqttAndroidClient mqttAndroidClient = null;
+
+
+    ConnectMode connectMode;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-        EventBus.getDefault().register(this);
         initView(savedInstanceState);
         initData();
+        setHandlers();
         setListener();
+        EventBus.getDefault().register(this);
     }
 
+    void setHandlers() {
+        handler = new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(@NonNull Message msg) {
+                switch (msg.what) {
+                    case 1:
+                        gpsDataViewModel.setData((GPSData) msg.obj);
+                        break;
+                    case 2:
+                        fanSpeedViewModel.setSpeedValue((int[]) msg.obj);
+                        break;
+                    case 3:
+                        statusViewModel.setValue((Status) msg.obj);
+                        break;
+                    case 4:
+                        batteryViewModel.setValue((Battery) msg.obj);
+                        break;
+                }
+                return false;
+            }
+        });
+
+        viewhandler = new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(@NonNull Message msg) {
+                switch (msg.what) {
+                    case 1:
+                        Status status = (Status) msg.obj;
+                        speed_data.setText(String.format("%.2fm/s", status.getSpeed()));
+                        front_wheel_angle_data.setText(String.format("%.2f°", status.getFront_wheel_angle()));
+                        yaw_angle_data.setText(String.format("%.2f°", status.getYaw_angle()));
+                        lat_data.setText(String.format("%.5f", status.getLat()));
+                        lng_data.setText(String.format("%.5f", status.getLng()));
+                        break;
+                    case 2:
+                        Battery battery = (Battery) msg.obj;
+                        charge_data.setText(String.format("%s%%", String.valueOf(battery.getPower())));
+                        voltage_data.setText(String.format("%sV", String.valueOf(battery.getVoltage())));
+                        charge_waveView.setWaveHeightPercent((float) battery.getPower() / 100);
+                        charge_card_data.setText(String.format("%s%%", String.valueOf(battery.getPower())));
+                }
+                return false;
+            }
+        });
+
+    }
 
     private void initView(Bundle savedInstanceState) {
-        client = ((RCApplication) getApplication()).getRosClient();
-//        publish();
+        Bundle bundle = getIntent().getExtras();
+        connectMode = (ConnectMode) Objects.requireNonNull(bundle).getSerializable("connect_mode");
+        rosBridgeClient = ((RCApplication) getApplication()).getRosClient();
+
         mGpsView = (GPSView) findViewById(R.id.gps_view);
 
         //获取地图控件引用
@@ -328,7 +365,7 @@ public class OldBunkerActivity extends BaseActivity implements GPSView.OnGPSView
         device_state_cardView.setOnClickListener(this);
         remote_control_cardView = findViewById(R.id.remote_control_cardView);
         remote_control_cardView.setOnClickListener(this);
-
+        charge_card_data = findViewById(R.id.charge_card_data);
 
         charge_waveView = findViewById(R.id.charge_waveView);
         charge_waveView.start();
@@ -368,12 +405,6 @@ public class OldBunkerActivity extends BaseActivity implements GPSView.OnGPSView
         setUpMap();
         setDialog();
         mPadding = getResources().getDimensionPixelSize(R.dimen.padding_size);
-        /*int statusBarHeight = DeviceUtils.getStatusBarHeight(this);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        getWindow().setStatusBarColor(Color.WHITE);
-        log(String.format("statusBarHeight=%s", statusBarHeight));*/
-//        SystemUIModes.setTranslucentStatus(this, true);
     }
 
     private void setSpeed() {
@@ -442,20 +473,20 @@ public class OldBunkerActivity extends BaseActivity implements GPSView.OnGPSView
     //订阅topic
     private void publish() {
         String msg1 = "{\"op\":\"subscribe\",\"topic\":\"/status\"}";
-        client.send(msg1);
+        rosBridgeClient.send(msg1);
         String msg2 = "{\"op\":\"subscribe\",\"topic\":\"/battery\"}";
-        client.send(msg2);
+        rosBridgeClient.send(msg2);
         String msg3 = "{\"op\":\"subscribe\",\"topic\":\"/control\"}";
-        client.send(msg3);
+        rosBridgeClient.send(msg3);
         String msg4 = "{\"op\":\"subscribe\",\"topic\":\"/pwm_control\"}";
-        client.send(msg4);
+        rosBridgeClient.send(msg4);
     }
 
     private void SendDataToRos(String topic, String data) {
         String msg1 = "{ \"op\": \"publish\", \"topic\": \"/" + topic + "\", \"msg\": " + data + "}";
         //        String msg2 = "{\"op\":\"publish\",\"topic\":\"/cmd_vel\",\"msg\":{\"linear\":{\"x\":" + 0 + ",\"y\":" +
         //                0 + ",\"z\":0},\"angular\":{\"x\":0,\"y\":0,\"z\":" + 0.5 + "}}}";
-        client.send(msg1);
+        rosBridgeClient.send(msg1);
     }
 
     //发送数据到ROS端
@@ -463,14 +494,14 @@ public class OldBunkerActivity extends BaseActivity implements GPSView.OnGPSView
         String msg1 = "{ \"op\": \"publish\", \"topic\": \"/" + topic + "\", \"msg\": { \"data\": \"" + data + "\"}}";
         //        String msg2 = "{\"op\":\"publish\",\"topic\":\"/cmd_vel\",\"msg\":{\"linear\":{\"x\":" + 0 + ",\"y\":" +
         //                0 + ",\"z\":0},\"angular\":{\"x\":0,\"y\":0,\"z\":" + 0.5 + "}}}";
-        client.send(msg1);
+        rosBridgeClient.send(msg1);
     }
 
 
     public void onEvent(@NonNull final PublishEvent event) {
         Log.d(TAG, "onEvent: " + event.name);
         if ("/status".equals(event.name)) {
-            Log.i("chatter", event.msg);
+            Log.i(TAG, event.msg);
             Status status = new Gson().fromJson(event.msg, Status.class);
             Message message = new Message();
             message.what = 3;
@@ -482,16 +513,23 @@ public class OldBunkerActivity extends BaseActivity implements GPSView.OnGPSView
             message.what = 4;
             message.obj = battery;
             handler.sendMessage(message);
-            Log.i("battery", event.msg);
+            Log.i(TAG, event.msg);
         } else if ("/pwm_control".equals(event.name)) {
             Spray spray = new Gson().fromJson(event.msg, Spray.class);
             Message message = new Message();
             message.what = 2;
             message.obj = spray.getDuc_array();
             handler.sendMessage(message);
-            Log.i("mypath", event.msg);
+            Log.i(TAG, event.msg);
+        } else if ("/mypath".equals(event.name)) {
+            Spray spray = new Gson().fromJson(event.msg, Spray.class);
+            Message message = new Message();
+            message.what = 2;
+            message.obj = spray.getDuc_array();
+            handler.sendMessage(message);
+            Log.i(TAG, event.msg);
         } else if ("/control".equals(event.name)) {
-            Log.i("control", event.msg);
+            Log.i(TAG, event.msg);
         }
     }
 
@@ -508,7 +546,7 @@ public class OldBunkerActivity extends BaseActivity implements GPSView.OnGPSView
         status_builder.setCancelable(true);           //将对话框以外的区域设置成无法点击
         // 载入自定义布局
         LayoutInflater inflater = getLayoutInflater();
-        View layout = inflater.inflate(R.layout.robot1_detail_layout, null);
+        View layout = inflater.inflate(R.layout.device_detail_layout, null);
         status_builder.setView(layout);
 
         yaw_angle_data = layout.findViewById(R.id.yaw_angle_data);
@@ -521,7 +559,6 @@ public class OldBunkerActivity extends BaseActivity implements GPSView.OnGPSView
         status_builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
                 dialog.dismiss();      //取消显示(关闭)对话框
             }
         });
@@ -797,30 +834,53 @@ public class OldBunkerActivity extends BaseActivity implements GPSView.OnGPSView
                 oldBunkerModelView.changeFromSpeed(ints);
             }
         });
-        setSpeed();
-        new Thread(new Runnable() {
+        statusViewModel = ViewModelProviders.of(this).get(StatusViewModel.class);
+        statusViewModel.getStatusMutableLiveData().observe(this, new Observer<Status>() {
             @Override
-            public void run() {
-                int i = 0;
-                double lng = 120.67888888888889;
-                double lat = 32.575833333333335;
-                while (true) {
-                    lng -= 0.000001;
-                    GPSData gpsData = new GPSData(lat, lng);
-//                    gpsDataViewModel.setData(new GPSData(lat, lng++));
-                    Message message = new Message();
-                    message.what = 1;
-                    message.obj = gpsData;
-                    handler.sendMessage(message);
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+            public void onChanged(@Nullable Status status) {
+                Message message = new Message();
+                message.what = 1;
+                message.obj = status;
+                viewhandler.sendMessage(message);
+            }
+        });
+
+        batteryViewModel = ViewModelProviders.of(this).get(BatteryViewModel.class);
+        batteryViewModel.getBatteryMutableLiveData().observe(this, new Observer<Battery>() {
+            @Override
+            public void onChanged(@Nullable Battery battery) {
+                Message message = new Message();
+                message.what = 2;
+                message.obj = battery;
+                viewhandler.sendMessage(message);
+            }
+        });
+
+        if (connectMode.equals(ConnectMode.TESTMODE)) {
+            setSpeed();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    int i = 0;
+                    double lng = 120.67888888888889;
+                    double lat = 32.575833333333335;
+                    while (true) {
+                        lng -= 0.000001;
+                        GPSData gpsData = new GPSData(lat, lng);
+                        Message message = new Message();
+                        message.what = 1;
+                        message.obj = gpsData;
+                        handler.sendMessage(message);
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
-            }
-        }).start();
+            }).start();
 
+        }
         mLocMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
     }
 
@@ -1382,23 +1442,6 @@ public class OldBunkerActivity extends BaseActivity implements GPSView.OnGPSView
         //registerWechatBroadcast();
     }
 
-    /**
-     * 注册微信广播
-     */
-    /*private void registerWechatBroadcast() {
-        //建议动态监听微信启动广播进行注册到微信
-        IntentFilter filter = new IntentFilter(ConstantsAPI.ACTION_REFRESH_WXAPP);
-        // 将该app注册到微信
-        mWechatBroadcast = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-
-                // 将该app注册到微信
-                api.registerApp(Constants.APP_ID);
-            }
-        };
-        registerReceiver(mWechatBroadcast, filter);
-    }*/
     @Override
     protected void onPause() {
         super.onPause();
@@ -1415,23 +1458,19 @@ public class OldBunkerActivity extends BaseActivity implements GPSView.OnGPSView
         //unregisterWechatBroadcast();
     }
 
-    /**
-     * 反注册微信广播
-     */
-  /*  private void unregisterWechatBroadcast() {
-        if(mWechatBroadcast != null){
-            unregisterReceiver(mWechatBroadcast);
-        }
-        if(mWechatBroadcast != null){
-            mWechatBroadcast = null;
-        }
-
-    }*/
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (((RCApplication) getApplication()).isConn()) {
-            client.disconnect();
+        if (rosBridgeClient != null && connectMode.equals(ConnectMode.LANMODE)) {
+            rosBridgeClient.disconnect();
+        }
+        if (mqttAndroidClient != null && connectMode.equals(ConnectMode.REMOTEMODE)) {
+            try {
+                mqttAndroidClient.unsubscribe(new String[]{"OldBunker/status", "/OldBunker/battery", "/OldBunker/spray"});
+            } catch (MqttException e) {
+                e.printStackTrace();
+                Log.d(TAG, "取消订阅失败");
+            }
         }
         //在activity执行onDestroy时执行mMapView.onDestroy()，销毁地图
         mMapView.onDestroy();

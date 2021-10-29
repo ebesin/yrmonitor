@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -29,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dadac.testrosbridge.RCApplication;
+import com.dwayne.monitor.enums.ConnectMode;
 import com.dwayne.monitor.view.model.HunterModelView;
 import com.github.mikephil.charting.data.Entry;
 import com.github.onlynight.waveview.WaveView;
@@ -54,15 +56,18 @@ import com.dwayne.monitor.util.DeviceUtils;
 import com.dwayne.monitor.util.LogUtil;
 import com.dwayne.monitor.view.map.GPSView;
 
+import org.eclipse.paho.android.service.MqttAndroidClient;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import de.greenrobot.event.EventBus;
 
 public class HunterActivity extends BaseActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, GPSView.OnGPSViewClickListener {
 
-    private static final String TAG = "MapActivity3";
+    private static final String TAG = "hunterActivity";
     private View mBottomSheet;
     private BottomSheetBehavior<View> mBehavior;
     private boolean slideDown;//向下滑动
@@ -79,51 +84,8 @@ public class HunterActivity extends BaseActivity implements View.OnClickListener
     private TextView slideUpInfo;
 
 
-    @SuppressLint("HandlerLeak")
-    Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case 1:
-                    gpsDataViewModel.setData((GPSData) msg.obj);
-                    break;
-                case 2:
-                    fanSpeedViewModel2.setSpeedValue((int[]) msg.obj);
-                    break;
-                case 3:
-                    statusViewModel.setValue((Status) msg.obj);
-                    break;
-                case 4:
-                    batteryViewModel.setValue((Battery) msg.obj);
-                    break;
-            }
-        }
-    };
-
-    @SuppressLint("HandlerLeak")
-    Handler viewhandler = new Handler() {
-        @SuppressLint("DefaultLocale")
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case 1:
-                    Status status = (Status) msg.obj;
-                    speed_data.setText(String.format("%.2fm/s", status.getSpeed()));
-                    front_wheel_angle_data.setText(String.format("%.2f°", status.getFront_wheel_angle()));
-                    yaw_angle_data.setText(String.format("%.2f°", status.getYaw_angle()));
-                    lat_data.setText(String.format("%.5f", status.getLat()));
-                    lng_data.setText(String.format("%.5f", status.getLng()));
-                    break;
-                case 2:
-                    Battery battery = (Battery) msg.obj;
-                    charge_data.setText(String.format("%s%%", String.valueOf(battery.getPower())));
-                    voltage_data.setText(String.format("%sV", String.valueOf(battery.getVoltage())));
-                    charge_waveView.setWaveHeightPercent((float) battery.getPower() / 100);
-                    charge_card_data.setText(String.format("%s%%", String.valueOf(battery.getPower())));
-            }
-        }
-    };
-
+    Handler handler;
+    Handler viewhandler;
 
     CardView charge_cardview;
     CardView setArgs_cardView;
@@ -182,34 +144,77 @@ public class HunterActivity extends BaseActivity implements View.OnClickListener
     EditText speed_data_inputview;
     EditText angle_data_inputview;
 
+    ConnectMode connectMode;
+
 
     //ros通信
-    ROSBridgeClient client;
-    String ip = "192.168.1.103";   //ros的 IP
-    String port = "9090";
+    ROSBridgeClient rosBridgeClient = null;
+    MqttAndroidClient mqttAndroidClient = null;
+
     boolean isConn = false;
-    Runnable connectRunnable = new Runnable() {
-        @Override
-        public void run() {
-            connect(ip, port);
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map3);
-        EventBus.getDefault().register(this);
         initView(savedInstanceState);
         initData();
+        setHandlers();
         setListener();
+        EventBus.getDefault().register(this);
+    }
+
+    void setHandlers(){
+        handler = new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(@NonNull Message msg) {
+                switch (msg.what) {
+                    case 1:
+                        gpsDataViewModel.setData((GPSData) msg.obj);
+                        break;
+                    case 2:
+                        fanSpeedViewModel2.setSpeedValue((int[]) msg.obj);
+                        break;
+                    case 3:
+                        statusViewModel.setValue((Status) msg.obj);
+                        break;
+                    case 4:
+                        batteryViewModel.setValue((Battery) msg.obj);
+                        break;
+                }
+                return false;
+            }
+        });
+
+        viewhandler = new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(@NonNull Message msg) {
+                switch (msg.what) {
+                    case 1:
+                        Status status = (Status) msg.obj;
+                        speed_data.setText(String.format("%.2fm/s", status.getSpeed()));
+                        front_wheel_angle_data.setText(String.format("%.2f°", status.getFront_wheel_angle()));
+                        yaw_angle_data.setText(String.format("%.2f°", status.getYaw_angle()));
+                        lat_data.setText(String.format("%.5f", status.getLat()));
+                        lng_data.setText(String.format("%.5f", status.getLng()));
+                        break;
+                    case 2:
+                        Battery battery = (Battery) msg.obj;
+                        charge_data.setText(String.format("%s%%", String.valueOf(battery.getPower())));
+                        voltage_data.setText(String.format("%sV", String.valueOf(battery.getVoltage())));
+                        charge_waveView.setWaveHeightPercent((float) battery.getPower() / 100);
+                        charge_card_data.setText(String.format("%s%%", String.valueOf(battery.getPower())));
+                }
+                return false;
+            }
+        });
     }
 
     private void initView(Bundle savedInstanceState) {
-        //建立连接,订阅topic
-//        new Thread(connectRunnable).start();
-        client = ((RCApplication) getApplication()).getRosClient();
-//        publish();
+        Bundle bundle = getIntent().getExtras();
+        connectMode = (ConnectMode) Objects.requireNonNull(bundle).getSerializable("connect_mode");
+        rosBridgeClient = ((RCApplication) getApplication()).getRosClient();
+
         largeImageView = findViewById(R.id.largeImage);
         try {
             largeImageView.setImage(new InputStreamBitmapDecoderFactory(getAssets().open("map2.png")));
@@ -254,7 +259,6 @@ public class HunterActivity extends BaseActivity implements View.OnClickListener
     }
 
     private void initData() {
-//        this.ip =  ((RCApplication) getApplication()).getIp();
 
 //        设置gps数据改变时的事件
         gpsDataViewModel = ViewModelProviders.of(this).get((GPSDataViewModel.class));
@@ -264,6 +268,7 @@ public class HunterActivity extends BaseActivity implements View.OnClickListener
 
             }
         });
+
         fanSpeedViewModel2 = ViewModelProviders.of(this).get(HenterSpraySpeedViewModel.class);
         fanSpeedViewModel2.getSpeed().observe(this, new Observer<int[]>() {
             @Override
@@ -271,7 +276,10 @@ public class HunterActivity extends BaseActivity implements View.OnClickListener
                 hunterModelView.changeFromSpeed(ints);
             }
         });
-        setSpeed();
+        if(connectMode.equals(ConnectMode.TESTMODE)) {
+            setSpeed();
+        }
+
         statusViewModel = ViewModelProviders.of(this).get(StatusViewModel.class);
         statusViewModel.getStatusMutableLiveData().observe(this, new Observer<Status>() {
             @Override
@@ -409,12 +417,12 @@ public class HunterActivity extends BaseActivity implements View.OnClickListener
      */
     public void connect(String ip, String port) {
 
-        client = new ROSBridgeClient("ws://" + ip + ":" + port);
-        boolean conneSucc = client.connect(new ROSClient.ConnectionStatusListener() {
+        rosBridgeClient = new ROSBridgeClient("ws://" + ip + ":" + port);
+        boolean conneSucc = rosBridgeClient.connect(new ROSClient.ConnectionStatusListener() {
             @Override
             public void onConnect() {
-                client.setDebug(true);
-                ((RCApplication) getApplication()).setRosClient(client);
+                rosBridgeClient.setDebug(true);
+                ((RCApplication) getApplication()).setRosClient(rosBridgeClient);
                 isConn = true;
                 showTip("连接成功");
                 publish();
@@ -451,18 +459,18 @@ public class HunterActivity extends BaseActivity implements View.OnClickListener
     //订阅topic
     private void publish() {
         String msg1 = "{\"op\":\"subscribe\",\"topic\":\"/status\"}";
-        client.send(msg1);
+        rosBridgeClient.send(msg1);
         String msg2 = "{\"op\":\"subscribe\",\"topic\":\"/battery\"}";
-        client.send(msg2);
+        rosBridgeClient.send(msg2);
         String msg3 = "{\"op\":\"subscribe\",\"topic\":\"/control\"}";
-        client.send(msg3);
+        rosBridgeClient.send(msg3);
     }
 
     private void SendDataToRos(String topic, String data) {
         String msg1 = "{ \"op\": \"publish\", \"topic\": \"/" + topic + "\", \"msg\": " + data + "}";
         //        String msg2 = "{\"op\":\"publish\",\"topic\":\"/cmd_vel\",\"msg\":{\"linear\":{\"x\":" + 0 + ",\"y\":" +
         //                0 + ",\"z\":0},\"angular\":{\"x\":0,\"y\":0,\"z\":" + 0.5 + "}}}";
-        client.send(msg1);
+        rosBridgeClient.send(msg1);
     }
 
     //发送数据到ROS端
@@ -470,14 +478,14 @@ public class HunterActivity extends BaseActivity implements View.OnClickListener
         String msg1 = "{ \"op\": \"publish\", \"topic\": \"/" + topic + "\", \"msg\": { \"data\": \"" + data + "\"}}";
         //        String msg2 = "{\"op\":\"publish\",\"topic\":\"/cmd_vel\",\"msg\":{\"linear\":{\"x\":" + 0 + ",\"y\":" +
         //                0 + ",\"z\":0},\"angular\":{\"x\":0,\"y\":0,\"z\":" + 0.5 + "}}}";
-        client.send(msg1);
+        rosBridgeClient.send(msg1);
     }
 
 
     public void onEvent(@NonNull final PublishEvent event) {
 
         if ("/status".equals(event.name)) {
-            Log.i("chatter", event.msg);
+            Log.i(TAG, event.msg);
             Status status = new Gson().fromJson(event.msg, Status.class);
             Message message = new Message();
             message.what = 3;
@@ -489,9 +497,9 @@ public class HunterActivity extends BaseActivity implements View.OnClickListener
             message.what = 4;
             message.obj = battery;
             handler.sendMessage(message);
-            Log.i("battery", event.msg);
+            Log.i(TAG, event.msg);
         } else if ("/control".equals(event.name)) {
-            Log.i("control", event.msg);
+            Log.i(TAG, event.msg);
         }
     }
 
@@ -505,7 +513,7 @@ public class HunterActivity extends BaseActivity implements View.OnClickListener
     @Override
     protected void onDestroy() {
         if (((RCApplication) getApplication()).isConn()) {
-            client.disconnect();
+            rosBridgeClient.disconnect();
         }
         super.onDestroy();
     }

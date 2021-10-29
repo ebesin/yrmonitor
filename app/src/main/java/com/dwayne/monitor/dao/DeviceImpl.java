@@ -14,5 +14,6 @@ public interface DeviceImpl {
 
     boolean updateNameAndIpById(String id, String name, String ip);
 
-    boolean updataAllInfoById(String id, String name, String ip,String type);
+    boolean updataAllInfoById(String id, String name, String ip,String type,String connectMode,String port);
+
 }

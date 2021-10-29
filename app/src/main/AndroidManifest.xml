@@ -27,6 +27,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <service android:name="org.eclipse.paho.android.service.MqttService">
+        </service>
+
         <activity
             android:name="com.dwayne.monitor.MainActivity"
             android:screenOrientation="portrait">

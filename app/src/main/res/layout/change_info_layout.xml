@@ -9,7 +9,7 @@
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="300dp"
-        android:layout_height="200dp"
+        android:layout_height="350dp"
         android:background="@drawable/charge_detail">
 
         <android.support.constraint.Guideline
@@ -48,7 +48,7 @@
             app:layout_constraintTop_toBottomOf="@+id/guideline2" />
 
         <TextView
-            android:id="@+id/speed_text"
+            android:id="@+id/device_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
@@ -67,30 +67,51 @@
             android:textAlignment="center"
 
             android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="@+id/speed_text"
+            app:layout_constraintBottom_toBottomOf="@+id/device_name"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/speed_text"
-            app:layout_constraintTop_toTopOf="@+id/speed_text" />
+            app:layout_constraintStart_toEndOf="@+id/device_name"
+            app:layout_constraintTop_toTopOf="@+id/device_name" />
 
         <TextView
-            android:id="@+id/front_wheel_angle_text"
+            android:id="@+id/device_ip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="设备ip"
             android:textSize="14sp"
-            app:layout_constraintStart_toStartOf="@+id/speed_text"
-            app:layout_constraintTop_toBottomOf="@+id/speed_text" />
+            app:layout_constraintStart_toStartOf="@+id/device_name"
+            app:layout_constraintTop_toBottomOf="@+id/device_name" />
 
         <TextView
-            android:id="@+id/front_wheel_angle_text2"
+            android:id="@+id/ip_port"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="端口号"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="@+id/device_ip"
+            app:layout_constraintTop_toBottomOf="@+id/device_ip" />
+
+        <TextView
+            android:id="@+id/device_type"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="设备类型"
             android:textSize="14sp"
-            app:layout_constraintStart_toStartOf="@+id/front_wheel_angle_text"
-            app:layout_constraintTop_toBottomOf="@+id/front_wheel_angle_text" />
+            app:layout_constraintStart_toStartOf="@+id/ip_port"
+            app:layout_constraintTop_toBottomOf="@+id/ip_port" />
+
+        <TextView
+            android:id="@+id/connect_mode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="连接方式"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="@+id/device_type"
+            app:layout_constraintTop_toBottomOf="@+id/device_type" />
+
 
         <EditText
             android:id="@+id/ip_inputview"
@@ -99,21 +120,47 @@
             android:layout_marginEnd="16dp"
             android:textAlignment="center"
             android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="@+id/front_wheel_angle_text"
+            app:layout_constraintBottom_toBottomOf="@+id/device_ip"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/device_name_inputview"
-            app:layout_constraintTop_toTopOf="@+id/front_wheel_angle_text" />
+            app:layout_constraintTop_toTopOf="@+id/device_ip" />
+
+        <EditText
+            android:id="@+id/port_inputview"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="0dp"
+            android:textAlignment="center"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/ip_port"
+            app:layout_constraintEnd_toEndOf="@+id/ip_inputview"
+            app:layout_constraintStart_toStartOf="@+id/ip_inputview"
+            app:layout_constraintTop_toTopOf="@+id/ip_port" />
 
         <Spinner
-            android:id="@+id/spinner"
+            android:id="@+id/device_type_spinner"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="@+id/front_wheel_angle_text2"
+            app:layout_constraintBottom_toBottomOf="@+id/device_type"
             android:textAlignment="center"
             app:layout_constraintEnd_toEndOf="@+id/ip_inputview"
             app:layout_constraintHorizontal_bias="1.0"
+            android:theme="@style/spinner"
             app:layout_constraintStart_toStartOf="@+id/ip_inputview"
-            app:layout_constraintTop_toTopOf="@+id/front_wheel_angle_text2" />
+            app:layout_constraintTop_toTopOf="@+id/device_type" />
+
+        <Spinner
+            android:id="@+id/connect_mode_spinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@+id/connect_mode"
+            android:textAlignment="center"
+            app:layout_constraintEnd_toEndOf="@+id/ip_inputview"
+            app:layout_constraintHorizontal_bias="1.0"
+            android:spinnerMode="dropdown"
+            android:theme="@style/spinner"
+            app:layout_constraintStart_toStartOf="@+id/ip_inputview"
+            app:layout_constraintTop_toTopOf="@+id/connect_mode" />
 
 
     </android.support.constraint.ConstraintLayout>

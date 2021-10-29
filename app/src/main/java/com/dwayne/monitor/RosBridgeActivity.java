@@ -100,9 +100,9 @@ public class RosBridgeActivity extends Activity implements View.OnClickListener 
      * @Function: 建立连接
      * @Return:
      */
-    public void onConnect(final String ip, String port) {
+    public void onConnect(final String ip) {
 
-        client = new ROSBridgeClient("ws://" + ip + ":" + port);
+        client = new ROSBridgeClient("ws://" + ip);
         conneSucc = client.connect(new ROSClient.ConnectionStatusListener() {
             @Override
             public void onConnect() {
@@ -234,7 +234,12 @@ public class RosBridgeActivity extends Activity implements View.OnClickListener 
                         showTip("请输入ip");
                     } else {
                         ip = String.valueOf(ip_input_text.getText());
-                        onConnect(ip, port);
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                onConnect(ip);
+                            }
+                        }).start();
                     }
                 } else {
                     client.disconnect();
