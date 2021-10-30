@@ -222,6 +222,7 @@ public class MainActivity extends BaseActivity {
                 client.send("{\"op\":\"subscribe\",\"topic\":\"/control\"}");
 //                String msg4 = "{\"op\":\"subscribe\",\"topic\":\"/pwm_control\"}";
                 client.send("{\"op\":\"subscribe\",\"topic\":\"/pwm_control\"}");
+                client.send("{\"op\":\"subscribe\",\"topic\":\"/mypath\"}");
                 showTip("连接成功");
                 Message message = new Message();
                 message.what = 3;
@@ -255,7 +256,7 @@ public class MainActivity extends BaseActivity {
         if (device.getType().equals(DeviceType.HUNTER.getType())) {
             //连接成功后订阅主题
             try {
-                Log.d(TAG, "subscribe MqttTopic==================" );
+                Log.d(TAG, "subscribe MqttTopic==================>Hunter/*" );
                 mqttAndroidClient.subscribe("/Hunter/status", 0);
                 mqttAndroidClient.subscribe("/Hunter/battery", 0);
                 mqttAndroidClient.subscribe("/Hunter/spray", 0);

@@ -67,6 +67,7 @@ import com.amap.api.services.geocoder.GeocodeSearch;
 import com.amap.api.services.help.Tip;
 import com.dadac.testrosbridge.RCApplication;
 import com.dwayne.monitor.enums.ConnectMode;
+import com.dwayne.monitor.mqtt.MqttClient;
 import com.dwayne.monitor.view.model.OldBunkerModelView;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -333,7 +334,12 @@ public class OldBunkerActivity extends BaseActivity implements GPSView.OnGPSView
     private void initView(Bundle savedInstanceState) {
         Bundle bundle = getIntent().getExtras();
         connectMode = (ConnectMode) Objects.requireNonNull(bundle).getSerializable("connect_mode");
-        rosBridgeClient = ((RCApplication) getApplication()).getRosClient();
+        if(connectMode.equals(ConnectMode.LANMODE)) {
+            rosBridgeClient = ((RCApplication) getApplication()).getRosClient();
+        }
+        if(connectMode.equals(ConnectMode.REMOTEMODE)){
+            mqttAndroidClient = MqttClient.getInstance(this).getmMqttClient();
+        }
 
         mGpsView = (GPSView) findViewById(R.id.gps_view);
 
@@ -1083,6 +1089,7 @@ public class OldBunkerActivity extends BaseActivity implements GPSView.OnGPSView
             return;
         }
 
+
         //获取经纬度
         double lng = location.getLongitude();
         double lat = location.getLatitude();
@@ -1455,23 +1462,24 @@ public class OldBunkerActivity extends BaseActivity implements GPSView.OnGPSView
     @Override
     protected void onStop() {
         super.onStop();
-        //unregisterWechatBroadcast();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
         if (rosBridgeClient != null && connectMode.equals(ConnectMode.LANMODE)) {
             rosBridgeClient.disconnect();
+            rosBridgeClient = null;
         }
         if (mqttAndroidClient != null && connectMode.equals(ConnectMode.REMOTEMODE)) {
             try {
                 mqttAndroidClient.unsubscribe(new String[]{"OldBunker/status", "/OldBunker/battery", "/OldBunker/spray"});
+                mqttAndroidClient = null;
             } catch (MqttException e) {
                 e.printStackTrace();
                 Log.d(TAG, "取消订阅失败");
             }
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
         //在activity执行onDestroy时执行mMapView.onDestroy()，销毁地图
         mMapView.onDestroy();
         mFirstLocation = true;
@@ -1487,8 +1495,9 @@ public class OldBunkerActivity extends BaseActivity implements GPSView.OnGPSView
         if (mLocMarker != null) {
             mLocMarker.destroy();
         }
-        // leakcanary检测
     }
+
+
 
     private void addCircle(LatLng latlng, double radius) {
         CircleOptions options = new CircleOptions();

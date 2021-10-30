@@ -30,7 +30,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dadac.testrosbridge.RCApplication;
+import com.dwayne.monitor.bean.Spray;
 import com.dwayne.monitor.enums.ConnectMode;
+import com.dwayne.monitor.mqtt.MqttEvent;
 import com.dwayne.monitor.view.model.HunterModelView;
 import com.github.mikephil.charting.data.Entry;
 import com.github.onlynight.waveview.WaveView;
@@ -57,13 +59,17 @@ import com.dwayne.monitor.util.LogUtil;
 import com.dwayne.monitor.view.map.GPSView;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import de.greenrobot.event.EventBus;
+
+
 
 public class HunterActivity extends BaseActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, GPSView.OnGPSViewClickListener {
 
@@ -483,7 +489,6 @@ public class HunterActivity extends BaseActivity implements View.OnClickListener
 
 
     public void onEvent(@NonNull final PublishEvent event) {
-
         if ("/status".equals(event.name)) {
             Log.i(TAG, event.msg);
             Status status = new Gson().fromJson(event.msg, Status.class);
@@ -498,9 +503,28 @@ public class HunterActivity extends BaseActivity implements View.OnClickListener
             message.obj = battery;
             handler.sendMessage(message);
             Log.i(TAG, event.msg);
-        } else if ("/control".equals(event.name)) {
+        } else if ("/mypath".equals(event.name)) {
+            Spray spray = new Gson().fromJson(event.msg, Spray.class);
+            Message message = new Message();
+            message.what = 2;
+            message.obj = spray.getDuc_array();
+            handler.sendMessage(message);
+            Log.i(TAG, event.msg);
+        }else if ("/control".equals(event.name)) {
+            Log.i(TAG, event.msg);
+        } else if ("/pwm_control".equals(event.name)) {
+            Spray spray = new Gson().fromJson(event.msg, Spray.class);
+            Message message = new Message();
+            message.what = 2;
+            message.obj = spray.getDuc_array();
+            handler.sendMessage(message);
             Log.i(TAG, event.msg);
         }
+    }
+
+    @Subscribe
+    public void onMessageEvent(MqttEvent mqttEvent){
+        Log.d(TAG,"MQTT RECEIVE====>"+mqttEvent.getTopic()+":\t"+mqttEvent.getMsg());
     }
 
 
@@ -512,10 +536,26 @@ public class HunterActivity extends BaseActivity implements View.OnClickListener
 
     @Override
     protected void onDestroy() {
-        if (((RCApplication) getApplication()).isConn()) {
-            rosBridgeClient.disconnect();
-        }
         super.onDestroy();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (rosBridgeClient != null && connectMode.equals(ConnectMode.LANMODE)) {
+            rosBridgeClient.disconnect();
+            rosBridgeClient = null;
+        }
+        if (mqttAndroidClient != null && connectMode.equals(ConnectMode.REMOTEMODE)) {
+            try {
+                mqttAndroidClient.unsubscribe(new String[]{"Hunter/status", "/Hunter/battery", "/Hunter/spray"});
+                mqttAndroidClient = null;
+            } catch (MqttException e) {
+                e.printStackTrace();
+                Log.d(TAG, "取消订阅失败");
+            }
+        }
+        super.onStop();
     }
 
     public void showPoiDetail(String locTitle, String locInfo) {
