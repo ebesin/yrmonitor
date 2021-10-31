@@ -32,6 +32,7 @@ import android.widget.Toast;
 import com.dadac.testrosbridge.RCApplication;
 import com.dwayne.monitor.bean.Spray;
 import com.dwayne.monitor.enums.ConnectMode;
+import com.dwayne.monitor.mqtt.MqttClient;
 import com.dwayne.monitor.mqtt.MqttEvent;
 import com.dwayne.monitor.view.model.HunterModelView;
 import com.github.mikephil.charting.data.Entry;
@@ -219,7 +220,12 @@ public class HunterActivity extends BaseActivity implements View.OnClickListener
     private void initView(Bundle savedInstanceState) {
         Bundle bundle = getIntent().getExtras();
         connectMode = (ConnectMode) Objects.requireNonNull(bundle).getSerializable("connect_mode");
-        rosBridgeClient = ((RCApplication) getApplication()).getRosClient();
+        if(connectMode.equals(ConnectMode.LANMODE)) {
+            rosBridgeClient = ((RCApplication) getApplication()).getRosClient();
+        }
+        if(connectMode.equals(ConnectMode.REMOTEMODE)){
+            mqttAndroidClient = MqttClient.getInstance(this).getmMqttClient();
+        }
 
         largeImageView = findViewById(R.id.largeImage);
         try {
@@ -548,7 +554,7 @@ public class HunterActivity extends BaseActivity implements View.OnClickListener
         }
         if (mqttAndroidClient != null && connectMode.equals(ConnectMode.REMOTEMODE)) {
             try {
-                mqttAndroidClient.unsubscribe(new String[]{"Hunter/status", "/Hunter/battery", "/Hunter/spray"});
+                mqttAndroidClient.unsubscribe(new String[]{"/Hunter/status", "/Hunter/battery", "/Hunter/spray"});
                 mqttAndroidClient = null;
             } catch (MqttException e) {
                 e.printStackTrace();

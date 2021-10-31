@@ -96,8 +96,6 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
                 }
             }
         };
-
-
         initView();
         setListener();
     }
@@ -114,6 +112,7 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
 
     private void SendDataToRos(String topic, String data) {
         String msg1 = "{ \"op\": \"publish\", \"topic\": \"/" + topic + "\", \"msg\": " + data +"}";
+        Log.d("SendData:",msg1);
         //        String msg2 = "{\"op\":\"publish\",\"topic\":\"/cmd_vel\",\"msg\":{\"linear\":{\"x\":" + 0 + ",\"y\":" +
         //                0 + ",\"z\":0},\"angular\":{\"x\":0,\"y\":0,\"z\":" + 0.5 + "}}}";
         client.send(msg1);

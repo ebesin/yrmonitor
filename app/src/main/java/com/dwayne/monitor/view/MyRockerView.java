@@ -25,7 +25,7 @@ public class MyRockerView extends View {
 
     private static final String TAG = "RockerView";
 
-    private static final int DEFAULT_SIZE = 600;
+    private static final int DEFAULT_SIZE = 1000;
     private static final float DEFAULT_ROCKER_SCALE = 0.5f;//默认半径为背景的1/2
 
     private Paint mAreaBackgroundPaint;
