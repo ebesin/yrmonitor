@@ -542,12 +542,6 @@ public class HunterActivity extends BaseActivity implements View.OnClickListener
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
         if (rosBridgeClient != null && connectMode.equals(ConnectMode.LANMODE)) {
             rosBridgeClient.disconnect();
             rosBridgeClient = null;
@@ -561,6 +555,11 @@ public class HunterActivity extends BaseActivity implements View.OnClickListener
                 Log.d(TAG, "取消订阅失败");
             }
         }
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onStop() {
         super.onStop();
     }
 

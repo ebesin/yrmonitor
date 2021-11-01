@@ -246,7 +246,7 @@ public class MainActivity extends BaseActivity {
                 ex.printStackTrace();
                 ((RCApplication) getApplication()).setConn(false);
                 showTip("连接失败");
-                Log.d(TAG, "ROS communication error");
+                Log.i(TAG, "Message:"+ex.getMessage()+"\n"+"CauseBy"+ex.getCause());
             }
         });
     }

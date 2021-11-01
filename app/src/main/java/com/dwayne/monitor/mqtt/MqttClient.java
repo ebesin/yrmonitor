@@ -13,8 +13,6 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.greenrobot.eventbus.EventBus;
 
-import java.util.Arrays;
-
 public class MqttClient {
     private static MqttClient instance;
     private Context context;

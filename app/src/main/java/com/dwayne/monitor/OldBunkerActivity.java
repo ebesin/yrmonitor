@@ -1462,24 +1462,23 @@ public class OldBunkerActivity extends BaseActivity implements GPSView.OnGPSView
     @Override
     protected void onStop() {
         super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
         if (rosBridgeClient != null && connectMode.equals(ConnectMode.LANMODE)) {
             rosBridgeClient.disconnect();
             rosBridgeClient = null;
         }
         if (mqttAndroidClient != null && connectMode.equals(ConnectMode.REMOTEMODE)) {
             try {
-                mqttAndroidClient.unsubscribe(new String[]{"OldBunker/status", "/OldBunker/battery", "/OldBunker/spray"});
+                mqttAndroidClient.unsubscribe(new String[]{"/Hunter/status", "/Hunter/battery", "/Hunter/spray"});
                 mqttAndroidClient = null;
             } catch (MqttException e) {
                 e.printStackTrace();
                 Log.d(TAG, "取消订阅失败");
             }
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
         //在activity执行onDestroy时执行mMapView.onDestroy()，销毁地图
         mMapView.onDestroy();
         mFirstLocation = true;
@@ -1495,6 +1494,7 @@ public class OldBunkerActivity extends BaseActivity implements GPSView.OnGPSView
         if (mLocMarker != null) {
             mLocMarker.destroy();
         }
+        super.onDestroy();
     }
 
 
