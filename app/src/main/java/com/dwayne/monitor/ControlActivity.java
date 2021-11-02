@@ -50,6 +50,14 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
     private float linearValue;
     private float angularValue;
 
+    private final Twist twist = new Twist(new Linear(0), new Angular(0));
+    /**
+     * 发送线程是否应该终止
+     */
+    boolean isRunning = true;
+    Thread send_thread;
+    int at_center_times = 0;
+
 
     @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
@@ -77,16 +85,6 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
                     case 0:
                         current_speed.setText(String.format("%.3f", linearValue));
                         current_angle.setText(String.format("%.3f", angularValue));
-                        final Linear linear = new Linear(linearValue);
-                        final Angular angular = new Angular(Math.PI*(angularValue/180));
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if(((RCApplication) getApplication()).isConn()) {
-                                    SendDataToRos("cmd_vel", new Gson().toJson(new Twist(linear, angular)));
-                                }
-                            }
-                        }).start();
                         break;
                     case 1:
 //                        current_distance.setText(String.valueOf(speedLevel*Math.sin(current_angle)));
@@ -100,6 +98,14 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
         };
         initView();
         setListener();
+        setThread();
+        send_thread.start();
+    }
+
+    @Override
+    protected void onDestroy() {
+        isRunning = false;
+        super.onDestroy();
     }
 
     private void initView() {
@@ -113,12 +119,43 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
     }
 
     private void SendDataToRos(String topic, String data) {
-        String msg1 = "{ \"op\": \"publish\", \"topic\": \"/" + topic + "\", \"msg\": " + data +"}";
-        Log.d("SendData:",msg1);
+        String msg1 = "{ \"op\": \"publish\", \"topic\": \"/" + topic + "\", \"msg\": " + data + "}";
+        Log.d("SendData:", msg1);
         //        String msg2 = "{\"op\":\"publish\",\"topic\":\"/cmd_vel\",\"msg\":{\"linear\":{\"x\":" + 0 + ",\"y\":" +
         //                0 + ",\"z\":0},\"angular\":{\"x\":0,\"y\":0,\"z\":" + 0.5 + "}}}";
         client.send(msg1);
     }
+
+
+    public void setThread() {
+        send_thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (isRunning) {
+                    //如果左右遥感都在原点，计数值+1
+                    if (iscenter_left == 0 && iscenter_right == 0) {
+                        at_center_times++;
+                        //如果大于10次则不发送
+                        if (at_center_times > 10) {
+                            continue;
+                        }
+                    }
+                    //否则计数值清零
+                    else {
+                        at_center_times = 0;
+                    }
+                    SendDataToRos("cmd_vel", new Gson().toJson(twist));
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        send_thread.setName("send_thread");
+    }
+
 
     private void setListener() {
 
@@ -128,11 +165,12 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
         rockerView_left.setOnDistanceLevelListener(new MyRockerView.OnDistanceLevelListener() {
             @Override
             public void onDistanceLevel(int level) {
-                speedLevel_left = (float)level/10;
+                speedLevel_left = (float) level / 10;
                 linearValue = (float) (iscenter_left * speedLevel_left * Math.sin(current_angle_left));
                 Message message = new Message();
                 message.what = 0;
                 handler.sendMessage(message);
+                twist.setLinear(new Linear(linearValue));
                 Log.d("level", String.valueOf(speedLevel_left));
             }
         });
@@ -148,6 +186,7 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
                 Message message = new Message();
                 message.what = 0;
                 handler.sendMessage(message);
+                twist.setAngular(new Angular(Math.PI * (angularValue / 180)));
             }
         });
 
@@ -181,6 +220,7 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
                 Message message = new Message();
                 message.what = 0;
                 handler.sendMessage(message);
+                twist.setLinear(new Linear(linearValue));
             }
 
             @Override
@@ -218,6 +258,7 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
                 Message message = new Message();
                 message.what = 0;
                 handler.sendMessage(message);
+                twist.setAngular(new Angular(Math.PI * (angularValue / 180)));
             }
 
             @Override
@@ -243,6 +284,7 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
                 Message message = new Message();
                 message.what = 0;
                 handler.sendMessage(message);
+                twist.setLinear(new Linear(linearValue));
             }
 
             @Override
@@ -267,6 +309,7 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
                 Message message = new Message();
                 message.what = 0;
                 handler.sendMessage(message);
+                twist.setAngular(new Angular(Math.PI * (angularValue / 180)));
             }
 
             @Override
