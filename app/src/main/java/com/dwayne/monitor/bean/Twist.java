@@ -9,6 +9,9 @@ public class Twist {
         this.angular = angular;
     }
 
+    public Twist() {
+    }
+
     public void setAngular(Angular angular){
         this.angular = angular;
     }
@@ -20,5 +23,10 @@ public class Twist {
     }
     public Linear getLinear(){
         return this.linear;
+    }
+
+    public void setData(Linear linear, Angular angular){
+        this.linear = linear;
+        this.angular = angular;
     }
 }

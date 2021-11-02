@@ -78,11 +78,13 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
                         current_speed.setText(String.format("%.3f", linearValue));
                         current_angle.setText(String.format("%.3f", angularValue));
                         final Linear linear = new Linear(linearValue);
-                        final Angular angular = new Angular(angularValue);
+                        final Angular angular = new Angular(Math.PI*(angularValue/180));
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                SendDataToRos("cmd_vel",new Gson().toJson(new Twist(linear,angular)));
+                                if(((RCApplication) getApplication()).isConn()) {
+                                    SendDataToRos("cmd_vel", new Gson().toJson(new Twist(linear, angular)));
+                                }
                             }
                         }).start();
                         break;

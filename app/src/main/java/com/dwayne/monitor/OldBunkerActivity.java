@@ -277,9 +277,9 @@ public class OldBunkerActivity extends BaseActivity implements GPSView.OnGPSView
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+        setHandlers();
         initView(savedInstanceState);
         initData();
-        setHandlers();
         setListener();
         EventBus.getDefault().register(this);
     }
@@ -334,7 +334,7 @@ public class OldBunkerActivity extends BaseActivity implements GPSView.OnGPSView
     private void initView(Bundle savedInstanceState) {
         Bundle bundle = getIntent().getExtras();
         connectMode = (ConnectMode) Objects.requireNonNull(bundle).getSerializable("connect_mode");
-        if(connectMode.equals(ConnectMode.LANMODE)) {
+        if(Objects.requireNonNull(connectMode).equals(ConnectMode.LANMODE)) {
             rosBridgeClient = ((RCApplication) getApplication()).getRosClient();
         }
         if(connectMode.equals(ConnectMode.REMOTEMODE)){

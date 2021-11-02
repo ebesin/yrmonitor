@@ -164,9 +164,9 @@ public class HunterActivity extends BaseActivity implements View.OnClickListener
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map3);
+        setHandlers();
         initView(savedInstanceState);
         initData();
-        setHandlers();
         setListener();
         EventBus.getDefault().register(this);
     }

@@ -3,10 +3,10 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         release {
-            keyAlias 'mykeyalias'
-            keyPassword '12345678'
-            storeFile file('/home/user/user.jks')
-            storePassword '12345678'
+            keyAlias 'yrmonitor'
+            keyPassword 'ebesin'
+            storeFile file('C:\\User\\dwayne\\ad\\yrmonitor.jks')
+            storePassword 'ebesin'
         }
     }
 
@@ -17,7 +17,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 30
         versionCode 1
-        versionName "1.0.4"
+        versionName "1.0.6"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.release

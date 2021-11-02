@@ -112,6 +112,8 @@ public class MainActivity extends BaseActivity {
                         startActivity(new Intent(MainActivity.this, RosBridgeActivity.class));
                     }
                     break;
+                case 4:
+                    mView.dismissAllowingStateLoss();
             }
             return false;
         }
@@ -236,7 +238,14 @@ public class MainActivity extends BaseActivity {
 
             @Override
             public void onDisconnect(boolean normal, String reason, int code) {
-                showTip("断开连接");
+                Log.d("code",code+"");
+                if(code == 1000){
+                    showTip("连接已断开");
+                }
+                if(code == 1006){
+                    showTip("连接异常");
+                }
+                handler.sendEmptyMessage(4);
                 ((RCApplication) getApplication()).setConn(false);
                 Log.d(TAG, "ROS disconnect");
             }

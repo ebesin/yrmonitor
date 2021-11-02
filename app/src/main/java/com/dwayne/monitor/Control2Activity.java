@@ -136,8 +136,8 @@ public class Control2Activity extends BaseActivity implements View.OnClickListen
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         isRunning = false;
+        super.onDestroy();
     }
 
     private void initView() {

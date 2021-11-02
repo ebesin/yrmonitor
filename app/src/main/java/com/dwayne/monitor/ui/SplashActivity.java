@@ -53,23 +53,12 @@ public class SplashActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
-        initView();
     }
 
     private void initView() {
         context = this;
-        handler=new Handler(new Handler.Callback() {
-            @Override
-            public boolean handleMessage(@NonNull Message msg) {
-                switch (msg.what){
-                    case 1:
-                        ToastUtil.showToast(context, (String) msg.obj);
-                        mAnimator.end();
-                }
-                return false;
-            }
-        });
         mqttClient = MqttClient.getInstance(this);
+        initAnimator();
         mqttClient.setOnConnectListener(new MqttClient.OnConnectListener() {
             @Override
             public void OnConnectSuccess() {
@@ -82,6 +71,17 @@ public class SplashActivity extends BaseActivity {
                 message.what = 1;
                 message.obj = failMsg;
                 handler.sendMessage(message);
+            }
+        });
+
+        handler = new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(@NonNull Message msg) {
+                switch (msg.what) {
+                    case 1:
+                        ToastUtil.showToast(context, (String) msg.obj);
+                }
+                return false;
             }
         });
     }
@@ -124,7 +124,7 @@ public class SplashActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if(!hasOnResumeChecked){
+        if (!hasOnResumeChecked) {
             checkPermissions();
             hasOnResumeChecked = true;
         }
@@ -137,15 +137,13 @@ public class SplashActivity extends BaseActivity {
             if (permissions != null && permissions.length > 0) {
                 // 有未授予权限,动态申请
                 PermissionUtil.requestPermissions(permissions, this, REQ_CODE_PERMISSIONS);
-            } else {
-                // 没有需要重新授予权限,直接进入主页
-                initAnimator();
+            }else{
+                initView();
             }
-        } else {
-            initAnimator();
+        }else{
+            initView();
         }
     }
-
 
 
     /**
@@ -155,7 +153,7 @@ public class SplashActivity extends BaseActivity {
     protected void onStop() {
         super.onStop();
         if (mAnimator != null) {
-            if(mAnimator.isRunning()){
+            if (mAnimator.isRunning()) {
                 mAnimator.cancel();
             }
         }
@@ -164,7 +162,7 @@ public class SplashActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(mAnimator != null){
+        if (mAnimator != null) {
             mAnimator = null;
         }
     }
@@ -196,9 +194,9 @@ public class SplashActivity extends BaseActivity {
                 }
             }
             // 有未授予权限,重新申请
-            if(noGrantedPermissions.size() > 0){
+            if (noGrantedPermissions.size() > 0) {
                 checkPermissions();
-            }else{
+            } else {
                 showMapPage();
             }
 
