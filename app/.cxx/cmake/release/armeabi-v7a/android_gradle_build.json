@@ -1,13 +1,10 @@
 
 {
-	"buildFiles" : 
-	[
-		"D:/android_app/TestRosBridge-master/TestRosBridge-master/app/CMakeLists.txt"
-	],
+	"buildFiles" : [ "E:/Android_App/TestRosBridge-master/app/CMakeLists.txt" ],
 	"cFileExtensions" : [ "c" ],
 	"cleanCommands" : 
 	[
-		"D:\\enviroment\\Android\\platforms\\Sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\android_app\\TestRosBridge-master\\TestRosBridge-master\\app\\.cxx\\cmake\\release\\armeabi-v7a --target clean"
+		"C:\\Users\\dwayne\\AppData\\Local\\Android\\Sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build E:\\Android_App\\TestRosBridge-master\\app\\.cxx\\cmake\\release\\armeabi-v7a --target clean"
 	],
 	"libraries" : 
 	{
@@ -15,27 +12,27 @@
 		{
 			"abi" : "armeabi-v7a",
 			"artifactName" : "native-test",
-			"buildCommand" : "D:\\enviroment\\Android\\platforms\\Sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\android_app\\TestRosBridge-master\\TestRosBridge-master\\app\\.cxx\\cmake\\release\\armeabi-v7a --target native-test",
+			"buildCommand" : "C:\\Users\\dwayne\\AppData\\Local\\Android\\Sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build E:\\Android_App\\TestRosBridge-master\\app\\.cxx\\cmake\\release\\armeabi-v7a --target native-test",
 			"buildType" : "release",
 			"files" : 
 			[
 				
 				{
-					"flags" : "  --target=armv7-none-linux-androideabi21 --gcc-toolchain=D:/enviroment/Android/platforms/Sdk/ndk/20.1.5948944/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=D:/enviroment/Android/platforms/Sdk/ndk/20.1.5948944/toolchains/llvm/prebuilt/windows-x86_64/sysroot -Dnative_test_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -march=armv7-a -mthumb -Wa,--noexecstack -Wformat -Werror=format-security  -Oz -DNDEBUG  -fPIC      -c ",
-					"src" : "D:/android_app/TestRosBridge-master/TestRosBridge-master/app/src/main/jni/native-test.c",
-					"workingDirectory" : "D:/android_app/TestRosBridge-master/TestRosBridge-master/app/.cxx/cmake/release/armeabi-v7a"
+					"flags" : "  --target=armv7-none-linux-androideabi21 --gcc-toolchain=C:/Users/dwayne/AppData/Local/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/dwayne/AppData/Local/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot -Dnative_test_EXPORTS  -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -march=armv7-a -mthumb -Wformat -Werror=format-security  -Oz -DNDEBUG  -fPIC      -c ",
+					"src" : "E:/Android_App/TestRosBridge-master/app/src/main/jni/native-test.c",
+					"workingDirectory" : "E:/Android_App/TestRosBridge-master/app/.cxx/cmake/release/armeabi-v7a"
 				}
 			],
-			"output" : "D:/android_app/TestRosBridge-master/TestRosBridge-master/app/build/intermediates/cmake/release/obj/armeabi-v7a/libnative-test.so",
-			"toolchain" : "2645841609"
+			"output" : "E:/Android_App/TestRosBridge-master/app/build/intermediates/cmake/release/obj/armeabi-v7a/libnative-test.so",
+			"toolchain" : "1607724041"
 		}
 	},
 	"toolchains" : 
 	{
-		"2645841609" : 
+		"1607724041" : 
 		{
-			"cCompilerExecutable" : "D:/enviroment/Android/platforms/Sdk/ndk/20.1.5948944/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe",
-			"cppCompilerExecutable" : "D:/enviroment/Android/platforms/Sdk/ndk/20.1.5948944/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe"
+			"cCompilerExecutable" : "C:/Users/dwayne/AppData/Local/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe",
+			"cppCompilerExecutable" : "C:/Users/dwayne/AppData/Local/Android/Sdk/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/bin/clang++.exe"
 		}
 	}
 }

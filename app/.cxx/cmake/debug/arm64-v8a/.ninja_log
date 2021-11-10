@@ -1,3 +1,5 @@
 # ninja log v5
-1	3918	0	CMakeFiles/native-test.dir/src/main/jni/native-test.c.o	a3dcf2b7015062d6
-3919	6050	0	../../../../build/intermediates/cmake/debug/obj/arm64-v8a/libnative-test.so	e5347880d2a40d75
+0	52	0	CMakeFiles/native-test.dir/src/main/jni/native-test.c.o	ee7a00a9685467a4
+52	142	0	../../../../build/intermediates/cmake/debug/obj/arm64-v8a/libnative-test.so	684ba0940c903d57
+1	57	0	CMakeFiles/native-test.dir/src/main/jni/native-test.c.o	ee7a00a9685467a4
+57	143	0	../../../../build/intermediates/cmake/debug/obj/arm64-v8a/libnative-test.so	684ba0940c903d57

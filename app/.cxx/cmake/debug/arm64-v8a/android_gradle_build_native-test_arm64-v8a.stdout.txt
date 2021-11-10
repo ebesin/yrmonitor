@@ -1,1 +1,2 @@
-ninja: no work to do.
+[1/2] Building C object CMakeFiles/native-test.dir/src/main/jni/native-test.c.o
+[2/2] Linking C shared library ..\..\..\..\build\intermediates\cmake\debug\obj\arm64-v8a\libnative-test.so

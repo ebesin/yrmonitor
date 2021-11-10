@@ -1,5 +1,5 @@
 {
-  "ndkFolder": "D:\\enviroment\\Android\\platforms\\Sdk\\ndk\\20.1.5948944",
+  "ndkFolder": "C:\\Users\\dwayne\\AppData\\Local\\Android\\Sdk\\ndk-bundle",
   "messages": [
     {
       "level": "INFO",
@@ -7,7 +7,7 @@
     },
     {
       "level": "INFO",
-      "message": "ndk.dir in local.properties is D:\\enviroment\\Android\\platforms\\Sdk\\ndk\\20.1.5948944"
+      "message": "ndk.dir in local.properties is not set"
     },
     {
       "level": "INFO",
@@ -15,27 +15,15 @@
     },
     {
       "level": "INFO",
-      "message": "sdkFolder is D:\\enviroment\\Android\\platforms\\Sdk"
+      "message": "sdkFolder is C:\\Users\\dwayne\\AppData\\Local\\Android\\Sdk"
     },
     {
       "level": "INFO",
-      "message": "Considering D:\\enviroment\\Android\\platforms\\Sdk\\ndk\\20.1.5948944 by ndk.dir"
+      "message": "Considering C:\\Users\\dwayne\\AppData\\Local\\Android\\Sdk\\ndk-bundle in SDK ndk-bundle folder"
     },
     {
       "level": "INFO",
-      "message": "Considering D:\\enviroment\\Android\\platforms\\Sdk\\ndk-bundle in SDK ndk-bundle folder"
-    },
-    {
-      "level": "INFO",
-      "message": "Considering D:\\enviroment\\Android\\platforms\\Sdk\\ndk\\20.1.5948944 in SDK ndk folder"
-    },
-    {
-      "level": "INFO",
-      "message": "Considering D:\\enviroment\\Android\\platforms\\Sdk\\ndk\\22.1.7171670 in SDK ndk folder"
-    },
-    {
-      "level": "INFO",
-      "message": "Found requested ndk.dir (D:\\enviroment\\Android\\platforms\\Sdk\\ndk\\20.1.5948944) which has version 20.1.5948944"
+      "message": "No user requested version, choosing C:\\Users\\dwayne\\AppData\\Local\\Android\\Sdk\\ndk-bundle which is version 22.1.7171670"
     }
   ]
 }

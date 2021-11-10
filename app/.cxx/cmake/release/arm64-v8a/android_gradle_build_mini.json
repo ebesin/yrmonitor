@@ -1,16 +1,16 @@
 {
   "buildFiles": [
-    "D:\\android_app\\TestRosBridge-master\\TestRosBridge-master\\app\\CMakeLists.txt"
+    "E:\\Android_App\\TestRosBridge-master\\app\\CMakeLists.txt"
   ],
   "cleanCommands": [
-    "D:\\enviroment\\Android\\platforms\\Sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\android_app\\TestRosBridge-master\\TestRosBridge-master\\app\\.cxx\\cmake\\release\\arm64-v8a --target clean"
+    "C:\\Users\\dwayne\\AppData\\Local\\Android\\Sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build E:\\Android_App\\TestRosBridge-master\\app\\.cxx\\cmake\\release\\arm64-v8a --target clean"
   ],
   "libraries": {
     "native-test-Release-arm64-v8a": {
       "artifactName": "native-test",
-      "buildCommand": "D:\\enviroment\\Android\\platforms\\Sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build D:\\android_app\\TestRosBridge-master\\TestRosBridge-master\\app\\.cxx\\cmake\\release\\arm64-v8a --target native-test",
+      "buildCommand": "C:\\Users\\dwayne\\AppData\\Local\\Android\\Sdk\\cmake\\3.6.4111459\\bin\\cmake.exe --build E:\\Android_App\\TestRosBridge-master\\app\\.cxx\\cmake\\release\\arm64-v8a --target native-test",
       "abi": "arm64-v8a",
-      "output": "D:\\android_app\\TestRosBridge-master\\TestRosBridge-master\\app\\build\\intermediates\\cmake\\release\\obj\\arm64-v8a\\libnative-test.so"
+      "output": "E:\\Android_App\\TestRosBridge-master\\app\\build\\intermediates\\cmake\\release\\obj\\arm64-v8a\\libnative-test.so"
     }
   }
 }

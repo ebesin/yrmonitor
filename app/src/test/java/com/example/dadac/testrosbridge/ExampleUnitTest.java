@@ -134,4 +134,6 @@ public class ExampleUnitTest {
     public void testEnum(){
         System.out.println(ConnectMode.REMOTEMODE.getMode());
     }
+
+
 }

@@ -33,6 +33,7 @@ import com.dwayne.monitor.dao.PortDao;
 import com.dwayne.monitor.enums.ConnectMode;
 import com.dwayne.monitor.enums.DeviceType;
 import com.dwayne.monitor.mqtt.MqttClient;
+import com.dwayne.monitor.mqtt.MqttEvent;
 import com.jilk.ros.ROSClient;
 import com.jilk.ros.rosbridge.ROSBridgeClient;
 import com.dwayne.monitor.adapter.DeviceAdapter;
@@ -44,6 +45,8 @@ import com.dwayne.monitor.ui.BaseActivity;
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttSecurityException;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -124,6 +127,7 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_layout);
         initView();
+        EventBus.getDefault().register(this);
     }
 
     private void initView() {
@@ -258,6 +262,11 @@ public class MainActivity extends BaseActivity {
                 Log.i(TAG, "Message:"+ex.getMessage()+"\n"+"CauseBy"+ex.getCause());
             }
         });
+    }
+
+    @Subscribe
+    public void onEvent(MqttEvent mqttEvent){
+        Log.d(TAG,"receive mqtt Data====>topic: "+mqttEvent.getTopic());
     }
 
     private void subscribeTopic(Device device) {

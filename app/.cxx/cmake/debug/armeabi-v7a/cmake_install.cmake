@@ -1,4 +1,4 @@
-# Install script for directory: D:/android_app/TestRosBridge-master/TestRosBridge-master/app
+# Install script for directory: E:/Android_App/TestRosBridge-master/app
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -40,5 +40,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "D:/android_app/TestRosBridge-master/TestRosBridge-master/app/.cxx/cmake/debug/armeabi-v7a/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "E:/Android_App/TestRosBridge-master/app/.cxx/cmake/debug/armeabi-v7a/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

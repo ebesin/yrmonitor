@@ -144,7 +144,9 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
                     else {
                         at_center_times = 0;
                     }
-                    SendDataToRos("cmd_vel", new Gson().toJson(twist));
+                    if(((RCApplication) getApplication()).isConn()) {
+                        SendDataToRos("cmd_vel", new Gson().toJson(twist));
+                    }
                     try {
                         Thread.sleep(50);
                     } catch (InterruptedException e) {

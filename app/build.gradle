@@ -15,7 +15,7 @@ android {
     defaultConfig {
         applicationId "com.jiyouliang.fmap"
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode 1
         versionName "1.0.7"
         vectorDrawables.useSupportLibrary = true
@@ -26,12 +26,13 @@ android {
                 cppFlags ""
             }
         }
+
     }
     buildTypes {
         release {
             buildConfigField "boolean", "LOG_DEBUG", "false" //不显示log
-            minifyEnabled true
-            shrinkResources true
+            minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
             multiDexEnabled = true
@@ -47,8 +48,8 @@ android {
             path "CMakeLists.txt"
         }
     }
-
 }
+
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')

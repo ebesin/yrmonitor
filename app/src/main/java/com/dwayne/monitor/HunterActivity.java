@@ -70,8 +70,6 @@ import java.util.List;
 import java.util.Objects;
 
 
-
-
 public class HunterActivity extends BaseActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, GPSView.OnGPSViewClickListener {
 
     private static final String TAG = "hunterActivity";
@@ -171,7 +169,7 @@ public class HunterActivity extends BaseActivity implements View.OnClickListener
         EventBus.getDefault().register(this);
     }
 
-    void setHandlers(){
+    void setHandlers() {
         handler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(@NonNull Message msg) {
@@ -220,10 +218,10 @@ public class HunterActivity extends BaseActivity implements View.OnClickListener
     private void initView(Bundle savedInstanceState) {
         Bundle bundle = getIntent().getExtras();
         connectMode = (ConnectMode) Objects.requireNonNull(bundle).getSerializable("connect_mode");
-        if(connectMode.equals(ConnectMode.LANMODE)) {
+        if (connectMode.equals(ConnectMode.LANMODE)) {
             rosBridgeClient = ((RCApplication) getApplication()).getRosClient();
         }
-        if(connectMode.equals(ConnectMode.REMOTEMODE)){
+        if (connectMode.equals(ConnectMode.REMOTEMODE)) {
             mqttAndroidClient = MqttClient.getInstance(this).getmMqttClient();
         }
 
@@ -288,7 +286,7 @@ public class HunterActivity extends BaseActivity implements View.OnClickListener
                 hunterModelView.changeFromSpeed(ints);
             }
         });
-        if(connectMode.equals(ConnectMode.TESTMODE)) {
+        if (connectMode.equals(ConnectMode.TESTMODE)) {
             setSpeed();
         }
 
@@ -493,8 +491,8 @@ public class HunterActivity extends BaseActivity implements View.OnClickListener
         rosBridgeClient.send(msg1);
     }
 
-
-    public void onEvent(@NonNull final PublishEvent event) {
+    @Subscribe
+    public void onWebsocketEvent(@NonNull final PublishEvent event) {
         if ("/status".equals(event.name)) {
             Log.i(TAG, event.msg);
             Status status = new Gson().fromJson(event.msg, Status.class);
@@ -516,7 +514,7 @@ public class HunterActivity extends BaseActivity implements View.OnClickListener
             message.obj = spray.getDuc_array();
             handler.sendMessage(message);
             Log.i(TAG, event.msg);
-        }else if ("/control".equals(event.name)) {
+        } else if ("/control".equals(event.name)) {
             Log.i(TAG, event.msg);
         } else if ("/pwm_control".equals(event.name)) {
             Spray spray = new Gson().fromJson(event.msg, Spray.class);
@@ -528,9 +526,29 @@ public class HunterActivity extends BaseActivity implements View.OnClickListener
         }
     }
 
+
     @Subscribe
-    public void onMessageEvent(MqttEvent mqttEvent){
-        Log.d(TAG,"MQTT RECEIVE====>"+mqttEvent.getTopic()+":\t"+mqttEvent.getMsg());
+    public void onMqttMessageEvent(MqttEvent mqttEvent) {
+        Log.d(TAG, "MQTT RECEIVE====>" + mqttEvent.getTopic() + ":\t" + mqttEvent.getMsg());
+        if(mqttEvent.getTopic().equals("/Hunter/status")){
+            Status status = new Gson().fromJson(mqttEvent.getMsg(), Status.class);
+            Message message = new Message();
+            message.what = 3;
+            message.obj = status;
+            handler.sendMessage(message);
+        }else if(mqttEvent.getTopic().equals("/Hunter/battery")){
+            Battery battery = new Gson().fromJson(mqttEvent.getMsg(), Battery.class);
+            Message message = new Message();
+            message.what = 4;
+            message.obj = battery;
+            handler.sendMessage(message);
+        }else if(mqttEvent.getTopic().equals("/Hunter/spray")){
+            Spray spray = new Gson().fromJson(mqttEvent.getMsg(), Spray.class);
+            Message message = new Message();
+            message.what = 2;
+            message.obj = spray.getDuc_array();
+            handler.sendMessage(message);
+        }
     }
 
 
@@ -548,13 +566,16 @@ public class HunterActivity extends BaseActivity implements View.OnClickListener
         }
         if (mqttAndroidClient != null && connectMode.equals(ConnectMode.REMOTEMODE)) {
             try {
+                Log.d(TAG,"shutdown");
                 mqttAndroidClient.unsubscribe(new String[]{"/Hunter/status", "/Hunter/battery", "/Hunter/spray"});
+//                mqttAndroidClient.unsubscribe(new String[]{});
                 mqttAndroidClient = null;
             } catch (MqttException e) {
                 e.printStackTrace();
                 Log.d(TAG, "取消订阅失败");
             }
         }
+        EventBus.getDefault().unregister(this);
         super.onDestroy();
     }
 
