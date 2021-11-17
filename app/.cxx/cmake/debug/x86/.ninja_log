@@ -1,5 +1,3 @@
 # ninja log v5
-0	54	0	CMakeFiles/native-test.dir/src/main/jni/native-test.c.o	2d6154d7346463f5
-54	137	0	../../../../build/intermediates/cmake/debug/obj/x86/libnative-test.so	1bcb68eb1ed13aac
-1	51	0	CMakeFiles/native-test.dir/src/main/jni/native-test.c.o	2d6154d7346463f5
-51	128	0	../../../../build/intermediates/cmake/debug/obj/x86/libnative-test.so	1bcb68eb1ed13aac
+1	50	0	CMakeFiles/native-test.dir/src/main/jni/native-test.c.o	2d6154d7346463f5
+50	132	0	../../../../build/intermediates/cmake/debug/obj/x86/libnative-test.so	1bcb68eb1ed13aac

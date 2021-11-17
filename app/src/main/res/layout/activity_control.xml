@@ -66,8 +66,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/current_direction"
-        android:textSize="@dimen/control_textsize"
         android:textColor="@color/white"
+        android:textSize="@dimen/control_textsize"
         app:layout_constraintStart_toStartOf="@+id/guideline2"
         app:layout_constraintTop_toTopOf="@+id/guideline7" />
 
@@ -76,21 +76,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:textSize="@dimen/control_textsize"
         android:textColor="@color/white"
+        android:textSize="@dimen/control_textsize"
         app:layout_constraintStart_toEndOf="@+id/textView2"
         app:layout_constraintTop_toTopOf="@+id/guideline7" />
-
 
 
     <TextView
         android:id="@+id/textView6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/current_speed"
-        android:textSize="@dimen/control_textsize"
         android:layout_marginTop="8dp"
+        android:text="@string/current_speed"
         android:textColor="@color/white"
+        android:textSize="@dimen/control_textsize"
         app:layout_constraintStart_toStartOf="@+id/guideline2"
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
@@ -99,8 +98,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:textSize="@dimen/control_textsize"
         android:textColor="@color/white"
+        android:textSize="@dimen/control_textsize"
         app:layout_constraintStart_toEndOf="@+id/textView6"
         app:layout_constraintTop_toTopOf="@+id/textView6" />
 
@@ -111,8 +110,8 @@
         android:text="@string/current_direction"
         android:textColor="@color/white"
         android:textSize="@dimen/control_textsize"
-        app:layout_constraintTop_toTopOf="@id/guideline7"
-        app:layout_constraintEnd_toStartOf="@id/guideline3"/>
+        app:layout_constraintEnd_toStartOf="@id/guideline3"
+        app:layout_constraintTop_toTopOf="@id/guideline7" />
 
     <TextView
         android:id="@+id/current_direction_right"
@@ -121,19 +120,19 @@
         android:layout_marginEnd="8dp"
         android:textColor="@color/white"
         android:textSize="@dimen/control_textsize"
-        app:layout_constraintTop_toTopOf="@id/textview7"
-        app:layout_constraintEnd_toStartOf="@id/textview7"/>
+        app:layout_constraintEnd_toStartOf="@id/textview7"
+        app:layout_constraintTop_toTopOf="@id/textview7" />
 
     <TextView
         android:id="@+id/textview8"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:text="@string/current_angle"
         android:textColor="@color/white"
-        android:layout_marginTop="8dp"
         android:textSize="@dimen/control_textsize"
-        app:layout_constraintTop_toBottomOf="@id/textview7"
-        app:layout_constraintEnd_toStartOf="@id/guideline3"/>
+        app:layout_constraintEnd_toStartOf="@id/guideline3"
+        app:layout_constraintTop_toBottomOf="@id/textview7" />
 
     <TextView
         android:id="@+id/current_angle"
@@ -142,6 +141,58 @@
         android:layout_marginEnd="8dp"
         android:textColor="@color/white"
         android:textSize="@dimen/control_textsize"
-        app:layout_constraintTop_toTopOf="@id/textview8"
-        app:layout_constraintEnd_toStartOf="@id/textview8"/>
+        app:layout_constraintEnd_toStartOf="@id/textview8"
+        app:layout_constraintTop_toTopOf="@id/textview8" />
+
+    <Switch
+        android:id="@+id/send_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:shadowColor="@color/white"
+        android:text="开关"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toBottomOf="@+id/send_switch">
+
+
+        <Switch
+            android:id="@+id/keep_move_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="恒速行走"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.jaygoo.widget.VerticalRangeSeekBar
+            android:id="@+id/speed_seekbar"
+            android:layout_width="wrap_content"
+            android:layout_height="200dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="32dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/keep_move_switch"
+            app:rsb_indicator_height="40dp"
+            app:rsb_indicator_radius="5dp"
+            app:rsb_indicator_show_mode="showWhenTouch"
+            app:rsb_mode="single"
+            app:rsb_progress_height="10dp"
+            app:rsb_thumb_height="30dp"
+            app:rsb_thumb_width="30dp"
+            app:rsb_tick_mark_mode="number" />
+
+    </android.support.constraint.ConstraintLayout>
+
 </android.support.constraint.ConstraintLayout>

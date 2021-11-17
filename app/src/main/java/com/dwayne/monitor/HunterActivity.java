@@ -217,7 +217,7 @@ public class HunterActivity extends BaseActivity implements View.OnClickListener
 
     private void initView(Bundle savedInstanceState) {
         Bundle bundle = getIntent().getExtras();
-        connectMode = (ConnectMode) Objects.requireNonNull(bundle).getSerializable("connect_mode");
+        connectMode = (ConnectMode) Objects.requireNonNull(bundle.getSerializable("connect_mode"));
         if (connectMode.equals(ConnectMode.LANMODE)) {
             rosBridgeClient = ((RCApplication) getApplication()).getRosClient();
         }
@@ -781,6 +781,9 @@ public class HunterActivity extends BaseActivity implements View.OnClickListener
             status_dialog.show();
         } else if (v == remote_control_cardView) {
             Intent intent = new Intent(this, ControlActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("connect_mode", connectMode);
+            intent.putExtras(bundle);
             startActivity(intent);
         }
     }

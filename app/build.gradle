@@ -17,7 +17,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 31
         versionCode 1
-        versionName "1.0.7"
+        versionName "1.0.8"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.release
@@ -96,5 +96,7 @@ dependencies {
     implementation 'org.eclipse.paho:org.eclipse.paho.android.service:1.1.1'
 
     implementation 'org.greenrobot:eventbus:3.1.1'
+
+    implementation 'com.github.Jay-Goo:RangeSeekBar:v3.0.0'
 
 }
