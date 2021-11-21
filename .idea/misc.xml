@@ -4,6 +4,9 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Android_App/TestRosBridge-master/app/src/main/res/layout/activity_control.xml" value="0.2" />
+        <entry key="..\:/Android_App/TestRosBridge-master/app/src/main/res/layout/activity_map3.xml" value="0.2082236842105263" />
+        <entry key="..\:/Android_App/TestRosBridge-master/app/src/main/res/layout/botton_sheet2.xml" value="0.2082236842105263" />
+        <entry key="..\:/Android_App/TestRosBridge-master/app/src/main/res/layout/view_supend_container3.xml" value="0.2082236842105263" />
       </map>
     </option>
   </component>

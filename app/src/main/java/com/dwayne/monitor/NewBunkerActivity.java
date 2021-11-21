@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -29,6 +30,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dadac.testrosbridge.RCApplication;
+import com.dwayne.monitor.bean.Spray;
+import com.dwayne.monitor.enums.ConnectMode;
+import com.dwayne.monitor.mqtt.MqttClient;
+import com.dwayne.monitor.mqtt.MqttEvent;
+import com.dwayne.monitor.view.model.HunterModelView;
+import com.dwayne.monitor.view.model.NewBunkerModelView;
+import com.github.mikephil.charting.data.Entry;
+import com.github.onlynight.waveview.WaveView;
+import com.google.gson.Gson;
+import com.jilk.ros.ROSClient;
+import com.jilk.ros.rosbridge.ROSBridgeClient;
+import com.jilk.ros.rosbridge.implementation.PublishEvent;
 import com.dwayne.monitor.ViewModel.BatteryViewModel;
 import com.dwayne.monitor.ViewModel.HenterSpraySpeedViewModel;
 import com.dwayne.monitor.ViewModel.GPSData;
@@ -46,23 +59,21 @@ import com.dwayne.monitor.ui.BaseActivity;
 import com.dwayne.monitor.util.DeviceUtils;
 import com.dwayne.monitor.util.LogUtil;
 import com.dwayne.monitor.view.map.GPSView;
-import com.dwayne.monitor.view.model.NewBunkerModelView;
-import com.github.mikephil.charting.data.Entry;
-import com.github.onlynight.waveview.WaveView;
-import com.google.gson.Gson;
-import com.jilk.ros.ROSClient;
-import com.jilk.ros.rosbridge.ROSBridgeClient;
-import com.jilk.ros.rosbridge.implementation.PublishEvent;
+
+import org.eclipse.paho.android.service.MqttAndroidClient;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-import de.greenrobot.event.EventBus;
 
 public class NewBunkerActivity extends BaseActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, GPSView.OnGPSViewClickListener {
 
-    private static final String TAG = "MapActivity3";
+    private static final String TAG = "hunterActivity";
     private View mBottomSheet;
     private BottomSheetBehavior<View> mBehavior;
     private boolean slideDown;//向下滑动
@@ -72,96 +83,56 @@ public class NewBunkerActivity extends BaseActivity implements View.OnClickListe
     private int mScreenWidth;
     private View mPoiColseView;
     private GPSView mGpsView;
+
     private TextView mTvLocTitle;
     private TextView mTvLocation;
 
     private TextView slideUpInfo;
 
-    @SuppressLint("HandlerLeak")
-    Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case 1:
-                    gpsDataViewModel.setData((GPSData) msg.obj);
-                    break;
-                case 2:
-                    fanSpeedViewModel2.setSpeedValue((int[]) msg.obj);
-                    break;
-                case 3:
-                    statusViewModel.setValue((Status) msg.obj);
-                    break;
-                case 4:
-                    batteryViewModel.setValue((Battery) msg.obj);
-                    break;
-            }
-        }
-    };
 
-    @SuppressLint("HandlerLeak")
-    Handler viewhandler = new Handler() {
-        @SuppressLint("DefaultLocale")
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case 1:
-                    Status status = (Status) msg.obj;
-                    speed_data.setText(String.format("%.2fm/s", status.getSpeed()));
-                    front_wheel_angle_data.setText(String.format("%.2f°", status.getFront_wheel_angle()));
-                    yaw_angle_data.setText(String.format("%.2f°", status.getYaw_angle()));
-                    lat_data.setText(String.format("%.5f", status.getLat()));
-                    lng_data.setText(String.format("%.5f", status.getLng()));
-                    break;
-                case 2:
-                    Battery battery = (Battery) msg.obj;
-                    charge_data.setText(String.format("%s%%", String.valueOf(battery.getPower())));
-                    voltage_data.setText(String.format("%sV", String.valueOf(battery.getVoltage())));
-                    charge_waveView.setWaveHeightPercent((float) battery.getPower() / 100);
-                    charge_card_data.setText(String.format("%s%%", String.valueOf(battery.getPower())));
-            }
-        }
-    };
+    Handler handler;
+    Handler viewhandler;
 
-    //地图
-    LargeImageView largeImageView;
-
+    CardView charge_cardview;
+    CardView setArgs_cardView;
+    CardView device_state_cardView;
+    CardView remote_control_cardView;
     Button determine;
     //用来保存数据
     List<Entry> list = new ArrayList<>();
 
+    //电池波纹
+    WaveView charge_waveView;
+    WaveView spray_waveView;
 
-    //一些暂时没用的按钮
-    Button emergency_stop;
-    Button back_to_home;
-    TextView charge_card_data;
+    //开关
+    Switch aSwitch;
 
     //modelview
     private NewBunkerModelView newBunkerModelView;
 
     Gson gson = new Gson();
 
+    //地图
+    LargeImageView largeImageView;
+
     /**
-     * 数据模型
+     * 数据
      */
     private GPSDataViewModel gpsDataViewModel;
     private HenterSpraySpeedViewModel fanSpeedViewModel2;
     private StatusViewModel statusViewModel;
     private BatteryViewModel batteryViewModel;
 
-    //卡片式控件
-    CardView charge_cardview;
-    CardView setArgs_cardView;
-    CardView device_state_cardView;
-    CardView remote_control_cardView;
-
-    //电池波纹
-    WaveView charge_waveView;
-    WaveView spray_waveView;
-
-    //点击是弹出的dialog
+    //dialog
     AlertDialog charge_dialog;
     AlertDialog args_dialog;
     AlertDialog status_dialog;
+
+
+    Button emergency_stop;
+    Button back_to_home;
+    TextView charge_card_data;
 
     //status dialog控件
     TextView speed_data;
@@ -179,36 +150,82 @@ public class NewBunkerActivity extends BaseActivity implements View.OnClickListe
     EditText speed_data_inputview;
     EditText angle_data_inputview;
 
-    //开关
-    Switch aSwitch;
+    ConnectMode connectMode;
+
 
     //ros通信
-    ROSBridgeClient client;
-    String ip = "192.168.1.103";   //ros的 IP
-    String port = "9090";
+    ROSBridgeClient rosBridgeClient = null;
+    MqttAndroidClient mqttAndroidClient = null;
+
     boolean isConn = false;
-    Runnable connectRunnable = new Runnable() {
-        @Override
-        public void run() {
-            connect(ip, port);
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map4);
-        EventBus.getDefault().register(this);
+        setHandlers();
         initView(savedInstanceState);
         initData();
         setListener();
+        EventBus.getDefault().register(this);
+    }
+
+    void setHandlers() {
+        handler = new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(@NonNull Message msg) {
+                switch (msg.what) {
+                    case 1:
+                        gpsDataViewModel.setData((GPSData) msg.obj);
+                        break;
+                    case 2:
+                        fanSpeedViewModel2.setSpeedValue((int[]) msg.obj);
+                        break;
+                    case 3:
+                        statusViewModel.setValue((Status) msg.obj);
+                        break;
+                    case 4:
+                        batteryViewModel.setValue((Battery) msg.obj);
+                        break;
+                }
+                return false;
+            }
+        });
+
+        viewhandler = new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(@NonNull Message msg) {
+                switch (msg.what) {
+                    case 1:
+                        Status status = (Status) msg.obj;
+                        speed_data.setText(String.format("%.2fm/s", status.getSpeed()));
+                        front_wheel_angle_data.setText(String.format("%.2f°", status.getFront_wheel_angle()));
+                        yaw_angle_data.setText(String.format("%.2f°", status.getYaw_angle()));
+                        lat_data.setText(String.format("%.5f", status.getLat()));
+                        lng_data.setText(String.format("%.5f", status.getLng()));
+                        break;
+                    case 2:
+                        Battery battery = (Battery) msg.obj;
+                        charge_data.setText(String.format("%s%%", String.valueOf(battery.getPower())));
+                        voltage_data.setText(String.format("%sV", String.valueOf(battery.getVoltage())));
+                        charge_waveView.setWaveHeightPercent((float) battery.getPower() / 100);
+                        charge_card_data.setText(String.format("%s%%", String.valueOf(battery.getPower())));
+                }
+                return false;
+            }
+        });
     }
 
     private void initView(Bundle savedInstanceState) {
-        //建立连接,订阅topic
-//        new Thread(connectRunnable).start();
-        client = ((RCApplication) getApplication()).getRosClient();
-//        publish();
+        Bundle bundle = getIntent().getExtras();
+        connectMode = (ConnectMode) Objects.requireNonNull(bundle.getSerializable("connect_mode"));
+        if (connectMode.equals(ConnectMode.LANMODE)) {
+            rosBridgeClient = ((RCApplication) getApplication()).getRosClient();
+        }
+        if (connectMode.equals(ConnectMode.REMOTEMODE)) {
+            mqttAndroidClient = MqttClient.getInstance(this).getmMqttClient();
+        }
+
         largeImageView = findViewById(R.id.largeImage);
         try {
             largeImageView.setImage(new InputStreamBitmapDecoderFactory(getAssets().open("map2.png")));
@@ -225,7 +242,6 @@ public class NewBunkerActivity extends BaseActivity implements View.OnClickListe
         mTvLocation = (TextView) findViewById(R.id.tv_my_loc);
         slideUpInfo = findViewById(R.id.slide_up_info);
         //数据显示控件
-        newBunkerModelView = findViewById(R.id.new_bunker_model_view);
         emergency_stop = findViewById(R.id.emergency_stop);
         emergency_stop.setOnClickListener(this);
         back_to_home = findViewById(R.id.back_to_home);
@@ -246,17 +262,21 @@ public class NewBunkerActivity extends BaseActivity implements View.OnClickListe
         aSwitch = findViewById(R.id.switch1);
         aSwitch.setOnCheckedChangeListener(this);
         aSwitch.setOnClickListener(this);
+//        setChart();
+        newBunkerModelView = findViewById(R.id.new_bunker_model_view);
+        //风机与旋转
         setBottomSheet();
         setDialog();
     }
 
-
     private void initData() {
+
 //        设置gps数据改变时的事件
         gpsDataViewModel = ViewModelProviders.of(this).get((GPSDataViewModel.class));
         gpsDataViewModel.getGpsData().observe(this, new Observer<GPSData>() {
             @Override
             public void onChanged(@Nullable GPSData gpsData) {
+
             }
         });
 
@@ -267,7 +287,10 @@ public class NewBunkerActivity extends BaseActivity implements View.OnClickListe
                 newBunkerModelView.changeFromSpeed(ints);
             }
         });
-        setSpeed();
+        if (connectMode.equals(ConnectMode.TESTMODE)) {
+            setSpeed();
+        }
+
         statusViewModel = ViewModelProviders.of(this).get(StatusViewModel.class);
         statusViewModel.getStatusMutableLiveData().observe(this, new Observer<Status>() {
             @Override
@@ -278,6 +301,7 @@ public class NewBunkerActivity extends BaseActivity implements View.OnClickListe
                 viewhandler.sendMessage(message);
             }
         });
+
         batteryViewModel = ViewModelProviders.of(this).get(BatteryViewModel.class);
         batteryViewModel.getBatteryMutableLiveData().observe(this, new Observer<Battery>() {
             @Override
@@ -290,7 +314,6 @@ public class NewBunkerActivity extends BaseActivity implements View.OnClickListe
         });
     }
 
-    //创建线程模拟数据变化
     private void setSpeed() {
         new Thread(new Runnable() {
             @Override
@@ -320,6 +343,7 @@ public class NewBunkerActivity extends BaseActivity implements View.OnClickListe
 
             private float lastSlide;//上次slideOffset
             private float currSlide;//当前slideOffset
+
 
             //BottomSheet状态改变回调
             @Override
@@ -404,12 +428,12 @@ public class NewBunkerActivity extends BaseActivity implements View.OnClickListe
      */
     public void connect(String ip, String port) {
 
-        client = new ROSBridgeClient("ws://" + ip + ":" + port);
-        boolean conneSucc = client.connect(new ROSClient.ConnectionStatusListener() {
+        rosBridgeClient = new ROSBridgeClient("ws://" + ip + ":" + port);
+        boolean conneSucc = rosBridgeClient.connect(new ROSClient.ConnectionStatusListener() {
             @Override
             public void onConnect() {
-                client.setDebug(true);
-                ((RCApplication) getApplication()).setRosClient(client);
+                rosBridgeClient.setDebug(true);
+                ((RCApplication) getApplication()).setRosClient(rosBridgeClient);
                 isConn = true;
                 showTip("连接成功");
                 publish();
@@ -446,18 +470,18 @@ public class NewBunkerActivity extends BaseActivity implements View.OnClickListe
     //订阅topic
     private void publish() {
         String msg1 = "{\"op\":\"subscribe\",\"topic\":\"/status\"}";
-        client.send(msg1);
+        rosBridgeClient.send(msg1);
         String msg2 = "{\"op\":\"subscribe\",\"topic\":\"/battery\"}";
-        client.send(msg2);
+        rosBridgeClient.send(msg2);
         String msg3 = "{\"op\":\"subscribe\",\"topic\":\"/control\"}";
-        client.send(msg3);
+        rosBridgeClient.send(msg3);
     }
 
     private void SendDataToRos(String topic, String data) {
         String msg1 = "{ \"op\": \"publish\", \"topic\": \"/" + topic + "\", \"msg\": " + data + "}";
         //        String msg2 = "{\"op\":\"publish\",\"topic\":\"/cmd_vel\",\"msg\":{\"linear\":{\"x\":" + 0 + ",\"y\":" +
         //                0 + ",\"z\":0},\"angular\":{\"x\":0,\"y\":0,\"z\":" + 0.5 + "}}}";
-        client.send(msg1);
+        rosBridgeClient.send(msg1);
     }
 
     //发送数据到ROS端
@@ -465,14 +489,13 @@ public class NewBunkerActivity extends BaseActivity implements View.OnClickListe
         String msg1 = "{ \"op\": \"publish\", \"topic\": \"/" + topic + "\", \"msg\": { \"data\": \"" + data + "\"}}";
         //        String msg2 = "{\"op\":\"publish\",\"topic\":\"/cmd_vel\",\"msg\":{\"linear\":{\"x\":" + 0 + ",\"y\":" +
         //                0 + ",\"z\":0},\"angular\":{\"x\":0,\"y\":0,\"z\":" + 0.5 + "}}}";
-        client.send(msg1);
+        rosBridgeClient.send(msg1);
     }
 
-
-    public void onEvent(@NonNull final PublishEvent event) {
-
+    @Subscribe
+    public void onWebsocketEvent(@NonNull final PublishEvent event) {
         if ("/status".equals(event.name)) {
-            Log.i("chatter", event.msg);
+            Log.i(TAG, event.msg);
             Status status = new Gson().fromJson(event.msg, Status.class);
             Message message = new Message();
             message.what = 3;
@@ -484,9 +507,48 @@ public class NewBunkerActivity extends BaseActivity implements View.OnClickListe
             message.what = 4;
             message.obj = battery;
             handler.sendMessage(message);
-            Log.i("battery", event.msg);
+            Log.i(TAG, event.msg);
+        } else if ("/mypath".equals(event.name)) {
+            Spray spray = new Gson().fromJson(event.msg, Spray.class);
+            Message message = new Message();
+            message.what = 2;
+            message.obj = spray.getDuc_array();
+            handler.sendMessage(message);
+            Log.i(TAG, event.msg);
         } else if ("/control".equals(event.name)) {
-            Log.i("control", event.msg);
+            Log.i(TAG, event.msg);
+        } else if ("/pwm_control".equals(event.name)) {
+            Spray spray = new Gson().fromJson(event.msg, Spray.class);
+            Message message = new Message();
+            message.what = 2;
+            message.obj = spray.getDuc_array();
+            handler.sendMessage(message);
+            Log.i(TAG, event.msg);
+        }
+    }
+
+
+    @Subscribe
+    public void onMqttMessageEvent(MqttEvent mqttEvent) {
+        Log.d(TAG, "MQTT RECEIVE====>" + mqttEvent.getTopic() + ":\t" + mqttEvent.getMsg());
+        if(mqttEvent.getTopic().equals("/Hunter/status")){
+            Status status = new Gson().fromJson(mqttEvent.getMsg(), Status.class);
+            Message message = new Message();
+            message.what = 3;
+            message.obj = status;
+            handler.sendMessage(message);
+        }else if(mqttEvent.getTopic().equals("/Hunter/battery")){
+            Battery battery = new Gson().fromJson(mqttEvent.getMsg(), Battery.class);
+            Message message = new Message();
+            message.what = 4;
+            message.obj = battery;
+            handler.sendMessage(message);
+        }else if(mqttEvent.getTopic().equals("/Hunter/spray")){
+            Spray spray = new Gson().fromJson(mqttEvent.getMsg(), Spray.class);
+            Message message = new Message();
+            message.what = 2;
+            message.obj = spray.getDuc_array();
+            handler.sendMessage(message);
         }
     }
 
@@ -499,10 +561,28 @@ public class NewBunkerActivity extends BaseActivity implements View.OnClickListe
 
     @Override
     protected void onDestroy() {
-        if (((RCApplication) getApplication()).isConn()) {
-            client.disconnect();
+        if (rosBridgeClient != null && connectMode.equals(ConnectMode.LANMODE)) {
+            rosBridgeClient.disconnect();
+            rosBridgeClient = null;
         }
+        if (mqttAndroidClient != null && connectMode.equals(ConnectMode.REMOTEMODE)) {
+            try {
+                Log.d(TAG,"shutdown");
+                mqttAndroidClient.unsubscribe(new String[]{"/Hunter/status", "/Hunter/battery", "/Hunter/spray"});
+//                mqttAndroidClient.unsubscribe(new String[]{});
+                mqttAndroidClient = null;
+            } catch (MqttException e) {
+                e.printStackTrace();
+                Log.d(TAG, "取消订阅失败");
+            }
+        }
+        EventBus.getDefault().unregister(this);
         super.onDestroy();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
     }
 
     public void showPoiDetail(String locTitle, String locInfo) {
@@ -702,6 +782,9 @@ public class NewBunkerActivity extends BaseActivity implements View.OnClickListe
             status_dialog.show();
         } else if (v == remote_control_cardView) {
             Intent intent = new Intent(this, ControlActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("connect_mode", connectMode);
+            intent.putExtras(bundle);
             startActivity(intent);
         }
     }

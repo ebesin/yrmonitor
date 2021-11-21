@@ -42,13 +42,15 @@ public class NewBunkerModelView extends ConstraintLayout {
         super(context);
         this.context = context;
     }
+
     public NewBunkerModelView(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
-        LayoutInflater.from(context).inflate(R.layout.new_bunker_model_view,this);
+        LayoutInflater.from(context).inflate(R.layout.new_bunker_model_view, this);
         initView();
     }
-    public void initView(){
+
+    public void initView() {
         fans = new ImageView[4];
         sprays = new ImageView[8];
         fans[0] = findViewById(R.id.fan_no_1);
@@ -103,31 +105,36 @@ public class NewBunkerModelView extends ConstraintLayout {
                 case 20:
                     fans[i].setImageDrawable(getResources().getDrawable(R.drawable.ic_fan_20));
                     fans[i].startAnimation(animation_20_speed);
-                    sprays[i].setImageDrawable(animationDrawable_20_speed[i]);
+                    sprays[2 * i].setImageDrawable(animationDrawable_20_speed[i]);
+                    sprays[2 * i + 1].setImageDrawable(animationDrawable_20_speed[i]);
                     animationDrawable_20_speed[i].start();
                     break;
                 case 40:
                     fans[i].setImageDrawable(getResources().getDrawable(R.drawable.ic_fan_40));
                     fans[i].startAnimation(animation_40_speed);
-                    sprays[i].setImageDrawable(animationDrawable_40_speed[i]);
+                    sprays[2 * i].setImageDrawable(animationDrawable_40_speed[i]);
+                    sprays[2 * i + 1].setImageDrawable(animationDrawable_40_speed[i]);
                     animationDrawable_40_speed[i].start();
                     break;
                 case 60:
                     fans[i].setImageDrawable(getResources().getDrawable(R.drawable.ic_fan_60));
                     fans[i].startAnimation(animation_60_speed);
-                    sprays[i].setImageDrawable(animationDrawable_60_speed[i]);
+                    sprays[2 * i].setImageDrawable(animationDrawable_60_speed[i]);
+                    sprays[2 * i + 1].setImageDrawable(animationDrawable_60_speed[i]);
                     animationDrawable_60_speed[i].start();
                     break;
                 case 80:
                     fans[i].setImageDrawable(getResources().getDrawable(R.drawable.ic_fan_80));
                     fans[i].startAnimation(animation_80_speed);
-                    sprays[i].setImageDrawable(animationDrawable_80_speed[i]);
+                    sprays[2 * i].setImageDrawable(animationDrawable_80_speed[i]);
+                    sprays[2 * i + 1].setImageDrawable(animationDrawable_80_speed[i]);
                     animationDrawable_80_speed[i].start();
                     break;
                 default:
                     fans[i].setImageDrawable(getResources().getDrawable(R.drawable.ic_fan_20));
                     sprays[i].startAnimation(animation_0_speed);
-                    sprays[i].setImageDrawable(animationDrawable_80_speed[i]);
+                    sprays[2 * i].setImageDrawable(animationDrawable_80_speed[i]);
+                    sprays[2 * i + 1].setImageDrawable(animationDrawable_0_speed[i]);
                     animationDrawable_80_speed[i].start();
             }
         }
