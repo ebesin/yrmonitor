@@ -1,7 +1,0 @@
-# ninja log v5
-0	70	0	CMakeFiles/native-test.dir/src/main/jni/native-test.c.o	b2026aa48d295363
-70	157	0	../../../../build/intermediates/cmake/release/obj/armeabi-v7a/libnative-test.so	411772cc77edf1d7
-1	63	0	CMakeFiles/native-test.dir/src/main/jni/native-test.c.o	b2026aa48d295363
-63	143	0	../../../../build/intermediates/cmake/release/obj/armeabi-v7a/libnative-test.so	411772cc77edf1d7
-1	124	0	CMakeFiles/native-test.dir/src/main/jni/native-test.c.o	b2026aa48d295363
-124	234	0	../../../../build/intermediates/cmake/release/obj/armeabi-v7a/libnative-test.so	411772cc77edf1d7

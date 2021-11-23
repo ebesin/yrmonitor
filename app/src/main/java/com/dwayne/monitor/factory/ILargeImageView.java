@@ -2,7 +2,7 @@ package com.dwayne.monitor.factory;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.DrawableRes;
+import androidx.annotation.DrawableRes;
 
 
 public interface ILargeImageView {

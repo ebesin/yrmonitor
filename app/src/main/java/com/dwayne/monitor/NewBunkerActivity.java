@@ -1,22 +1,20 @@
 package com.dwayne.monitor;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.v7.widget.CardView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import androidx.cardview.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,7 +32,6 @@ import com.dwayne.monitor.bean.Spray;
 import com.dwayne.monitor.enums.ConnectMode;
 import com.dwayne.monitor.mqtt.MqttClient;
 import com.dwayne.monitor.mqtt.MqttEvent;
-import com.dwayne.monitor.view.model.HunterModelView;
 import com.dwayne.monitor.view.model.NewBunkerModelView;
 import com.github.mikephil.charting.data.Entry;
 import com.github.onlynight.waveview.WaveView;
@@ -152,6 +149,8 @@ public class NewBunkerActivity extends BaseActivity implements View.OnClickListe
 
     ConnectMode connectMode;
 
+    Bundle bundle;
+
 
     //ros通信
     ROSBridgeClient rosBridgeClient = null;
@@ -217,7 +216,7 @@ public class NewBunkerActivity extends BaseActivity implements View.OnClickListe
     }
 
     private void initView(Bundle savedInstanceState) {
-        Bundle bundle = getIntent().getExtras();
+        bundle = getIntent().getExtras();
         connectMode = (ConnectMode) Objects.requireNonNull(bundle.getSerializable("connect_mode"));
         if (connectMode.equals(ConnectMode.LANMODE)) {
             rosBridgeClient = ((RCApplication) getApplication()).getRosClient();
@@ -782,8 +781,6 @@ public class NewBunkerActivity extends BaseActivity implements View.OnClickListe
             status_dialog.show();
         } else if (v == remote_control_cardView) {
             Intent intent = new Intent(this, ControlActivity.class);
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("connect_mode", connectMode);
             intent.putExtras(bundle);
             startActivity(intent);
         }

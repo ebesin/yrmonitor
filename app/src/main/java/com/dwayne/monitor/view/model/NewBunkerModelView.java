@@ -1,9 +1,9 @@
 package com.dwayne.monitor.view.model;
 
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.graphics.drawable.AnimationDrawable;
-import android.support.constraint.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.animation.Animation;
@@ -12,7 +12,6 @@ import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 
 import com.dwayne.monitor.R;
-import com.dwayne.monitor.ViewModel.SpraySpeedViewModel;
 
 public class NewBunkerModelView extends ConstraintLayout {
     Context context;

@@ -3,6 +3,7 @@ package com.example.dadac.testrosbridge;
 import com.dwayne.monitor.HunterActivity;
 import com.dwayne.monitor.NewBunkerActivity;
 import com.dwayne.monitor.enums.ConnectMode;
+import com.dwayne.monitor.enums.DeviceType;
 import com.dwayne.monitor.view.model.HunterModelView;
 import com.google.gson.Gson;
 import com.jilk.ros.ROSClient;
@@ -135,5 +136,14 @@ public class ExampleUnitTest {
         System.out.println(ConnectMode.REMOTEMODE.getMode());
     }
 
+    @Test
+    public void testSin(){
+        System.out.println(Math.sin(Math.PI/2));
+    }
+
+    @Test
+    public void testEquals(){
+        System.out.println("履带车v1".equals(DeviceType.OLDBUNKER.getType()));
+    }
 
 }

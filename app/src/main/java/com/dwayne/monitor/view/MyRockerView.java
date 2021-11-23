@@ -124,6 +124,10 @@ public class MyRockerView extends View {
         mRockerPosition = new Point();
     }
 
+    public void setmDistanceLevel(int level){
+        mDistanceLevel = level;
+    }
+
     /**
      * 获取属性
      *

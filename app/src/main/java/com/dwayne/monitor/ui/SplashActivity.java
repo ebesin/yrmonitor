@@ -11,10 +11,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.NonNull;
-import android.util.Log;
+import androidx.annotation.NonNull;
+
 import android.view.View;
-import android.widget.Toast;
 
 import com.dwayne.monitor.MainActivity;
 import com.dwayne.monitor.R;

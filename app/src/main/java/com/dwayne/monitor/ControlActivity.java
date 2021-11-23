@@ -6,8 +6,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.annotation.RequiresApi;
-import android.support.design.widget.TabLayout;
+
+import androidx.annotation.RequiresApi;
+
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -19,6 +20,7 @@ import android.widget.TextView;
 
 import com.dadac.testrosbridge.RCApplication;
 import com.dwayne.monitor.enums.ConnectMode;
+import com.dwayne.monitor.enums.DeviceType;
 import com.dwayne.monitor.mqtt.MqttClient;
 import com.google.gson.Gson;
 import com.jaygoo.widget.OnRangeChangedListener;
@@ -88,6 +90,8 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
     int at_center_times = 0;
 
     ConnectMode connectMode;
+    String deviceType;
+    Bundle bundle;
 
 
     @RequiresApi(api = Build.VERSION_CODES.P)
@@ -123,6 +127,7 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
             }
         };
         initView();
+        initData();
         initSeekBar();
         setListener();
         setThread();
@@ -135,16 +140,7 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
         super.onDestroy();
     }
 
-
     private void initView() {
-        Bundle bundle = getIntent().getExtras();
-        connectMode = (ConnectMode) Objects.requireNonNull(bundle.getSerializable("connect_mode"));
-        if (connectMode.equals(ConnectMode.LANMODE)) {
-            rosBridgeClient = ((RCApplication) getApplication()).getRosClient();
-        }
-        if (connectMode.equals(ConnectMode.REMOTEMODE)) {
-            mqttAndroidClient = MqttClient.getInstance(this).getmMqttClient();
-        }
         rockerView_left = findViewById(R.id.rockerview_left);
         rockerView_right = findViewById(R.id.rockerview_right);
         current_direction_left = findViewById(R.id.current_direction_left);
@@ -154,6 +150,24 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
         send_switch = findViewById(R.id.send_switch);
         keep_move_switch = findViewById(R.id.keep_move_switch);
         speed_seekbar = findViewById(R.id.speed_seekbar);
+    }
+
+    public void initData() {
+        bundle = getIntent().getExtras();
+        connectMode = (ConnectMode) Objects.requireNonNull(bundle.getSerializable("connect_mode"));
+        if (connectMode.equals(ConnectMode.LANMODE)) {
+            rosBridgeClient = ((RCApplication) getApplication()).getRosClient();
+        }
+        if (connectMode.equals(ConnectMode.REMOTEMODE)) {
+            mqttAndroidClient = MqttClient.getInstance(this).getmMqttClient();
+        }
+        deviceType = (String) Objects.requireNonNull(bundle.get("device_type"));
+        if (deviceType.equals(DeviceType.HUNTER.getType())) {
+            rockerView_right.setmDistanceLevel(31);
+        }
+        if (deviceType.equals(DeviceType.NEWBUNKER.getType())) {
+            rockerView_right.setmDistanceLevel(46);
+        }
     }
 
     private void initSeekBar() {
@@ -172,7 +186,7 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
                         0 + ",\"z\":0},\"angular\":{\"x\":0,\"y\":0,\"z\":" + 0.5 + "}}}";
         */
         rosBridgeClient.send(msg1);
-        Log.d(TAG,"SendDataToRosBridge:\t"+msg1);
+        Log.d(TAG, "SendDataToRosBridge:\t" + msg1);
     }
 
     private void SendDataToMqtt(String topic, String data) {
@@ -183,7 +197,7 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
         } catch (MqttException e) {
             e.printStackTrace();
         }
-        Log.d(TAG,"SendDataToMqtt:\t"+data);
+        Log.d(TAG, "SendDataToMqtt:\t" + data);
     }
 
 
@@ -247,12 +261,14 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
         rockerView_right.setOnDistanceLevelListener(new MyRockerView.OnDistanceLevelListener() {
             @Override
             public void onDistanceLevel(int level) {
+                Log.d(TAG,"level:"+level);
                 angleLevel_right = level;
                 angularValue = (float) (iscenter_right * angleLevel_right * Math.cos(current_angle_right));
                 Message message = new Message();
                 message.what = 0;
                 handler.sendMessage(message);
-                twist.setAngular(new Angular(Math.PI * (angularValue / 180)));
+//                twist.setAngular(new Angular(Math.PI * (angularValue / 180)));
+                twist.setAngular(new Angular(Math.toRadians(angularValue)));
             }
         });
 
@@ -324,7 +340,7 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
                 Message message = new Message();
                 message.what = 0;
                 handler.sendMessage(message);
-                twist.setAngular(new Angular(Math.PI * (angularValue / 180)));
+                twist.setAngular(new Angular(Math.toRadians(angularValue)));
             }
 
             @Override
@@ -345,7 +361,7 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
             @Override
             public void angle(double angle) {
                 Log.d("angle", String.valueOf(angle));
-                current_angle_left = Math.PI * ((360 - angle) / 180);
+                current_angle_left = Math.toRadians((360 - angle));
                 linearValue = (float) (iscenter_left * speedLevel_left * Math.sin(current_angle_left));
                 Message message = new Message();
                 message.what = 0;
@@ -370,12 +386,12 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
 
             @Override
             public void angle(double angle) {
-                current_angle_right = Math.PI * ((180 - angle) / 180);
+                current_angle_right = Math.toRadians((180 - angle));
                 angularValue = (float) (iscenter_right * angleLevel_right * Math.cos(current_angle_right));
                 Message message = new Message();
                 message.what = 0;
                 handler.sendMessage(message);
-                twist.setAngular(new Angular(Math.PI * (angularValue / 180)));
+                twist.setAngular(new Angular(Math.toRadians(angularValue)));
             }
 
             @Override

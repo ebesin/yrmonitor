@@ -2,7 +2,7 @@ package com.dwayne.monitor.view.map;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.support.constraint.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;

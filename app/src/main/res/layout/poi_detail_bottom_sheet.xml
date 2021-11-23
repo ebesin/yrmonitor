@@ -12,7 +12,7 @@
     app:layout_behavior="@string/bottom_sheet_behavior">
 
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_marginLeft="@dimen/padding_size"
@@ -53,7 +53,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_title" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View
         style="@style/DividerCommon"
@@ -158,7 +158,7 @@
         android:layout_height="match_parent"
         android:background="@color/gray_bg">
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             style="@style/SettingItem.Large"
             android:layout_marginTop="@dimen/padding_medium"
             android:paddingLeft="@dimen/padding_size"
@@ -193,7 +193,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
 
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>
 

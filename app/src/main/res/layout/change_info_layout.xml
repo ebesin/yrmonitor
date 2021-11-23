@@ -7,12 +7,12 @@
     android:background="@drawable/charge_detail"
     android:orientation="vertical">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="300dp"
         android:layout_height="350dp"
         android:background="@drawable/charge_detail">
 
-        <android.support.constraint.Guideline
+        <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -137,7 +137,7 @@
             app:layout_constraintStart_toStartOf="@+id/ip_inputview"
             app:layout_constraintTop_toTopOf="@+id/ip_port" />
 
-        <Spinner
+        <org.angmarch.views.NiceSpinner
             android:id="@+id/device_type_spinner"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -149,7 +149,7 @@
             app:layout_constraintStart_toStartOf="@+id/ip_inputview"
             app:layout_constraintTop_toTopOf="@+id/device_type" />
 
-        <Spinner
+        <org.angmarch.views.NiceSpinner
             android:id="@+id/connect_mode_spinner"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -163,5 +163,5 @@
             app:layout_constraintTop_toTopOf="@+id/connect_mode" />
 
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </RelativeLayout>

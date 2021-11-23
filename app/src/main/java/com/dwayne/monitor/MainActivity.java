@@ -1,20 +1,18 @@
 package com.dwayne.monitor;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -39,9 +37,9 @@ import com.jilk.ros.rosbridge.ROSBridgeClient;
 import com.dwayne.monitor.adapter.DeviceAdapter;
 import com.dwayne.monitor.bean.Device;
 import com.dwayne.monitor.dao.DeviceDao;
-import com.dwayne.monitor.database.DatabaseHelper;
 import com.dwayne.monitor.ui.BaseActivity;
 
+import org.angmarch.views.NiceSpinner;
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttSecurityException;
@@ -90,10 +88,10 @@ public class MainActivity extends BaseActivity {
 
     List<String> allTypeName;
     List<String> allConnectMode;
-    ArrayAdapter<String> arrayAdapter;
-    ArrayAdapter<String> arrayAdapter2;
-    Spinner deviceTypeSpinner;
-    Spinner connectModeSpinner;
+    ArrayAdapter arrayAdapter;
+    ArrayAdapter arrayAdapter2;
+    NiceSpinner deviceTypeSpinner;
+    NiceSpinner connectModeSpinner;
 
 
     Handler handler = new Handler(new Handler.Callback() {
@@ -149,10 +147,10 @@ public class MainActivity extends BaseActivity {
         deviceAdapter.setDevices(devices);
         allTypeName = deviceTypeDao.getAllTypeName();
         allConnectMode = connectModeDao.getAllConnectMode();
-        arrayAdapter = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, allTypeName);
-        arrayAdapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
-        arrayAdapter2 = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, allConnectMode);
-        arrayAdapter2.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
+        arrayAdapter = new ArrayAdapter<>(this, R.layout.item_select, allTypeName);
+        arrayAdapter.setDropDownViewResource(R.layout.item_drapdown);
+        arrayAdapter2 = new ArrayAdapter<>(this, R.layout.item_select, allConnectMode);
+        arrayAdapter2.setDropDownViewResource(R.layout.item_drapdown);
         refreshDevice();
     }
 
@@ -195,6 +193,7 @@ public class MainActivity extends BaseActivity {
                                 bundle = new Bundle();
                                 bundle.putSerializable("connect_mode", ConnectMode.TESTMODE);
                                 bundle.putString("device_activity", deviceTypeDao.getIntentClassByName(device.getType()));
+                                bundle.putString("device_type","none");
                                 msg.setData(bundle);
                                 handler.sendMessage(msg);
                             }
@@ -235,6 +234,7 @@ public class MainActivity extends BaseActivity {
                 bundle = new Bundle();
                 bundle.putSerializable("connect_mode", ConnectMode.LANMODE);
                 bundle.putString("device_activity", deviceTypeDao.getIntentClassByName(device.getType()));
+                bundle.putString("device_type",device.getType());
                 message.setData(bundle);
                 handler.sendMessage(message);
                 Log.d(TAG, "Connect ROS success");
@@ -315,6 +315,7 @@ public class MainActivity extends BaseActivity {
         bundle = new Bundle();
         bundle.putSerializable("connect_mode", ConnectMode.REMOTEMODE);
         bundle.putString("device_activity", deviceTypeDao.getIntentClassByName(device.getType()));
+        bundle.putString("device_type",device.getType());
         message.setData(bundle);
         handler.sendMessage(message);
     }
@@ -344,13 +345,11 @@ public class MainActivity extends BaseActivity {
         ip_inputview = layout.findViewById(R.id.ip_inputview);
         port_inputview = layout.findViewById(R.id.port_inputview);
         deviceTypeSpinner = layout.findViewById(R.id.device_type_spinner);
-        deviceTypeSpinner.setAdapter(arrayAdapter);
-
-        deviceTypeSpinner.setSelection(getDeviceTypeIndex(index));
-
+        deviceTypeSpinner.attachDataSource(deviceTypeDao.getAllTypeName());
+        deviceTypeSpinner.setSelectedIndex(getDeviceTypeIndex(index));
         connectModeSpinner = layout.findViewById(R.id.connect_mode_spinner);
-        connectModeSpinner.setAdapter(arrayAdapter2);
-        connectModeSpinner.setSelection(getConnectModeIndex(index));
+        connectModeSpinner.attachDataSource(connectModeDao.getAllConnectMode());
+        connectModeSpinner.setSelectedIndex(getConnectModeIndex(index));
 
         device_name_inputview.setText(device.getName());
         ip_inputview.setText(device.getIp());
