@@ -1,0 +1,114 @@
+apply plugin: 'com.android.application'
+
+android {
+    signingConfigs {
+        release {
+            keyAlias 'yrmonitor'
+            keyPassword 'ebesin'
+            storeFile file('C:\\User\\dwayne\\ad\\yrmonitor.jks')
+            storePassword 'ebesin'
+        }
+    }
+
+    compileSdkVersion 30
+
+    defaultConfig {
+        applicationId "com.jiyouliang.fmap"
+        minSdkVersion 21
+        targetSdkVersion 31
+        versionCode 1
+        versionName "1.0.9"
+        vectorDrawables.useSupportLibrary = true
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.release
+        externalNativeBuild {
+            cmake {
+                cppFlags ""
+            }
+        }
+
+    }
+    buildTypes {
+        release {
+            buildConfigField "boolean", "LOG_DEBUG", "false" //不显示log
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+            multiDexEnabled = true
+        }
+        debug {
+            signingConfig signingConfigs.debug
+            minifyEnabled false
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+}
+
+
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    //noinspection GradleCompatible
+    implementation 'androidx.appcompat:appcompat:1.3.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
+    //noinspection GradleCompatible
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
+
+
+//    testImplementation 'junit:junit:4.13.2'
+//    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+//    androidTestImplementation 'com.android.support.test:rules:1.0.2'
+//    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    androidTestImplementation 'androidx.test:runner:1.4.0'
+    androidTestImplementation 'androidx.test:rules:1.4.0'
+
+    //noinspection GradleCompatible
+    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.0.0'
+    implementation 'androidx.annotation:annotation:1.3.0'
+    implementation 'com.alibaba:fastjson:1.1.71.android'
+    implementation 'com.github.bumptech.glide:glide:4.9.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
+
+    implementation 'com.amap.api:navi-3dmap:7.9.1_3dmap7.9.1'
+    implementation 'com.amap.api:search:7.9.0'
+    implementation 'com.amap.api:location:5.3.1'
+
+    implementation 'com.jakewharton:butterknife:10.2.3'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.3'
+
+    implementation files('libs/json-simple-1.1.jar')
+
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+    implementation 'com.github.onlynight:WaveView:1.0.0'
+
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.8.6'
+
+    implementation 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.0'
+    implementation 'org.eclipse.paho:org.eclipse.paho.android.service:1.1.1'
+
+    implementation 'org.greenrobot:eventbus:3.1.1'
+
+    implementation 'com.github.Jay-Goo:RangeSeekBar:v3.0.0'
+
+    implementation 'com.github.arcadefire:nice-spinner:1.4.4'
+
+
+
+}
