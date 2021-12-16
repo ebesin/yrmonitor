@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/charge_detail"
+    android:orientation="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="300dp"
+        android:layout_height="250dp"
+        android:background="@drawable/charge_detail">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.3" />
+
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            app:layout_constraintBottom_toTopOf="@+id/guideline2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_setting" />
+
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="参数设置"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toTopOf="@+id/guideline2"
+            app:layout_constraintStart_toEndOf="@+id/imageView3"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:id="@+id/line"
+            style="@style/detailCommon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/guideline2" />
+
+        <TextView
+            android:id="@+id/speed_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            android:text="激光雷达与树干距离"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideline2" />
+
+        <EditText
+            android:id="@+id/speed_data"
+            android:layout_width="70dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="30dp"
+            android:textAlignment="center"
+            android:textSize="14sp"
+
+            app:layout_constraintBottom_toBottomOf="@+id/speed_text"
+            app:layout_constraintStart_toEndOf="@+id/speed_text"
+            app:layout_constraintTop_toTopOf="@+id/speed_text" />
+
+        <TextView
+            android:id="@+id/front_wheel_angle_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="树木最大高度"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="@+id/speed_text"
+            app:layout_constraintTop_toBottomOf="@+id/speed_text" />
+
+        <EditText
+            android:id="@+id/front_wheel_angle_data"
+            android:layout_width="70dp"
+            android:layout_height="40dp"
+            android:textSize="14sp"
+            android:textAlignment="center"
+            app:layout_constraintBottom_toBottomOf="@+id/front_wheel_angle_text"
+            app:layout_constraintStart_toStartOf="@+id/speed_data"
+            app:layout_constraintTop_toTopOf="@+id/front_wheel_angle_text" />
+
+        <TextView
+            android:id="@+id/yaw_angle_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="最大检测范围"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="@+id/front_wheel_angle_text"
+            app:layout_constraintTop_toBottomOf="@+id/front_wheel_angle_text" />
+
+        <EditText
+            android:id="@+id/yaw_angle_data"
+            android:layout_width="70dp"
+            android:layout_height="40dp"
+            android:textSize="14sp"
+            android:textAlignment="center"
+            app:layout_constraintBottom_toBottomOf="@+id/yaw_angle_text"
+            app:layout_constraintStart_toStartOf="@+id/front_wheel_angle_data"
+            app:layout_constraintTop_toTopOf="@+id/yaw_angle_text" />
+
+        <TextView
+            android:id="@+id/lat_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="延时单元"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="@+id/yaw_angle_text"
+            app:layout_constraintTop_toBottomOf="@+id/yaw_angle_text" />
+
+        <EditText
+            android:id="@+id/lat_data"
+            android:layout_width="70dp"
+            android:layout_height="40dp"
+            android:textSize="14sp"
+            android:textAlignment="center"
+            app:layout_constraintBottom_toBottomOf="@+id/lat_text"
+            app:layout_constraintStart_toStartOf="@+id/yaw_angle_data"
+            app:layout_constraintTop_toTopOf="@+id/lat_text" />
+
+        <TextView
+            android:id="@+id/textView26"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="m"
+            app:layout_constraintBottom_toBottomOf="@+id/speed_data"
+            app:layout_constraintStart_toEndOf="@+id/speed_data"
+            app:layout_constraintTop_toTopOf="@+id/speed_data" />
+
+        <TextView
+            android:id="@+id/textView27"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="m"
+            app:layout_constraintBottom_toBottomOf="@+id/front_wheel_angle_data"
+            app:layout_constraintStart_toEndOf="@+id/front_wheel_angle_data"
+            app:layout_constraintTop_toBottomOf="@+id/speed_data" />
+
+        <TextView
+            android:id="@+id/textView28"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="m"
+            app:layout_constraintBottom_toBottomOf="@+id/yaw_angle_data"
+            app:layout_constraintStart_toEndOf="@+id/yaw_angle_data"
+            app:layout_constraintTop_toBottomOf="@+id/front_wheel_angle_data" />
+
+        <TextView
+            android:id="@+id/textView29"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="t"
+            app:layout_constraintBottom_toBottomOf="@+id/lat_data"
+            app:layout_constraintStart_toEndOf="@+id/lat_data"
+            app:layout_constraintTop_toBottomOf="@+id/yaw_angle_data" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>

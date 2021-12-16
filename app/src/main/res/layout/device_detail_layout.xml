@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/charge_detail"
+    android:orientation="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="300dp"
+        android:layout_height="250dp"
+        android:background="@drawable/charge_detail">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.30" />
+
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            app:layout_constraintBottom_toTopOf="@+id/guideline2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_state" />
+
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="设备状态"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toTopOf="@+id/guideline2"
+            app:layout_constraintStart_toEndOf="@+id/imageView3"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <View
+            android:id="@+id/line"
+            style="@style/detailCommon"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/guideline2" />
+
+        <TextView
+            android:id="@+id/speed_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="16dp"
+            android:text="实时速度"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideline2" />
+
+        <TextView
+            android:id="@+id/speed_data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="60dp"
+            android:text="2 m/s"
+            app:layout_constraintBottom_toBottomOf="@+id/speed_text"
+            app:layout_constraintStart_toEndOf="@+id/speed_text"
+            app:layout_constraintTop_toTopOf="@+id/speed_text" />
+
+        <TextView
+            android:id="@+id/front_wheel_angle_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="前轮转向角"
+            app:layout_constraintStart_toStartOf="@+id/speed_text"
+            app:layout_constraintTop_toBottomOf="@+id/speed_text" />
+
+        <TextView
+            android:id="@+id/front_wheel_angle_data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="34°"
+            app:layout_constraintBottom_toBottomOf="@+id/front_wheel_angle_text"
+            app:layout_constraintStart_toStartOf="@+id/speed_data"
+            app:layout_constraintTop_toTopOf="@+id/front_wheel_angle_text" />
+
+        <TextView
+            android:id="@+id/yaw_angle_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="偏航角"
+            app:layout_constraintStart_toStartOf="@+id/front_wheel_angle_text"
+            app:layout_constraintTop_toBottomOf="@+id/front_wheel_angle_text" />
+
+        <TextView
+            android:id="@+id/yaw_angle_data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="5°"
+            app:layout_constraintBottom_toBottomOf="@+id/yaw_angle_text"
+            app:layout_constraintStart_toStartOf="@+id/front_wheel_angle_data"
+            app:layout_constraintTop_toTopOf="@+id/yaw_angle_text" />
+
+        <TextView
+            android:id="@+id/lat_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="纬度"
+            app:layout_constraintStart_toStartOf="@+id/yaw_angle_text"
+            app:layout_constraintTop_toBottomOf="@+id/yaw_angle_text" />
+
+        <TextView
+            android:id="@+id/lng_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="经度"
+            app:layout_constraintStart_toStartOf="@+id/lat_text"
+            app:layout_constraintTop_toBottomOf="@+id/lat_text" />
+
+        <TextView
+            android:id="@+id/lat_data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="107 m"
+            app:layout_constraintBottom_toBottomOf="@+id/lat_text"
+            app:layout_constraintStart_toStartOf="@+id/yaw_angle_data"
+            app:layout_constraintTop_toTopOf="@+id/lat_text" />
+
+        <TextView
+            android:id="@+id/lng_data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="107 m"
+            app:layout_constraintStart_toStartOf="@+id/lat_data"
+            app:layout_constraintTop_toTopOf="@+id/lng_text" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>
