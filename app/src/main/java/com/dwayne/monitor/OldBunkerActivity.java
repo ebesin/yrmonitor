@@ -1,8 +1,6 @@
 package com.dwayne.monitor;
 
 import android.app.AlertDialog;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,14 +12,6 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import androidx.core.content.ContextCompat;
-import androidx.cardview.widget.CardView;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -40,6 +30,16 @@ import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
@@ -65,23 +65,10 @@ import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.geocoder.GeocodeSearch;
 import com.amap.api.services.help.Tip;
 import com.dadac.testrosbridge.RCApplication;
-import com.dwayne.monitor.enums.ConnectMode;
-import com.dwayne.monitor.mqtt.MqttClient;
-import com.dwayne.monitor.view.model.OldBunkerModelView;
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.github.onlynight.waveview.WaveView;
-import com.google.gson.Gson;
-import com.jilk.ros.rosbridge.ROSBridgeClient;
-import com.jilk.ros.rosbridge.implementation.PublishEvent;
 import com.dwayne.monitor.ViewModel.BatteryViewModel;
-import com.dwayne.monitor.ViewModel.OldBunkerSpraySpeedViewModel;
 import com.dwayne.monitor.ViewModel.GPSData;
 import com.dwayne.monitor.ViewModel.GPSDataViewModel;
+import com.dwayne.monitor.ViewModel.OldBunkerSpraySpeedViewModel;
 import com.dwayne.monitor.ViewModel.StatusViewModel;
 import com.dwayne.monitor.bean.Angular;
 import com.dwayne.monitor.bean.Battery;
@@ -90,9 +77,10 @@ import com.dwayne.monitor.bean.Linear;
 import com.dwayne.monitor.bean.Spray;
 import com.dwayne.monitor.bean.Status;
 import com.dwayne.monitor.bean.Twist;
+import com.dwayne.monitor.enums.ConnectMode;
 import com.dwayne.monitor.harware.SensorEventHelper;
+import com.dwayne.monitor.mqtt.MqttClient;
 import com.dwayne.monitor.ui.BaseActivity;
-
 import com.dwayne.monitor.ui.user.UserActivity;
 import com.dwayne.monitor.util.DeviceUtils;
 import com.dwayne.monitor.util.LogUtil;
@@ -102,16 +90,26 @@ import com.dwayne.monitor.view.map.GPSView;
 import com.dwayne.monitor.view.map.NearbySearchView;
 import com.dwayne.monitor.view.map.PoiDetailBottomView;
 import com.dwayne.monitor.view.map.TrafficView;
+import com.dwayne.monitor.view.model.OldBunkerModelView;
 import com.dwayne.monitor.view.widget.OnItemClickListener;
-
-import org.eclipse.paho.android.service.MqttAndroidClient;
-import org.eclipse.paho.client.mqttv3.MqttException;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.onlynight.waveview.WaveView;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.gson.Gson;
+import com.jilk.ros.rosbridge.ROSBridgeClient;
+import com.jilk.ros.rosbridge.implementation.PublishEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import de.greenrobot.event.EventBus;
+import info.mqtt.android.service.MqttAndroidClient;
 
 public class OldBunkerActivity extends BaseActivity implements GPSView.OnGPSViewClickListener, NearbySearchView.OnNearbySearchViewClickListener, AMapGestureListener, AMapLocationListener, LocationSource, TrafficView.OnTrafficChangeListener, View.OnClickListener, MapViewInterface, PoiDetailBottomView.OnPoiDetailBottomClickListener, AMap.OnPOIClickListener, OnItemClickListener, CompoundButton.OnCheckedChangeListener {
     private static final String TAG = "OldBunkerActivity";
@@ -1470,13 +1468,8 @@ public class OldBunkerActivity extends BaseActivity implements GPSView.OnGPSView
             rosBridgeClient = null;
         }
         if (mqttAndroidClient != null && connectMode.equals(ConnectMode.REMOTEMODE)) {
-            try {
-                mqttAndroidClient.unsubscribe(new String[]{"/Hunter/status", "/Hunter/battery", "/Hunter/spray"});
-                mqttAndroidClient = null;
-            } catch (MqttException e) {
-                e.printStackTrace();
-                Log.d(TAG, "取消订阅失败");
-            }
+            mqttAndroidClient.unsubscribe(new String[]{"/Hunter/status", "/Hunter/battery", "/Hunter/spray"});
+            mqttAndroidClient = null;
         }
         //在activity执行onDestroy时执行mMapView.onDestroy()，销毁地图
         mMapView.onDestroy();
@@ -1495,8 +1488,6 @@ public class OldBunkerActivity extends BaseActivity implements GPSView.OnGPSView
         }
         super.onDestroy();
     }
-
-
 
     private void addCircle(LatLng latlng, double radius) {
         CircleOptions options = new CircleOptions();

@@ -1,8 +1,6 @@
 package com.dwayne.monitor;
 
 import android.app.AlertDialog;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,10 +9,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import androidx.cardview.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,38 +21,43 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
+
 import com.dadac.testrosbridge.RCApplication;
-import com.dwayne.monitor.bean.Spray;
-import com.dwayne.monitor.enums.ConnectMode;
-import com.dwayne.monitor.mqtt.MqttClient;
-import com.dwayne.monitor.mqtt.MqttEvent;
-import com.dwayne.monitor.view.model.NewBunkerModelView;
-import com.github.mikephil.charting.data.Entry;
-import com.github.onlynight.waveview.WaveView;
-import com.google.gson.Gson;
-import com.jilk.ros.ROSClient;
-import com.jilk.ros.rosbridge.ROSBridgeClient;
-import com.jilk.ros.rosbridge.implementation.PublishEvent;
 import com.dwayne.monitor.ViewModel.BatteryViewModel;
-import com.dwayne.monitor.ViewModel.HenterSpraySpeedViewModel;
 import com.dwayne.monitor.ViewModel.GPSData;
 import com.dwayne.monitor.ViewModel.GPSDataViewModel;
+import com.dwayne.monitor.ViewModel.HenterSpraySpeedViewModel;
 import com.dwayne.monitor.ViewModel.StatusViewModel;
 import com.dwayne.monitor.bean.Angular;
 import com.dwayne.monitor.bean.Battery;
 import com.dwayne.monitor.bean.Control;
 import com.dwayne.monitor.bean.Linear;
+import com.dwayne.monitor.bean.Spray;
 import com.dwayne.monitor.bean.Status;
 import com.dwayne.monitor.bean.Twist;
+import com.dwayne.monitor.enums.ConnectMode;
 import com.dwayne.monitor.factory.InputStreamBitmapDecoderFactory;
 import com.dwayne.monitor.factory.LargeImageView;
+import com.dwayne.monitor.mqtt.MqttClient;
+import com.dwayne.monitor.mqtt.MqttEvent;
 import com.dwayne.monitor.ui.BaseActivity;
 import com.dwayne.monitor.util.DeviceUtils;
 import com.dwayne.monitor.util.LogUtil;
 import com.dwayne.monitor.view.map.GPSView;
+import com.dwayne.monitor.view.model.NewBunkerModelView;
+import com.github.mikephil.charting.data.Entry;
+import com.github.onlynight.waveview.WaveView;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.gson.Gson;
+import com.jilk.ros.ROSClient;
+import com.jilk.ros.rosbridge.ROSBridgeClient;
+import com.jilk.ros.rosbridge.implementation.PublishEvent;
 
-import org.eclipse.paho.android.service.MqttAndroidClient;
-import org.eclipse.paho.client.mqttv3.MqttException;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
@@ -66,6 +65,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import info.mqtt.android.service.MqttAndroidClient;
 
 
 public class NewBunkerActivity extends BaseActivity implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, GPSView.OnGPSViewClickListener {
@@ -565,15 +566,10 @@ public class NewBunkerActivity extends BaseActivity implements View.OnClickListe
             rosBridgeClient = null;
         }
         if (mqttAndroidClient != null && connectMode.equals(ConnectMode.REMOTEMODE)) {
-            try {
-                Log.d(TAG,"shutdown");
-                mqttAndroidClient.unsubscribe(new String[]{"/Hunter/status", "/Hunter/battery", "/Hunter/spray"});
+            Log.d(TAG,"shutdown");
+            mqttAndroidClient.unsubscribe(new String[]{"/Hunter/status", "/Hunter/battery", "/Hunter/spray"});
 //                mqttAndroidClient.unsubscribe(new String[]{});
-                mqttAndroidClient = null;
-            } catch (MqttException e) {
-                e.printStackTrace();
-                Log.d(TAG, "取消订阅失败");
-            }
+            mqttAndroidClient = null;
         }
         EventBus.getDefault().unregister(this);
         super.onDestroy();

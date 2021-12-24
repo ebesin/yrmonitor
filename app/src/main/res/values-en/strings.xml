@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FMap</string>
+    <string name="header_name">UJS</string>
+    <string name="Plantation">Dapeng</string>
+    <string name="green_house_plant">Dapeng Plantation</string>
+    <string name="Electricity">battery:65%</string>
+    <string name="setArgs">Parameter Setting</string>
+    <string name="setSpeed">speed control</string>
+    <string name="device_state">robot status</string>
+    <string name="remote_control">remote control</string>
+</resources>

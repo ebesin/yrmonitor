@@ -9,10 +9,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.appcompat.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,35 +16,38 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.common.CatLoadingView;
 import com.dadac.testrosbridge.RCApplication;
+import com.dwayne.monitor.adapter.DeviceAdapter;
+import com.dwayne.monitor.bean.Device;
 import com.dwayne.monitor.dao.ConnectModeDao;
+import com.dwayne.monitor.dao.DeviceDao;
 import com.dwayne.monitor.dao.DeviceTypeDao;
 import com.dwayne.monitor.dao.PortDao;
 import com.dwayne.monitor.enums.ConnectMode;
 import com.dwayne.monitor.enums.DeviceType;
 import com.dwayne.monitor.mqtt.MqttClient;
 import com.dwayne.monitor.mqtt.MqttEvent;
+import com.dwayne.monitor.ui.BaseActivity;
 import com.jilk.ros.ROSClient;
 import com.jilk.ros.rosbridge.ROSBridgeClient;
-import com.dwayne.monitor.adapter.DeviceAdapter;
-import com.dwayne.monitor.bean.Device;
-import com.dwayne.monitor.dao.DeviceDao;
-import com.dwayne.monitor.ui.BaseActivity;
 
 import org.angmarch.views.NiceSpinner;
-import org.eclipse.paho.android.service.MqttAndroidClient;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttSecurityException;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import info.mqtt.android.service.MqttAndroidClient;
 
 
 public class MainActivity extends BaseActivity {
@@ -273,42 +272,18 @@ public class MainActivity extends BaseActivity {
         MqttAndroidClient mqttAndroidClient = MqttClient.getInstance(this).getmMqttClient();
         if (device.getType().equals(DeviceType.HUNTER.getType())) {
             //连接成功后订阅主题
-            try {
-                Log.d(TAG, "subscribe MqttTopic==================>Hunter/*" );
-                mqttAndroidClient.subscribe("/Hunter/status", 0);
-                mqttAndroidClient.subscribe("/Hunter/battery", 0);
-                mqttAndroidClient.subscribe("/Hunter/spray", 0);
-            } catch (MqttSecurityException e) {
-                e.printStackTrace();
-                Log.d(TAG, "MqttSecurityException--------->" + e.getMessage());
-            } catch (MqttException e) {
-                e.printStackTrace();
-                Log.d(TAG, "MqttException--------->" + e.getMessage());
-            }
+            Log.d(TAG, "subscribe MqttTopic==================>Hunter/*" );
+            mqttAndroidClient.subscribe("/Hunter/status", 0);
+            mqttAndroidClient.subscribe("/Hunter/battery", 0);
+            mqttAndroidClient.subscribe("/Hunter/spray", 0);
         } else if (device.getType().equals(DeviceType.OLDBUNKER.getType())) {
-            try {
-                mqttAndroidClient.subscribe("/OldBunker/status", 0);
-                mqttAndroidClient.subscribe("/OldBunker/battery", 0);
-                mqttAndroidClient.subscribe("/OldBunker/spray", 0);
-            } catch (MqttSecurityException e) {
-                e.printStackTrace();
-                Log.d(TAG, "MqttSecurityException--------->" + e.getMessage());
-            } catch (MqttException e) {
-                e.printStackTrace();
-                Log.d(TAG, "MqttException--------->" + e.getMessage());
-            }
+            mqttAndroidClient.subscribe("/OldBunker/status", 0);
+            mqttAndroidClient.subscribe("/OldBunker/battery", 0);
+            mqttAndroidClient.subscribe("/OldBunker/spray", 0);
         } else {
-            try {
-                mqttAndroidClient.subscribe("/NewBunker/status", 0);
-                mqttAndroidClient.subscribe("/NewBunker/battery", 0);
-                mqttAndroidClient.subscribe("/NewBunker/spray", 0);
-            } catch (MqttSecurityException e) {
-                e.printStackTrace();
-                Log.d(TAG, "MqttSecurityException--------->" + e.getMessage());
-            } catch (MqttException e) {
-                e.printStackTrace();
-                Log.d(TAG, "MqttException--------->" + e.getMessage());
-            }
+            mqttAndroidClient.subscribe("/NewBunker/status", 0);
+            mqttAndroidClient.subscribe("/NewBunker/battery", 0);
+            mqttAndroidClient.subscribe("/NewBunker/spray", 0);
         }
         Message message = new Message();
         message.what = 3;

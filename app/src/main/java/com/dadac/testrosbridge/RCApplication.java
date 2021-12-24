@@ -25,7 +25,7 @@ public class RCApplication extends Application {
         super.onCreate();
         databaseHelper = new DatabaseHelper(this);
         DataBaseUtil.setDatabaseHelper(databaseHelper);
-        mqttClient = MqttClient.getInstance(this);
+//        mqttClient = MqttClient.getInstance(this);
     }
 
     @Override

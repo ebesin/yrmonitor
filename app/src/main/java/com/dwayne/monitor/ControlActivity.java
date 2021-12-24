@@ -6,9 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-
-import androidx.annotation.RequiresApi;
-
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -18,27 +15,29 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
+
 import com.dadac.testrosbridge.RCApplication;
+import com.dwayne.monitor.bean.Angular;
+import com.dwayne.monitor.bean.Linear;
+import com.dwayne.monitor.bean.Twist;
 import com.dwayne.monitor.enums.ConnectMode;
 import com.dwayne.monitor.enums.DeviceType;
 import com.dwayne.monitor.mqtt.MqttClient;
+import com.dwayne.monitor.ui.BaseActivity;
+import com.dwayne.monitor.view.MyRockerView;
 import com.google.gson.Gson;
 import com.jaygoo.widget.OnRangeChangedListener;
 import com.jaygoo.widget.RangeSeekBar;
 import com.jaygoo.widget.VerticalRangeSeekBar;
 import com.jilk.ros.rosbridge.ROSBridgeClient;
-import com.dwayne.monitor.bean.Angular;
-import com.dwayne.monitor.bean.Linear;
-import com.dwayne.monitor.bean.Twist;
-import com.dwayne.monitor.ui.BaseActivity;
-import com.dwayne.monitor.view.MyRockerView;
 
-import org.eclipse.paho.android.service.MqttAndroidClient;
-import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.math.BigDecimal;
 import java.util.Objects;
+
+import info.mqtt.android.service.MqttAndroidClient;
 
 
 public class ControlActivity extends BaseActivity implements View.OnClickListener {
@@ -192,11 +191,7 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
     private void SendDataToMqtt(String topic, String data) {
         MqttMessage mqttMessage = new MqttMessage();
         mqttMessage.setPayload(data.getBytes());
-        try {
-            mqttAndroidClient.publish(topic, mqttMessage);
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
+        mqttAndroidClient.publish(topic, mqttMessage);
         Log.d(TAG, "SendDataToMqtt:\t" + data);
     }
 
