@@ -6,9 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-
-import androidx.annotation.RequiresApi;
-
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -18,27 +15,29 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
+
 import com.dadac.testrosbridge.RCApplication;
+import com.dwayne.monitor.bean.Angular;
+import com.dwayne.monitor.bean.Linear;
+import com.dwayne.monitor.bean.Twist;
 import com.dwayne.monitor.enums.ConnectMode;
 import com.dwayne.monitor.enums.DeviceType;
 import com.dwayne.monitor.mqtt.MqttClient;
+import com.dwayne.monitor.ui.BaseActivity;
+import com.dwayne.monitor.view.MyRockerView;
 import com.google.gson.Gson;
 import com.jaygoo.widget.OnRangeChangedListener;
 import com.jaygoo.widget.RangeSeekBar;
 import com.jaygoo.widget.VerticalRangeSeekBar;
 import com.jilk.ros.rosbridge.ROSBridgeClient;
-import com.dwayne.monitor.bean.Angular;
-import com.dwayne.monitor.bean.Linear;
-import com.dwayne.monitor.bean.Twist;
-import com.dwayne.monitor.ui.BaseActivity;
-import com.dwayne.monitor.view.MyRockerView;
 
-import org.eclipse.paho.android.service.MqttAndroidClient;
-import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.math.BigDecimal;
 import java.util.Objects;
+
+import info.mqtt.android.service.MqttAndroidClient;
 
 
 public class ControlActivity extends BaseActivity implements View.OnClickListener {
@@ -74,6 +73,10 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
 
     private final Twist twist = new Twist(new Linear(0), new Angular(0));
     private final Twist constant_twist = new Twist(new Linear(0), new Angular(0));
+
+    private final Linear linear= new Linear(0);
+    private final Angular angular = new Angular(0);
+    private final Linear constant_linear = new Linear(0);
     /**
      * 发送线程是否应该终止
      */
@@ -192,11 +195,7 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
     private void SendDataToMqtt(String topic, String data) {
         MqttMessage mqttMessage = new MqttMessage();
         mqttMessage.setPayload(data.getBytes());
-        try {
-            mqttAndroidClient.publish(topic, mqttMessage);
-        } catch (MqttException e) {
-            e.printStackTrace();
-        }
+        mqttAndroidClient.publish(topic, mqttMessage);
         Log.d(TAG, "SendDataToMqtt:\t" + data);
     }
 
@@ -208,16 +207,19 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
                 while (isRunning) {
                     //总开关打开
                     if (isSending) {
+                        twist.setAngular(angular);
                         //如果以恒速行走
                         if (constant_speed) {
+                            twist.setLinear(constant_linear);
                             if (connectMode.equals(ConnectMode.LANMODE)) {
-                                SendDataToRos("cmd_vel", new Gson().toJson(constant_twist));
+                                SendDataToRos("cmd_vel", new Gson().toJson(twist));
                             } else if (connectMode.equals(ConnectMode.REMOTEMODE)) {
-                                SendDataToMqtt("/hunter/control", new Gson().toJson(constant_twist));
+                                SendDataToMqtt("/hunter/control", new Gson().toJson(twist));
                             }
                         }
                         //否则就看摇杆的
                         else {
+                            twist.setLinear(linear);
                             if (connectMode.equals(ConnectMode.LANMODE)) {
                                 SendDataToRos("cmd_vel", new Gson().toJson(twist));
                             } else if (connectMode.equals(ConnectMode.REMOTEMODE)) {
@@ -250,7 +252,8 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
                 Message message = new Message();
                 message.what = 0;
                 handler.sendMessage(message);
-                twist.setLinear(new Linear(linearValue));
+//                twist.setLinear(new Linear(linearValue));
+                linear.setX(linearValue);
                 Log.d("level", String.valueOf(speedLevel_left));
             }
         });
@@ -268,7 +271,8 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
                 message.what = 0;
                 handler.sendMessage(message);
 //                twist.setAngular(new Angular(Math.PI * (angularValue / 180)));
-                twist.setAngular(new Angular(Math.toRadians(angularValue)));
+//                twist.setAngular(new Angular(Math.toRadians(angularValue)));
+                angular.setZ(Math.toRadians(angularValue));
             }
         });
 
@@ -302,7 +306,8 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
                 Message message = new Message();
                 message.what = 0;
                 handler.sendMessage(message);
-                twist.setLinear(new Linear(linearValue));
+//                twist.setLinear(new Linear(linearValue));
+                linear.setX(linearValue);
             }
 
             @Override
@@ -340,7 +345,8 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
                 Message message = new Message();
                 message.what = 0;
                 handler.sendMessage(message);
-                twist.setAngular(new Angular(Math.toRadians(angularValue)));
+//                twist.setAngular(new Angular(Math.toRadians(angularValue)));
+                angular.setZ(Math.toRadians(angularValue));
             }
 
             @Override
@@ -366,7 +372,8 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
                 Message message = new Message();
                 message.what = 0;
                 handler.sendMessage(message);
-                twist.setLinear(new Linear(linearValue));
+//                twist.setLinear(new Linear(linearValue));
+                linear.setX(linearValue);
             }
 
             @Override
@@ -391,7 +398,8 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
                 Message message = new Message();
                 message.what = 0;
                 handler.sendMessage(message);
-                twist.setAngular(new Angular(Math.toRadians(angularValue)));
+//                twist.setAngular(new Angular(Math.toRadians(angularValue)));
+                angular.setZ(Math.toRadians(angularValue));
             }
 
             @Override
@@ -418,7 +426,8 @@ public class ControlActivity extends BaseActivity implements View.OnClickListene
             @Override
             public void onRangeChanged(RangeSeekBar view, float leftValue, float rightValue, boolean isFromUser) {
                 Log.d(TAG, "leftValue:" + new BigDecimal(leftValue).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
-                constant_twist.setLinear(new Linear(new BigDecimal(leftValue).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()));
+//                constant_twist.setLinear(new Linear(new BigDecimal(leftValue).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()));
+                constant_linear.setX(new BigDecimal(leftValue).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue());
             }
 
             @Override

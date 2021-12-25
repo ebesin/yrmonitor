@@ -3,7 +3,12 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Android_App/Monitor/app/src/main/res/drawable/ic_method_draw_image1.xml" value="0.21842105263157896" />
+        <entry key="..\:/Android_App/Monitor/app/src/main/res/layout/activity_control.xml" value="0.19835526315789473" />
         <entry key="..\:/Android_App/Monitor/app/src/main/res/layout/activity_user_detail.xml" value="0.2082236842105263" />
+        <entry key="..\:/Android_App/Monitor/app/src/main/res/layout/botton_sheet2.xml" value="0.14802631578947367" />
+        <entry key="..\:/Android_App/Monitor/app/src/main/res/layout/botton_sheet3.xml" value="0.22" />
+        <entry key="..\:/Android_App/Monitor/app/src/main/res/layout/new_bunker_model_view.xml" value="0.22080471050049066" />
         <entry key="..\:/Android_App/TestRosBridge-master/app/src/main/res/layout/activity_control.xml" value="0.2" />
         <entry key="..\:/Android_App/TestRosBridge-master/app/src/main/res/layout/activity_map3.xml" value="0.2082236842105263" />
         <entry key="..\:/Android_App/TestRosBridge-master/app/src/main/res/layout/botton_sheet2.xml" value="0.2082236842105263" />

@@ -3,15 +3,16 @@ package com.dwayne.monitor.mqtt;
 import android.content.Context;
 import android.util.Log;
 
-import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttActionListener;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.greenrobot.eventbus.EventBus;
+
+import info.mqtt.android.service.Ack;
+import info.mqtt.android.service.MqttAndroidClient;
 
 public class MqttClient {
     private static MqttClient instance;
@@ -45,7 +46,7 @@ public class MqttClient {
     public void connectMQTT() {
         //连接时使用的clientId, 必须唯一, 一般加时间戳
         String clientId = "dwayne" + System.currentTimeMillis();
-        mMqttClient = new MqttAndroidClient(context, "tcp://110.42.159.133:1883", clientId);
+        mMqttClient = new MqttAndroidClient(context, "tcp://110.42.159.133:1883", clientId, Ack.AUTO_ACK);
         //连接参数
         MqttConnectOptions options;
         options = new MqttConnectOptions();
@@ -79,31 +80,21 @@ public class MqttClient {
 
             }
         });
-        try {
-            //进行连接
-            mMqttClient.connect(options, null, new IMqttActionListener() {
-                @Override
-                public void onSuccess(IMqttToken asyncActionToken) {
-                    Log.d(TAG, "onSuccess: 连接成功");
-                    isConnected = true;
-                    try {
-                        mMqttClient.subscribe("test", 0);
-                        onConnectListener.OnConnectSuccess();
-                    } catch (MqttException e) {
-                        e.printStackTrace();
-                        onConnectListener.OnConnectFail("订阅test话题失败\n错误代码："+e.getReasonCode());
-                    }
-                }
-                @Override
-                public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    Log.d(TAG, "onFailure: 连接MQTT服务失败"+exception.getMessage());
-                    onConnectListener.OnConnectFail("连接MQTT服务失败,远程连接功能不可用\n错误代码："+asyncActionToken.getException().getReasonCode());
-                }
-            });
-        } catch (MqttException e) {
-            Log.d(TAG, "onFailure: 连接MQTT服务失败"+e.getMessage());
-            onConnectListener.OnConnectFail("连接MQTT服务失败，远程连接功能不可用\n错误代码："+e.getReasonCode());
-        }
+        //进行连接
+        mMqttClient.connect(options, null, new IMqttActionListener() {
+            @Override
+            public void onSuccess(IMqttToken asyncActionToken) {
+                Log.d(TAG, "onSuccess: 连接成功");
+                isConnected = true;
+                mMqttClient.subscribe("test", 0);
+                onConnectListener.OnConnectSuccess();
+            }
+            @Override
+            public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+                Log.d(TAG, "onFailure: 连接MQTT服务失败"+exception.getMessage());
+                onConnectListener.OnConnectFail("连接MQTT服务失败,远程连接功能不可用\n错误代码："+asyncActionToken.getException().getReasonCode());
+            }
+        });
     }
 
     public boolean isConnected() {
