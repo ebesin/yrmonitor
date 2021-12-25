@@ -52,45 +52,34 @@ import info.mqtt.android.service.MqttAndroidClient;
 
 public class MainActivity extends BaseActivity {
 
-    final String TAG = "MainActivity";
-
-    Toolbar toolbar;
-
+    private final String TAG = "MainActivity";
+    private Toolbar toolbar;
     private RecyclerView recyclerView;
     private DeviceAdapter deviceAdapter;
-    List<Device> devices = new ArrayList<>();
-
-    CatLoadingView mView;
-    Intent robot1_intent;
-
-    ROSBridgeClient client;
-    String ip = "192.168.1.103";
-    ;   //ros的 IP
-    String port = "9090";
-
-    Intent deviceActivity;
-    Bundle bundle;
-
-
-    AlertDialog change_device_info_dialog;
-
-    Context context;
-
-    DeviceDao deviceDao;
-    DeviceTypeDao deviceTypeDao;
-    ConnectModeDao connectModeDao;
-    PortDao portDao;
-
-    EditText device_name_inputview;
-    EditText ip_inputview;
-    EditText port_inputview;
-
-    List<String> allTypeName;
-    List<String> allConnectMode;
-    ArrayAdapter arrayAdapter;
-    ArrayAdapter arrayAdapter2;
-    NiceSpinner deviceTypeSpinner;
-    NiceSpinner connectModeSpinner;
+    private List<Device> devices = new ArrayList<>();
+    private CatLoadingView mView;
+    private Intent robot1_intent;
+    private ROSBridgeClient client;
+    private String ip = "192.168.1.103";
+    //ros的 IP
+    private String port = "9090";
+    private Intent deviceActivity;
+    private Bundle bundle;
+    private AlertDialog change_device_info_dialog;
+    private Context context;
+    private DeviceDao deviceDao;
+    private DeviceTypeDao deviceTypeDao;
+    private ConnectModeDao connectModeDao;
+    private PortDao portDao;
+    private EditText device_name_inputview;
+    private EditText ip_inputview;
+    private EditText port_inputview;
+    private List<String> allTypeName;
+    private List<String> allConnectMode;
+    private ArrayAdapter arrayAdapter;
+    private ArrayAdapter arrayAdapter2;
+    private NiceSpinner deviceTypeSpinner;
+    private NiceSpinner connectModeSpinner;
 
 
     Handler handler = new Handler(new Handler.Callback() {

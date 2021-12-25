@@ -80,7 +80,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
-                app:layout_constraintBottom_toTopOf="@+id/spray_head_2"
+                app:layout_constraintBottom_toBottomOf="@+id/fan_no_1"
                 app:layout_constraintEnd_toStartOf="@+id/fan_no_1"
                 app:layout_constraintTop_toTopOf="@+id/fan_no_1"
                 app:srcCompat="@drawable/progress_20_round" />
@@ -89,74 +89,37 @@
                 android:id="@+id/spray_head_2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="@+id/fan_no_1"
-                app:layout_constraintEnd_toEndOf="@+id/spray_head_1"
-                app:srcCompat="@drawable/progress_40_round" />
-
-            <ImageView
-                android:id="@+id/spray_head_3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
-                app:layout_constraintBottom_toTopOf="@+id/spray_head_4"
-                app:layout_constraintEnd_toEndOf="@+id/spray_head_2"
+                app:layout_constraintBottom_toBottomOf="@+id/fan_no_2"
                 app:layout_constraintEnd_toStartOf="@+id/fan_no_2"
                 app:layout_constraintTop_toTopOf="@+id/fan_no_2"
                 app:srcCompat="@drawable/progress_60_round" />
 
             <ImageView
-                android:id="@+id/spray_head_4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="@+id/fan_no_2"
-                app:layout_constraintEnd_toEndOf="@+id/spray_head_3"
-                app:layout_constraintTop_toBottomOf="@+id/spray_head_3"
-                app:srcCompat="@drawable/progress_40_round" />
-
-            <ImageView
-                android:id="@+id/spray_head_5"
+                android:id="@+id/spray_head_3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
+                android:layout_marginBottom="8dp"
                 android:rotation="180"
-                app:layout_constraintBottom_toTopOf="@+id/spray_head_6"
+                app:layout_constraintBottom_toBottomOf="@+id/fan_no_3"
                 app:layout_constraintStart_toEndOf="@+id/fan_no_3"
                 app:layout_constraintTop_toTopOf="@+id/fan_no_3"
                 app:srcCompat="@drawable/progress_20_round" />
 
             <ImageView
-                android:id="@+id/spray_head_6"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:rotation="180"
-                app:layout_constraintBottom_toBottomOf="@+id/fan_no_3"
-                app:layout_constraintStart_toStartOf="@+id/spray_head_5"
-                app:layout_constraintTop_toBottomOf="@+id/spray_head_5"
-                app:srcCompat="@drawable/progress_40_round" />
-
-            <ImageView
-                android:id="@+id/spray_head_7"
+                android:id="@+id/spray_head_4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
+                android:layout_marginBottom="8dp"
                 android:rotation="180"
-                app:layout_constraintBottom_toTopOf="@+id/spray_head_8"
+                app:layout_constraintBottom_toBottomOf="@+id/fan_no_4"
                 app:layout_constraintStart_toEndOf="@+id/fan_no_4"
                 app:layout_constraintTop_toTopOf="@+id/fan_no_4"
                 app:srcCompat="@drawable/progress_60_round" />
 
-            <ImageView
-                android:id="@+id/spray_head_8"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:rotation="180"
-                app:layout_constraintBottom_toBottomOf="@+id/fan_no_4"
-                app:layout_constraintStart_toStartOf="@+id/spray_head_7"
-                app:layout_constraintTop_toBottomOf="@+id/spray_head_7"
-                app:srcCompat="@drawable/progress_80_round" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

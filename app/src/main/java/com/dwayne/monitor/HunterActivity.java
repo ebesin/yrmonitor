@@ -81,39 +81,28 @@ public class HunterActivity extends BaseActivity implements View.OnClickListener
     private int mScreenWidth;
     private View mPoiColseView;
     private GPSView mGpsView;
-
     private TextView mTvLocTitle;
     private TextView mTvLocation;
-
     private TextView slideUpInfo;
-
-
-    Handler handler;
-    Handler viewhandler;
-
-    CardView charge_cardview;
-    CardView setArgs_cardView;
-    CardView device_state_cardView;
-    CardView remote_control_cardView;
-    Button determine;
+    private Handler handler;
+    private Handler viewhandler;
+    private CardView charge_cardview;
+    private CardView setArgs_cardView;
+    private CardView device_state_cardView;
+    private CardView remote_control_cardView;
+    private Button determine;
     //用来保存数据
-    List<Entry> list = new ArrayList<>();
-
+    private List<Entry> list = new ArrayList<>();
     //电池波纹
-    WaveView charge_waveView;
-    WaveView spray_waveView;
-
+    private WaveView charge_waveView;
+    private WaveView spray_waveView;
     //开关
-    Switch aSwitch;
-
+    private Switch aSwitch;
     //modelview
     private HunterModelView hunterModelView;
-
-    Gson gson = new Gson();
-
+    private Gson gson = new Gson();
     //地图
-    LargeImageView largeImageView;
-
+    private LargeImageView largeImageView;
     /**
      * 数据
      */
@@ -121,43 +110,32 @@ public class HunterActivity extends BaseActivity implements View.OnClickListener
     private HenterSpraySpeedViewModel fanSpeedViewModel2;
     private StatusViewModel statusViewModel;
     private BatteryViewModel batteryViewModel;
-
     //dialog
-    AlertDialog charge_dialog;
-    AlertDialog args_dialog;
-    AlertDialog status_dialog;
-
-
-    Button emergency_stop;
-    Button back_to_home;
-    TextView charge_card_data;
-
+    private AlertDialog charge_dialog;
+    private AlertDialog args_dialog;
+    private AlertDialog status_dialog;
+    private Button emergency_stop;
+    private Button back_to_home;
+    private TextView charge_card_data;
     //status dialog控件
-    TextView speed_data;
-    TextView front_wheel_angle_data;
-    TextView yaw_angle_data;
-    TextView lat_data;
-    TextView lng_data;
-
+    private TextView speed_data;
+    private TextView front_wheel_angle_data;
+    private TextView yaw_angle_data;
+    private TextView lat_data;
+    private TextView lng_data;
     //battery dialog控件
-    TextView charge_data;
-    TextView voltage_data;
-    TextView capacity_data;
-
+    private TextView charge_data;
+    private TextView voltage_data;
+    private TextView capacity_data;
     //args dialog控件
-    EditText speed_data_inputview;
-    EditText angle_data_inputview;
-
-    ConnectMode connectMode;
-
-    Bundle bundle;
-
-
+    private EditText speed_data_inputview;
+    private EditText angle_data_inputview;
+    private ConnectMode connectMode;
+    private Bundle bundle;
     //ros通信
-    ROSBridgeClient rosBridgeClient = null;
-    MqttAndroidClient mqttAndroidClient = null;
-
-    boolean isConn = false;
+    private ROSBridgeClient rosBridgeClient = null;
+    private MqttAndroidClient mqttAndroidClient = null;
+    private boolean isConn = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

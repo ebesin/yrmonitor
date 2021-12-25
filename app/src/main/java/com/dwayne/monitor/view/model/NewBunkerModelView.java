@@ -1,15 +1,15 @@
 package com.dwayne.monitor.view.model;
 
-import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.graphics.drawable.AnimationDrawable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
+
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.dwayne.monitor.R;
 
@@ -60,10 +60,7 @@ public class NewBunkerModelView extends ConstraintLayout {
         sprays[1] = findViewById(R.id.spray_head_2);
         sprays[2] = findViewById(R.id.spray_head_3);
         sprays[3] = findViewById(R.id.spray_head_4);
-        sprays[4] = findViewById(R.id.spray_head_5);
-        sprays[5] = findViewById(R.id.spray_head_6);
-        sprays[6] = findViewById(R.id.spray_head_7);
-        sprays[7] = findViewById(R.id.spray_head_8);
+
         animationDrawable_0_speed = new AnimationDrawable[8];
         animationDrawable_20_speed = new AnimationDrawable[8];
         animationDrawable_40_speed = new AnimationDrawable[8];
@@ -104,36 +101,31 @@ public class NewBunkerModelView extends ConstraintLayout {
                 case 20:
                     fans[i].setImageDrawable(getResources().getDrawable(R.drawable.ic_fan_20));
                     fans[i].startAnimation(animation_20_speed);
-                    sprays[2 * i].setImageDrawable(animationDrawable_20_speed[i]);
-                    sprays[2 * i + 1].setImageDrawable(animationDrawable_20_speed[i]);
+                    sprays[i].setImageDrawable(animationDrawable_20_speed[i]);
                     animationDrawable_20_speed[i].start();
                     break;
                 case 40:
                     fans[i].setImageDrawable(getResources().getDrawable(R.drawable.ic_fan_40));
                     fans[i].startAnimation(animation_40_speed);
-                    sprays[2 * i].setImageDrawable(animationDrawable_40_speed[i]);
-                    sprays[2 * i + 1].setImageDrawable(animationDrawable_40_speed[i]);
+                    sprays[i].setImageDrawable(animationDrawable_40_speed[i]);
                     animationDrawable_40_speed[i].start();
                     break;
                 case 60:
                     fans[i].setImageDrawable(getResources().getDrawable(R.drawable.ic_fan_60));
                     fans[i].startAnimation(animation_60_speed);
-                    sprays[2 * i].setImageDrawable(animationDrawable_60_speed[i]);
-                    sprays[2 * i + 1].setImageDrawable(animationDrawable_60_speed[i]);
+                    sprays[i].setImageDrawable(animationDrawable_60_speed[i]);
                     animationDrawable_60_speed[i].start();
                     break;
                 case 80:
                     fans[i].setImageDrawable(getResources().getDrawable(R.drawable.ic_fan_80));
                     fans[i].startAnimation(animation_80_speed);
-                    sprays[2 * i].setImageDrawable(animationDrawable_80_speed[i]);
-                    sprays[2 * i + 1].setImageDrawable(animationDrawable_80_speed[i]);
+                    sprays[i].setImageDrawable(animationDrawable_80_speed[i]);
                     animationDrawable_80_speed[i].start();
                     break;
                 default:
                     fans[i].setImageDrawable(getResources().getDrawable(R.drawable.ic_fan_20));
                     sprays[i].startAnimation(animation_0_speed);
-                    sprays[2 * i].setImageDrawable(animationDrawable_80_speed[i]);
-                    sprays[2 * i + 1].setImageDrawable(animationDrawable_0_speed[i]);
+                    sprays[i].setImageDrawable(animationDrawable_80_speed[i]);
                     animationDrawable_80_speed[i].start();
             }
         }
